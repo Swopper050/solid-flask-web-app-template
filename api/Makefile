@@ -59,5 +59,5 @@ server:
 	$(DEV_ENV) python server.py 
 
 database:
-	CONTAINER_NAME=react-flask-web-app-template-db-1 ROOT_PASSWORD=$(DB_ROOT_PASSWORD) DB_NAME=$(DB_NAME) DB_USER=$(DB_USER) DB_PASSWORD=$(DB_PASSWORD) ./scripts/create_database.sh
+	CONTAINER_NAME=solid-flask-web-app-template-db-1 ROOT_PASSWORD=$(DB_ROOT_PASSWORD) DB_NAME=$(DB_NAME) DB_USER=$(DB_USER) DB_PASSWORD=$(DB_PASSWORD) ./scripts/create_database.sh
 	python scripts/add_fixtures.py

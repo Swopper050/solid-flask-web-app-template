@@ -1,13 +1,11 @@
-import { JSXElement, Fragment } from "solid-js";
+import { JSXElement } from "solid-js";
 
 import { SideBar } from "../components/SideBar";
+import { PageBase } from "./PageBase";
 
 
-function LandingPage(): JSXElement {
+export function LandingPage(): JSXElement {
   return (
-    <Fragment>
-      <SideBar />
-
-    </Fragment>
+    <PageBase />
   )
 }
