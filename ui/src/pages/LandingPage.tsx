@@ -1,11 +1,12 @@
 import { JSXElement } from "solid-js";
 
-import { SideBar } from "../components/SideBar";
-import { PageBase } from "./PageBase";
 
-
-export function LandingPage(): JSXElement {
+function LandingPage(): JSXElement {
   return (
-    <PageBase />
+    <div>
+      This is the landing page.
+    </div>
   )
 }
+
+export default LandingPage;
