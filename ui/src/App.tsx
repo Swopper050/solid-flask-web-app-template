@@ -1,5 +1,5 @@
 import type { Component } from 'solid-js';
-import { useRoutes } from '@solidjs/router';
+import { useRoutes, A } from '@solidjs/router';
 
 import { routes } from './routes';
 
@@ -11,9 +11,9 @@ const App: Component = () => {
       <input id="main-sidebar" type="checkbox" class="drawer-toggle" />
       <div class="drawer-side border-r">
         <ul class="menu bg-base-200 text-base-content min-h-full w-56">
-          <li><a href="/" class="text-xl font-bold mb-2">My solid app</a></li>
-          <li><a href="/home">Home</a></li>
-          <li><a href="/about">About</a></li>
+          <li><A role="button" class="btn text-xl font-bold mb-2" href="/">My solid app</A></li>
+          <li class="h-14"><A role="button" class="btn" activeClass="btn-outline" href="/home">Home</A></li>
+          <li class="h-14"><A role="button" class="btn" activeClass="btn-outline" href="/about">About</A></li>
         </ul>
       </div>
 
