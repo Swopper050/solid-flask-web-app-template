@@ -1,27 +1,27 @@
 import type { Component } from 'solid-js';
-import { useRoutes, A } from '@solidjs/router';
+import { useRoutes, useNavigate } from '@solidjs/router';
 
 import { routes } from './routes';
+import ProfileMenu from "./components/ProfileMenu";
 
 const App: Component = () => {
   const Route = useRoutes(routes);
+  const navigate = useNavigate();
 
   return (
     <div class="drawer drawer-open">
       <input id="main-sidebar" type="checkbox" class="drawer-toggle" />
       <div class="drawer-side border-r">
         <ul class="menu bg-base-200 text-base-content min-h-full w-56">
-          <li><A role="button" class="btn text-xl font-bold mb-2" href="/">My solid app</A></li>
-          <li class="h-14"><A role="button" class="btn" activeClass="btn-outline" href="/home">Home</A></li>
-          <li class="h-14"><A role="button" class="btn" activeClass="btn-outline" href="/about">About</A></li>
+          <li class="mb-2"><ProfileMenu /></li>
+          <li class="mb-1"><a onClick={() => navigate('/home')}>Home</a></li>
+          <li class="mb-1"><a onClick={() => navigate("/about")}>About</a></li>
         </ul>
       </div>
 
       <div class="drawer-content flex flex-col">
         <div class="navbar bg-base-100">
-          <div class="flex-1">
-            joe
-          </div>
+          <div class="flex-1"></div>
           <div class="flex-none">
             <button class="btn btn-square btn-ghost">
               <svg
