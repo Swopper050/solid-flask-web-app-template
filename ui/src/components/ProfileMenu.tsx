@@ -3,7 +3,7 @@ import {JSXElement} from "solid-js";
 
 function ProfileMenu(): JSXElement {
   return (
-    <div tabindex="0" class="dropdown dropdown-bottom">
+    <div tabindex="0" class="dropdown dropdown-bottom relative">
       <div class="avatar">
         <div class="mask mask-squircle w-6">
           <i class="fas fa-check"></i>
@@ -11,7 +11,7 @@ function ProfileMenu(): JSXElement {
       </div>
       <div
         tabindex="0"
-        class="dropdown-content card card-compact bg-primary text-primary-content z-[1] w-64 p-2 shadow"
+        class="dropdown-content card card-compact bg-primary text-primary-content z-[1] w-64 p-2 shadow absolute"
       >
         <div class="card-body">
           <h3 class="card-title">Card title!</h3>
