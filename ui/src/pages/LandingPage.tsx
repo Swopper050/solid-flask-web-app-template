@@ -1,7 +1,7 @@
 import { JSXElement } from "solid-js";
 
-import puppy from '../../public/puppy.jpg';
-import preikestolen from '../../public/preikestolen.jpg';
+import puppy from '/puppy.jpg';
+import preikestolen from '/preikestolen.jpg';
 
 import { ThemeSwitcher } from "../components/ThemeSwitcher";
 import { LoginModal } from "../components/LoginModal";
