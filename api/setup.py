@@ -8,7 +8,7 @@ setup(
     packages=find_packages(),
     install_requires=[
         "flask==3.0.3",
-        "flask-jwt-extended==4.6.0",
+        "flask-login==0.6.3",
         "flask-restx==1.3.0",
         "flask-sqlalchemy==3.1.1",
         "marshmallow==3.21.3",

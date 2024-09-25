@@ -4,6 +4,7 @@ from marshmallow import Schema, fields, validate
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from werkzeug.security import check_password_hash, generate_password_hash
+from flask_login import UserMixin
 
 from app.db.database import db
 
@@ -11,13 +12,12 @@ if TYPE_CHECKING:
     from app.db.post import Post
 
 
-class User(db.Model):
+class User(db.Model, UserMixin):
     __tablename__ = "user"
 
     id: Mapped[int] = mapped_column(primary_key=True)
 
     email: Mapped[str] = mapped_column(String(100), unique=True, index=True)
-    name: Mapped[str] = mapped_column(String(30), nullable=False)
     is_admin: Mapped[bool] = mapped_column(default=False)
     hashed_password: Mapped[str] = mapped_column(String(256))
 
@@ -32,6 +32,5 @@ class User(db.Model):
 
 class UserSchema(Schema):
     id = fields.Integer()
-    name = fields.String(validate=validate.Length(max=30))
     email = fields.String(validate=validate.Length(max=100))
     is_admin = fields.Boolean()

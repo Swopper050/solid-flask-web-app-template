@@ -1,4 +1,5 @@
-import { JSXElement } from "solid-js";
+import { JSXElement, Show } from "solid-js";
+import { A } from "@solidjs/router";
 
 import puppy from '/puppy.jpg';
 import preikestolen from '/preikestolen.jpg';
@@ -6,28 +7,44 @@ import preikestolen from '/preikestolen.jpg';
 import { ThemeSwitcher } from "../components/ThemeSwitcher";
 import { LoginModal } from "../components/LoginModal";
 import { RegisterModal } from "../components/RegisterModal";
+import { useUser } from "../context";
 
 export function LandingPage(): JSXElement {
+  const { user } = useUser();
+
   return (
     <>
       <div class="navbar fixed bg-base-100 top-0 left-0">
         <div class="flex-1">
-          <a class="btn btn-ghost text-xl">My solid app</a>
+          <A class="btn btn-ghost text-xl" href="">My solid app</A>
         </div>
 
         <ThemeSwitcher />
-        <div class="flex-none mx-1">
-          <button class="btn btn-ghost" onClick={() => document.getElementById("login_modal").showModal()}>
-            Login
-          </button>
-          <LoginModal />
-        </div>
-        <div class="flex-none mx-1">
-          <button class="btn btn-ghost" onClick={() => document.getElementById("register_modal").showModal()}>
-            Register
-          </button>
-          <RegisterModal />
-        </div>
+
+        <Show
+          when={user() === null}
+          fallback={
+            <div class="flex-none mx-1">
+              <A class="btn btn-ghost" href="/home">
+                To the app
+              </A>
+            </div>
+          }
+        >
+          <div class="flex-none mx-1">
+            <button class="btn btn-ghost" onClick={() => document.getElementById("login_modal").showModal()}>
+              Login
+            </button>
+            <LoginModal />
+          </div>
+
+          <div class="flex-none mx-1">
+            <button class="btn btn-ghost" onClick={() => document.getElementById("register_modal").showModal()}>
+              Register
+            </button>
+            <RegisterModal />
+          </div>
+        </Show>
       </div>
 
       <div class="flex justify-center mt-40">

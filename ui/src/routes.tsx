@@ -1,24 +1,41 @@
-import { createEffect, JSXElement } from "solid-js";
+import { JSXElement, Show } from "solid-js";
 
 import { lazy } from 'solid-js';
-import { useNavigate } from "@solidjs/router";
+import { Navigate } from "@solidjs/router";
 import type { RouteDefinition } from '@solidjs/router';
 
+import { useUser } from "./context";
 import { LandingPage } from "./pages/LandingPage";
 import { Home } from "./pages/Home";
+import { BasePage } from "./pages/BasePage";
 
 
 function ProtectedRoute(props: {route: () => JSXElement}): JSXElement {
-  const navigate = useNavigate();
+  const { user, loading } = useUser();
 
-  createEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      navigate("/login");
-    }
-  });
+  console.log(loading())
+  console.log(localStorage.getItem("access_token"))
+  console.log(user())
 
-  return <>{props.route()}</>;
+  return (
+    <Show
+      when={!loading() && user() === null}
+      fallback={
+        <Show
+          when={loading()}
+          fallback={props.route()}
+        >
+          <div class="flex flex-col justify-center items-center h-screen w-screen">
+            <div class="loading loading-ball text-neutral loading-lg mb-3" />
+            <div class="text-lg text-neutral font-bold">Loading...</div>
+          </div>
+        </Show>
+      }
+    >
+      <Navigate href="/"/>
+    </Show>
+    
+  )
 };
 
 export default ProtectedRoute;
@@ -30,7 +47,7 @@ export const routes: RouteDefinition[] = [
   },
   {
     path: '/home',
-    component: () => <ProtectedRoute route={Home} />
+    component: () => <ProtectedRoute route={() => <BasePage mainComponent={Home} />} />
   },
   {
     path: '/about',

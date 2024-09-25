@@ -1,10 +1,24 @@
-import { JSXElement } from "solid-js";
+import { createSignal, createEffect, JSXElement } from "solid-js";
 
 
 export function ThemeSwitcher(): JSXElement {
+  const [isDark, setIsDark] = createSignal<boolean>(
+    JSON.parse(localStorage.getItem("isDark")) ?? false
+  )
+
+  createEffect(() => {
+    localStorage.setItem("isDark", JSON.stringify(isDark()))
+  })
+
   return (
     <label class="swap swap-rotate mx-2">
-      <input type="checkbox" class="theme-controller" value="dark" />
+      <input
+        type="checkbox"
+        class="theme-controller"
+        checked={isDark()}
+        value="dark"
+        onChange={() => setIsDark(!isDark())}
+      />
     
       <svg
         class="swap-off h-6 w-6 fill-current"

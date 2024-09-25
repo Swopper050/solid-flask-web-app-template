@@ -2,7 +2,7 @@ import os
 from io import BytesIO
 
 from flask import request, send_file
-from flask_jwt_extended import current_user, jwt_required
+from flask_login import current_user, login_required
 from flask_restx import Resource
 
 import app.config as config
@@ -15,7 +15,7 @@ from minio.error import S3Error
 
 @api.route("/user/<int:id>")
 class UserResource(Resource):
-    @jwt_required()
+    @login_required
     def get(self, id: int):
         if current_user is None:
             return {"error_message": "User is not logged in"}, 401
@@ -26,7 +26,7 @@ class UserResource(Resource):
         user = User.query.get(id)
         return UserSchema().dump(user)
 
-    @jwt_required()
+    @login_required
     def put(self, id: int):
         if current_user is None:
             return {"error_message": "User is not logged in"}, 401
@@ -45,7 +45,7 @@ class UserResource(Resource):
 
 @api.route("/user/<int:id>/profile_picture")
 class ProfilePictureResource(Resource):
-    @jwt_required()
+    @login_required
     def get(self, id: int):
         user = User.query.get(id)
         if user is None:
@@ -64,7 +64,7 @@ class ProfilePictureResource(Resource):
             as_attachment=False,
         )
 
-    @jwt_required()
+    @login_required
     def post(self, id: int):
         if current_user is None:
             return {"error_message": "User is not logged in"}, 401
