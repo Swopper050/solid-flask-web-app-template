@@ -12,10 +12,6 @@ import { BasePage } from './pages/BasePage'
 function ProtectedRoute(props: { route: () => JSXElement }): JSXElement {
   const { user, loading } = useUser()
 
-  console.log(loading())
-  console.log(localStorage.getItem('access_token'))
-  console.log(user())
-
   return (
     <Show
       when={!loading() && user() === null}

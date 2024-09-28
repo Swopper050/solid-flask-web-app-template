@@ -23,19 +23,21 @@ export const UserProvider = (props: { children: JSXElement }) => {
   const [loading, setLoading] = createSignal(true)
 
   onMount(() => {
-    try {
-      api.get('/whoami').then(async (response) => {
+    api
+      .get('/whoami')
+      .then(async (response) => {
         if (response.status === 200) {
           setUser(new User(response.data))
         } else {
           setUser(null)
         }
+
+        setLoading(false)
       })
-    } catch {
-      setUser(null)
-    } finally {
-      setLoading(false)
-    }
+      .catch(() => {
+        setUser(null)
+        setLoading(false)
+      })
   })
 
   return (

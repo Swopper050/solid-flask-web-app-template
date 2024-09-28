@@ -59,11 +59,11 @@ export function LandingPage(): JSXElement {
 
       <div class="flex justify-center mt-40">
         <h1 class="text-4xl font-bold">
-          This is
+          {'This is '}
           <span class="text-transparent bg-clip-text bg-gradient-to-tr from-primary to-secondary">
-            your
+            {'your '}
           </span>
-          web application.
+          {'web application.'}
         </h1>
       </div>
       <div class="flex justify-center mt-5">
