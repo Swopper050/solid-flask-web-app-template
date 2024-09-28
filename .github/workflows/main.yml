@@ -1,0 +1,56 @@
+name: 
+
+on:
+  push:
+    branches: [ "develop" ]
+  pull_request:
+    branches: [ "develop" ]
+
+jobs:
+  lint-ui:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup npm
+      uses: actions/setup-node@v4
+      with:
+        node-version: 22.4.0
+
+    - name: Install dependencies
+      run: cd ui && make deps
+
+    - name: Lint
+      run: cd ui && make lint
+
+  lint-api:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup python
+      uses: actions/setup-python@v5
+      with:
+        python-version: 3.12
+
+    - name: Install dependencies
+      run: cd api && make deps
+
+    - name: Lint
+      run: cd api && make lint
+
+  tests-api:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup python
+      uses: actions/setup-python@v5
+      with:
+        python-version: 3.12
+
+    - name: Install dependencies
+      run: cd api && make deps
+
+    - name: Tests
+      run: cd api && make test
