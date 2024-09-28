@@ -1,10 +1,10 @@
 from typing import TYPE_CHECKING, List
 
+from flask_login import UserMixin
 from marshmallow import Schema, fields, validate
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from werkzeug.security import check_password_hash, generate_password_hash
-from flask_login import UserMixin
 
 from app.db.database import db
 

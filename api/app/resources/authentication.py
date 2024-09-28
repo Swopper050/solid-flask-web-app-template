@@ -1,5 +1,5 @@
 from flask import request
-from flask_login import login_user, login_required, logout_user, current_user
+from flask_login import current_user, login_required, login_user, logout_user
 from flask_restx import Resource
 from marshmallow import Schema, fields
 
