@@ -1,8 +1,8 @@
-import { JSXElement } from 'solid-js';
-import { A } from '@solidjs/router';
+import { JSXElement } from 'solid-js'
+import { A } from '@solidjs/router'
 
-import ProfileMenu from "../components/ProfileMenu";
-import { ThemeSwitcher } from "../components/ThemeSwitcher";
+import ProfileMenu from '../components/ProfileMenu'
+import { ThemeSwitcher } from '../components/ThemeSwitcher'
 
 interface BasePageProps {
   mainComponent: () => JSXElement
@@ -13,9 +13,13 @@ export function BasePage(props: BasePageProps): JSXElement {
     <div class="drawer drawer-open">
       <input id="main-sidebar" type="checkbox" class="drawer-toggle" />
       <div class="flex flex-col drawer-side bg-base-200">
-        <A class="btn btn-ghost text-xl flex-1 m-2" href="/">My solid app</A>
+        <A class="btn btn-ghost text-xl flex-1 m-2" href="/">
+          My solid app
+        </A>
         <ul class="menu text-base-content flex-1 w-56">
-          <li class="mb-1 font-bold"><A href="/home">Home</A></li>
+          <li class="mb-1 font-bold">
+            <A href="/home">Home</A>
+          </li>
         </ul>
       </div>
 
@@ -30,10 +34,8 @@ export function BasePage(props: BasePageProps): JSXElement {
           </div>
         </div>
 
-        <main>
-          {props.mainComponent()}
-        </main>
+        <main>{props.mainComponent()}</main>
       </div>
     </div>
-  );
-};
+  )
+}

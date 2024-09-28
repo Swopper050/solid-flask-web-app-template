@@ -29,7 +29,7 @@ export class BaseModel<TModelAttributes extends BaseModelAttributes> {
   }
 
   async put(updateWithResult: boolean = true) {
-    let request: Promise<Response>;
+    let request: Promise<Response>
     if (this.attrs.id !== null) {
       request = api.put(
         `${this.apiUrl}/${this.attrs.id}`,

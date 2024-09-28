@@ -1,19 +1,26 @@
-import { createContext, createSignal, onMount, useContext, Accessor, JSXElement } from "solid-js";
+import {
+  createContext,
+  createSignal,
+  onMount,
+  useContext,
+  Accessor,
+  JSXElement,
+} from 'solid-js'
 
-import api from "./api";
-import { User } from "./models/User";
+import api from './api'
+import { User } from './models/User'
 
 interface UserContextAttributes {
-  user: Accessor<User> | null;
+  user: Accessor<User> | null
   setUser: (user: User | null) => void
-  loading: Accessor<boolean>;
+  loading: Accessor<boolean>
 }
 
-const UserContext = createContext<UserContextAttributes | null>(null);
+const UserContext = createContext<UserContextAttributes | null>(null)
 
-export const UserProvider = (props: {children: JSXElement}) => {
-  const [user, setUser] = createSignal<User | null>(null);
-  const [loading, setLoading] = createSignal(true);
+export const UserProvider = (props: { children: JSXElement }) => {
+  const [user, setUser] = createSignal<User | null>(null)
+  const [loading, setLoading] = createSignal(true)
 
   onMount(() => {
     try {
@@ -21,28 +28,28 @@ export const UserProvider = (props: {children: JSXElement}) => {
         if (response.status === 200) {
           setUser(new User(response.data))
         } else {
-          setUser(null);
+          setUser(null)
         }
       })
     } catch {
-      setUser(null);
+      setUser(null)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
   })
 
   return (
-    <UserContext.Provider value={{user: user, setUser, loading: loading}}>
+    <UserContext.Provider value={{ user: user, setUser, loading: loading }}>
       {props.children}
     </UserContext.Provider>
   )
 }
 
 export const useUser = (): UserContextAttributes => {
-  const userContext = useContext(UserContext);
+  const userContext = useContext(UserContext)
   if (userContext === null) {
-      throw new Error("useUser can only be used within a UserProvider");
+    throw new Error('useUser can only be used within a UserProvider')
   }
 
-  return userContext;
+  return userContext
 }

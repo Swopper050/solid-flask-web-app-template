@@ -34,7 +34,7 @@ export class User extends BaseModel<UserAttributes> {
   }
 
   get isAdmin(): boolean {
-    return super.get("is_admin");
+    return super.get('is_admin')
   }
 
   get accessToken(): string | null {

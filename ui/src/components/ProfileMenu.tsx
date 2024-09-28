@@ -1,36 +1,39 @@
-import {createSignal, JSXElement, Show} from "solid-js";
-import {useNavigate} from "@solidjs/router";
-import { clsx } from "clsx";
+import { createSignal, JSXElement, Show } from 'solid-js'
+import { useNavigate } from '@solidjs/router'
+import { clsx } from 'clsx'
 
-import { useUser } from "../context";
-import { DotsIcon } from "./icons/Dots";
+import { useUser } from '../context'
+import { DotsIcon } from './icons/Dots'
 
-import api from "../api";
-
+import api from '../api'
 
 function ProfileMenu(): JSXElement {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
-  const { user, setUser } = useUser();
-  const [loggingOut, setLoggingOut] = createSignal(false);
-  const [showLogoutFailedToast, setShowLogoutFailedToast] = createSignal(false);
+  const { user, setUser } = useUser()
+  const [loggingOut, setLoggingOut] = createSignal(false)
+  const [showLogoutFailedToast, setShowLogoutFailedToast] = createSignal(false)
 
   const timeLogoutFailedToast = () => {
-    setShowLogoutFailedToast(true);
-    setTimeout(() => setShowLogoutFailedToast(false), 5000);
+    setShowLogoutFailedToast(true)
+    setTimeout(() => setShowLogoutFailedToast(false), 5000)
   }
 
   const logout = async () => {
     setLoggingOut(true)
 
-    api.post("/logout").then(() => {
-      setUser(null);
-      navigate("/");
-    }).catch(() => {
-      timeLogoutFailedToast();
-    }).finally(() => {
-      setLoggingOut(false);
-    })
+    api
+      .post('/logout')
+      .then(() => {
+        setUser(null)
+        navigate('/')
+      })
+      .catch(() => {
+        timeLogoutFailedToast()
+      })
+      .finally(() => {
+        setLoggingOut(false)
+      })
   }
 
   return (
@@ -48,8 +51,19 @@ function ProfileMenu(): JSXElement {
           </button>
         </li>
         <li class="text-left">
-          <button class={clsx("btn", "btn-ghost", "text-left", loggingOut() && "btn-disabled")} onClick={logout}>
-            <Show when={loggingOut()} fallback={<i class="fa-solid fa-arrow-right-from-bracket" />}>
+          <button
+            class={clsx(
+              'btn',
+              'btn-ghost',
+              'text-left',
+              loggingOut() && 'btn-disabled'
+            )}
+            onClick={logout}
+          >
+            <Show
+              when={loggingOut()}
+              fallback={<i class="fa-solid fa-arrow-right-from-bracket" />}
+            >
               <span class="loading loading-ball text-neutral loading-sm" />
             </Show>
             Logout
@@ -68,4 +82,4 @@ function ProfileMenu(): JSXElement {
   )
 }
 
-export default ProfileMenu;
+export default ProfileMenu
