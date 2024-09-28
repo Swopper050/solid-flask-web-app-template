@@ -1,20 +1,53 @@
-import { lazy } from 'solid-js';
-import type { RouteDefinition } from '@solidjs/router';
+import { JSXElement, Show } from 'solid-js'
 
-import { LandingPage } from './pages/LandingPage';
+import { lazy } from 'solid-js'
+import { Navigate } from '@solidjs/router'
+import type { RouteDefinition } from '@solidjs/router'
+
+import { useUser } from './context'
+import { LandingPage } from './pages/LandingPage'
+import { Home } from './pages/Home'
+import { BasePage } from './pages/BasePage'
+
+function ProtectedRoute(props: { route: () => JSXElement }): JSXElement {
+  const { user, loading } = useUser()
+
+  return (
+    <Show
+      when={!loading() && user() === null}
+      fallback={
+        <Show when={loading()} fallback={props.route()}>
+          <div class="flex flex-col justify-center items-center h-screen w-screen">
+            <div class="loading loading-ball text-neutral loading-lg mb-3" />
+            <div class="text-lg text-neutral font-bold">Loading...</div>
+          </div>
+        </Show>
+      }
+    >
+      <Navigate href="/" />
+    </Show>
+  )
+}
+
+export default ProtectedRoute
 
 export const routes: RouteDefinition[] = [
   {
     path: '/',
-    component: LandingPage,
+    component: () => <LandingPage />,
+  },
+  {
+    path: '/home',
+    component: () => (
+      <ProtectedRoute route={() => <BasePage mainComponent={Home} />} />
+    ),
+  },
+  {
+    path: '/about',
+    component: lazy(() => import('./pages/About')),
   },
   //{
-    //path: '/about',
-    //component: lazy(() => import('./pages/about')),
-    //data: AboutData,
+  //path: '**',
+  //component: lazy(() => import('./errors/404')),
   //},
-  //{
-    //path: '**',
-    //component: lazy(() => import('./errors/404')),
-  //},
-];
+]

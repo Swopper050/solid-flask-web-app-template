@@ -5,7 +5,6 @@ from app.db import User
 def add_users(db):
     user = User(
         email="admin@test.nl",
-        name="admin",
         is_admin=True,
     )
     user.set_password("admin")

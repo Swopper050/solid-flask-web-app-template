@@ -1,0 +1,143 @@
+import { JSXElement, createSignal, Show } from 'solid-js'
+import { useNavigate } from '@solidjs/router'
+import { clsx } from 'clsx'
+
+import { EmailIcon } from './icons/Email'
+import { PasswordIcon } from './icons/Password'
+import api from '../api'
+
+import { useUser } from '../context'
+import { User } from '../models/User'
+
+export function RegisterModal(): JSXElement {
+  const { setUser } = useUser()
+  const [email, setEmail] = createSignal<string | null>(null)
+  const [password, setPassword] = createSignal<string | null>(null)
+  const [checkPassword, setCheckPassword] = createSignal<string | null>(null)
+  const [errorMsg, setErrorMsg] = createSignal<string | null>(null)
+  const [submitting, setSubmitting] = createSignal(false)
+
+  const navigate = useNavigate()
+
+  let registerModalRef: HTMLDialogElement | undefined
+
+  const passwordsMatch = () => {
+    return password() === checkPassword()
+  }
+
+  const formReady = () => {
+    return passwordsMatch() && password() !== null && email !== null
+  }
+
+  const handleLogin = async () => {
+    setSubmitting(true)
+
+    api
+      .post(
+        '/register',
+        JSON.stringify({ email: email(), password: password() })
+      )
+      .then((response) => {
+        setUser(new User(response.data))
+        registerModalRef?.close()
+        navigate('/home')
+      })
+      .catch((error) => {
+        setErrorMsg(error.response.data.error_message)
+      })
+      .finally(() => {
+        setSubmitting(false)
+      })
+  }
+
+  return (
+    <dialog ref={registerModalRef} id="register_modal" class="modal">
+      <div class="modal-box">
+        <h3 class="flex justify-center text-lg font-bold mb-6">Register</h3>
+
+        <form method="dialog">
+          <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
+            ✕
+          </button>
+        </form>
+
+        <label class="input input-bordered flex items-center gap-2 mb-3">
+          <EmailIcon />
+          <input
+            type="text"
+            class="grow"
+            placeholder="your@email.com"
+            value={email()}
+            onInput={(e) =>
+              setEmail(e.target.value === '' ? null : e.target.value)
+            }
+          />
+        </label>
+
+        <label class="input input-bordered flex items-center gap-2 mb-3">
+          <PasswordIcon />
+          <input
+            type="password"
+            class="grow"
+            placeholder="Your password"
+            value={password()}
+            onInput={(e) =>
+              setPassword(e.target.value === '' ? null : e.target.value)
+            }
+          />
+        </label>
+
+        <label
+          class={clsx(
+            'input',
+            'input-bordered',
+            'flex',
+            'items-center',
+            'gap-2',
+            !passwordsMatch() && 'input-error'
+          )}
+        >
+          <PasswordIcon />
+          <input
+            type="password"
+            class="grow"
+            placeholder="Confirm password"
+            value={checkPassword()}
+            onInput={(e) =>
+              setCheckPassword(e.target.value === '' ? null : e.target.value)
+            }
+          />
+        </label>
+        <Show when={!passwordsMatch()}>
+          <div class="label">
+            <span class="label-text-alt text-error">
+              Passwords do not match
+            </span>
+          </div>
+        </Show>
+
+        <Show when={errorMsg() !== null}>
+          <div role="alert" class="alert alert-error my-6">
+            <span>{errorMsg()}</span>
+          </div>
+        </Show>
+
+        <div class="modal-action flex justify-center">
+          <button
+            class={clsx(
+              'btn',
+              'btn-primary',
+              (submitting() || !formReady()) && 'btn-disabled'
+            )}
+            onClick={handleLogin}
+          >
+            <Show when={submitting()}>
+              <span class="loading loading-spinner" />
+            </Show>
+            Register
+          </button>
+        </div>
+      </div>
+    </dialog>
+  )
+}

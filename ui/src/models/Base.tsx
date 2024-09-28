@@ -1,4 +1,4 @@
-import { get, put } from '../fetch'
+import api from '../api'
 
 export interface BaseModelAttributes {
   id: number | null
@@ -25,18 +25,18 @@ export class BaseModel<TModelAttributes extends BaseModelAttributes> {
   }
 
   async fetch() {
-    this.updateAttributesWithResult(get(`${this.apiUrl}/${this.attrs.id}`))
+    this.updateAttributesWithResult(api.get(`${this.apiUrl}/${this.attrs.id}`))
   }
 
   async put(updateWithResult: boolean = true) {
-    let request: Promise<Response>;
+    let request: Promise<Response>
     if (this.attrs.id !== null) {
-      request = put(
+      request = api.put(
         `${this.apiUrl}/${this.attrs.id}`,
         JSON.stringify(this.attrs)
       )
     } else {
-      request = put(this.apiUrl, JSON.stringify(this.attrs))
+      request = api.put(this.apiUrl, JSON.stringify(this.attrs))
     }
 
     if (updateWithResult) {

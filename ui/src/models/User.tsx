@@ -10,7 +10,7 @@ export interface UserAttributes extends BaseModelAttributes {
 
 export class User extends BaseModel<UserAttributes> {
   apiUrl = '/user'
-  attrs: UserAttributes
+  declare attrs: UserAttributes
 
   constructor(attrs: UserAttributes) {
     super(attrs)
@@ -34,7 +34,7 @@ export class User extends BaseModel<UserAttributes> {
   }
 
   get isAdmin(): boolean {
-    return super.get("is_admin");
+    return super.get('is_admin')
   }
 
   get accessToken(): string | null {
