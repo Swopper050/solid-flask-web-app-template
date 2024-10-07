@@ -56,7 +56,7 @@ test: ## Run tests
 	$(PYTEST)
 
 server: ## Start development server
-	$(DEV_ENV) python server.py 
+	$(DEV_ENV) flask --app server run
 
 fixtures: ## Adds initial fixtures to the database
 	python scripts/add_fixtures.py
