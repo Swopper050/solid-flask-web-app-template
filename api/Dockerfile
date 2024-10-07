@@ -11,7 +11,7 @@ ENV PATH="/home/my-solid-app/venv/bin:$PATH"
 COPY --chown=my-solid-app requirements.txt requirements.txt
 RUN pip install -r requirements.txt
 
-COPY . .
+COPY --chown=my-solid-app . .
 
 EXPOSE 5000
 
