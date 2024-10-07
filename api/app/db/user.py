@@ -4,7 +4,7 @@ from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from app.db.database import db
+from app.extensions import db
 
 
 class User(db.Model, UserMixin):

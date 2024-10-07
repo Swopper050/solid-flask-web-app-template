@@ -1,7 +1,15 @@
 from flask import Flask
 
-import app.config as config
+from app.extensions import api, login_manager, db
+from app.config import DevConfig, TestConfig, ProdConfig
 
-app = Flask(__name__)
-app.config["SQLALCHEMY_DATABASE_URI"] = config.SQLALCHEMY_DATABASE_URL
-app.config["SECRET_KEY"] = config.MY_SOLID_APP_SECRET_KEY
+
+def create_app(config_object: DevConfig | ProdConfig | TestConfig = ProdConfig()):
+    app = Flask(__name__)
+    app.config.from_object(config_object)
+
+    db.init_app(app)
+    login_manager.init_app(app)
+    api.init_app(app)
+
+    return app
