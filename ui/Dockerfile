@@ -1,12 +1,17 @@
-FROM node:20-alpine AS build
+FROM node:20-slim AS build
+
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
 
 WORKDIR /app
-COPY package*.json ./
-RUN npm install
+COPY package.json package.json
+COPY pnpm-lock.yaml pnpm-lock.yaml
+RUN pnpm install
 
 COPY . .
 
-RUN npm run build
+RUN pnpm run build
 
 
 FROM nginx:1

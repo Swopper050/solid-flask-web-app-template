@@ -11,20 +11,20 @@ help:  ## Display this help
 
 deps: ## Install all dependencies
 	rm -rf node_modules/
-	npm install
+	pnpm install
 
 format: ## Format code with eslint and prettier
-	npx eslint $(LINT_FILES) --fix
-	npx prettier --write $(LINT_FILES)
+	pnpm eslint $(LINT_FILES) --fix
+	pnpm prettier --write $(LINT_FILES)
 
 lint: ## Run lint check with eslint and prettier
-	npx eslint $(LINT_FILES)
-	npx prettier --check $(LINT_FILES)
+	pnpm eslint $(LINT_FILES)
+	pnpm prettier --check $(LINT_FILES)
 
 formatlint: format lint ## First format code, then run linters
 
 server: ## Start the development server
-	npm run dev
+	pnpm run dev
 
 docker_latest: ## Build a docker container and tag it with the current git version tag and 'latest'
 	docker build -t $(DOCKERHUB_NAMESPACE)/my-solid-app-ui:$(VERSION) -t $(DOCKERHUB_NAMESPACE)/my-solid-app-ui:latest .
