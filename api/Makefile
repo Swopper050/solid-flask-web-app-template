@@ -1,63 +1,81 @@
 LINT_FILES=server.py app/ tests/ scripts/
 TEST_PATH=tests
 PYTEST=pytest $(TEST_PATH) --pythonwarnings=once
+VERSION = $(shell git describe --tags --always)
 
-DB_ROOT_PASSWORD=myapp_root_password
-DB_USER=myapp_user
-DB_PASSWORD=myapp_password
-DB_NAME=myapp_db
+DOCKERHUB_NAMESPACE=test
+
+DB_ROOT_PASSWORD=my_solid_app_db_root_password
+DB_USER=my_solid_app_user
+DB_PASSWORD=my_solid_app_password
+DB_NAME=my_solid_app_db
 DB_HOST=127.0.0.1
 DB_PORT=3306
 DB_URL=mysql://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)
 
-DEV_ENV=DB_NAME=$(DB_NAME) DB_USER=$(DB_USER) DB_PASSWORD=$(DB_PASSWORD) DB_HOST=$(DB_HOST) DB_PORT=$(DB_PORT)
+DEV_ENV=MY_SOLID_APP_DB_NAME=$(DB_NAME) \
+  MY_SOLID_APP_DB_USER=$(DB_USER) \
+  MY_SOLID_APP_DB_PASSWORD=$(DB_PASSWORD) \
+  MY_SOLID_APP_DB_HOST=$(DB_HOST) \
+  MY_SOLID_APP_DB_PORT=$(DB_PORT)
 
 
-help:
-	$(call echotask,"pip","Updates pip.")
-	$(call echotask,"deps_dev","Installs development dependencies.")
-	$(call echotask,"deps_prod","Installs application dependencies.")
-	$(call echotask,"deps","Installs dev and application dependencies.")
-	$(call echotask,"format","Runs black, isort and flake8.")
-	$(call echotask,"format_check","Runs black, isort in check only mode.")
-	$(call echotask,"flake8","Runs flake8.")
-	$(call echotask,"lint","Runs black, isort and flake8 in check only mode.")
-	$(call echotask,"formatlint","Formats the code and then lints it.")
-	$(call echotask,"test","Runs all tests.")
-	$(call echotask,"server","Runs the API.")
+##@ Utility
+help:  ## Display this help
+	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m\033[0m\n"} /^[a-zA-Z_-]+:.*?##/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
 
-pip:
+
+pip: ## Update pip
 	pip install --upgrade pip
 
-deps_dev: pip
+deps_dev: pip ## Install development dependencies 
 	pip install -r requirements_dev.txt
 
-deps_prod: pip
+deps_prod: pip ## Install production dependencies
+	pip install -r requirements.txt
 	pip install -e .
 
-deps: deps_prod deps_dev
+deps: deps_prod deps_dev ## Install all dependencies
 
-format:
+format: ## Format code with black and isort
 	isort --filter-files $(LINT_FILES)
 	black $(LINT_FILES)
 
-format_check:
+format_check: ## Check code with black and isort
 	isort --check-only --filter-files $(LINT_FILES)
 	black --check $(LINT_FILES)
 
-flake8:
+flake8: ## Run flake8 lint check
 	flake8 $(LINT_FILES)
 
-lint: format_check flake8
+lint: format_check flake8 ## Run isort, black and flake8
 
-formatlint: format lint
+formatlint: format lint ## Format code first, then run linters
 
-test:
+test: ## Run tests
 	$(PYTEST)
 
-server:
+server: ## Start development server
 	$(DEV_ENV) python server.py 
 
-database:
-	CONTAINER_NAME=solid-flask-web-app-template-db-1 ROOT_PASSWORD=$(DB_ROOT_PASSWORD) DB_NAME=$(DB_NAME) DB_USER=$(DB_USER) DB_PASSWORD=$(DB_PASSWORD) ./scripts/create_database.sh
+fixtures: ## Adds initial fixtures to the database
 	python scripts/add_fixtures.py
+
+docker_latest: ## Build a docker container and tag it with the current git version tag and 'latest'
+	docker build -t $(DOCKERHUB_NAMESPACE)/my-solid-app-api:$(VERSION) -t $(DOCKERHUB_NAMESPACE)/my-solid-app-api:latest .
+
+docker_push: ## Push the docker containers with the current git version tag and 'latest'
+	docker push $(DOCKERHUB_NAMESPACE)/my-solid-app-api:$(VERSION)
+	docker push $(DOCKERHUB_NAMESPACE)/my-solid-app-api:latest
+
+docker_run: ## Run the api as a docker container
+	docker run \
+		--name my-solid-app-api \
+		--network host \
+		-e MY_SOLID_APP_DB_NAME=$(DB_NAME) \
+		-e MY_SOLID_APP_DB_USER=$(DB_USER) \
+		-e MY_SOLID_APP_DB_PASSWORD=$(DB_PASSWORD) \
+		-e MY_SOLID_APP_DB_HOST=$(DB_HOST) \
+		-e MY_SOLID_APP_DB_PORT=$(DB_PORT) \
+		-d \
+		$(DOCKERHUB_NAMESPACE)/my-solid-app-api:latest

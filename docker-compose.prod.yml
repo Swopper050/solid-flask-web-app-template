@@ -1,0 +1,66 @@
+services:
+  ui:
+    image: mydocker/my-solid-app-ui:latest
+    container_name: my-solid-app-ui
+    volumes:
+      - '/etc/letsencrypt/:/etc/letsencrypt/'
+    ports:
+      - '80:80'
+      - '443:443'
+    networks:
+      - my-solid-app-network
+    depends_on:
+      - api
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '5m'
+        max-file: '10'
+
+  api:
+    image: mydocker/my-solid-app-api:latest
+    container_name: my-solid-app-api
+    environment:
+      MY_SOLID_APP_DB_NAME: $MY_SOLID_APP_DB_NAME
+      MY_SOLID_APP_DB_USER: $MY_SOLID_APP_DB_USER
+      MY_SOLID_APP_DB_PASSWORD: $MY_SOLID_APP_DB_PASSWORD
+      MY_SOLID_APP_DB_HOST: 'db'
+      MY_SOLID_APP_DB_PORT: '3306'
+      MY_SOLID_APP_SECRET_KEY: $MY_SOLID_APP_SECRET_KEY
+    networks:
+      - my-solid-app-network
+    depends_on:
+      - db
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '5m'
+        max-file: '5'
+
+  db:
+    image: mariadb:latest
+    container_name: mariadb_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: $MYSQL_ROOT_PASSWORD
+      MYSQL_DATABASE: $MY_SOLID_APP_DB_NAME
+      MYSQL_USER: $MY_SOLID_APP_DB_USER
+      MYSQL_PASSWORD: $MY_SOLID_APP_DB_PASSWORD
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - my-solid-app-network
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '5m'
+        max-file: '5'
+
+
+networks:
+  my-solid-app-network:
+    driver: bridge
+
+
+volumes:
+  db_data:
