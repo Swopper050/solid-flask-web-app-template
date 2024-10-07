@@ -1,4 +1,4 @@
-from app.db.database import ModelBase
+from app.extensions import ModelBase
 
 
 def update_model(model: ModelBase, data: dict):

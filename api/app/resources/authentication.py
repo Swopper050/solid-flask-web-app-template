@@ -3,8 +3,13 @@ from flask_login import current_user, login_required, login_user, logout_user
 from flask_restx import Resource
 from marshmallow import Schema, fields
 
-from app import api, db
 from app.db.user import User, UserSchema
+from app.extensions import api, db, login_manager
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(user_id)
 
 
 class RegisterSchema(Schema):
