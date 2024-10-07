@@ -1,0 +1,12 @@
+services:
+  db:
+    image: mariadb:latest
+    container_name: my-solid-app-mariadb
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: my_solid_app_root_password
+      MYSQL_DATABASE: my_solid_app_db
+      MYSQL_USER: my_solid_app_user
+      MYSQL_PASSWORD: my_solid_app_password

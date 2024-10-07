@@ -1,22 +1,34 @@
 LINT_FILES=src/**
 
+DOCKERHUB_NAMESPACE=test
 
-help:
-	$(call echotask,"deps","Removes and installs all dependencies.")
-	$(call echotask,"format","Runs eslint and prettier.")
-	$(call echotask,"lint","Runs eslint and prettier in check only mode.")
-	$(call echotask,"formatlint","Formats the code and then lints it.")
+VERSION = $(shell git describe --tags --always)
 
-deps:
+
+##@ Utility
+help:  ## Display this help
+	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m\033[0m\n"} /^[a-zA-Z_-]+:.*?##/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
+
+deps: ## Install all dependencies
 	rm -rf node_modules/
 	npm install
 
-format:
+format: ## Format code with eslint and prettier
 	npx eslint $(LINT_FILES) --fix
 	npx prettier --write $(LINT_FILES)
 
-lint: ## Run various linters.
+lint: ## Run lint check with eslint and prettier
 	npx eslint $(LINT_FILES)
 	npx prettier --check $(LINT_FILES)
 
-formatlint: format lint
+formatlint: format lint ## First format code, then run linters
+
+server: ## Start the development server
+	npm run dev
+
+docker_latest: ## Build a docker container and tag it with the current git version tag and 'latest'
+	docker build -t $(DOCKERHUB_NAMESPACE)/my-solid-app-ui:$(VERSION) -t $(DOCKERHUB_NAMESPACE)/my-solid-app-ui:latest .
+
+docker_push: ## Push the odcker containers with the current git version tag and 'latest'
+	docker push $(DOCKERHUB_NAMESPACE)/my-solid-app-ui:$(VERSION)
+	docker push $(DOCKERHUB_NAMESPACE)/my-solid-app-ui:latest

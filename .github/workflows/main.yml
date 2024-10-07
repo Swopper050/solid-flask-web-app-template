@@ -1,16 +1,21 @@
 name: 
 
 on:
-  push:
-    branches: [ "develop" ]
   pull_request:
-    branches: [ "develop" ]
+    branches:
+      - develop
+  push:
+    branches:
+      - develop
+      - main
+    tags: 
+      - 'v[0-9].[0-9]+.[0-9]+'
 
 jobs:
   lint-ui:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Setup npm
       uses: actions/setup-node@v4
@@ -26,7 +31,7 @@ jobs:
   lint-api:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Setup python
       uses: actions/setup-python@v5
@@ -42,7 +47,7 @@ jobs:
   tests-api:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Setup python
       uses: actions/setup-python@v5
@@ -54,3 +59,101 @@ jobs:
 
     - name: Tests
       run: cd api && make test
+
+  docker-api-build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup
+        uses: actions/checkout@v4
+
+      - name: Build docker image
+        run: cd api && make docker_latest
+
+  docker-ui-build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup
+        uses: actions/checkout@v4
+
+      - name: Build docker image
+        run: cd ui && make docker_latest
+
+  docker-api-build-push:
+    runs-on: ubuntu-latest
+    if: github.ref_type == 'tag' && startsWith(github.ref, 'refs/tags/v')
+    needs: [lint-api, tests-api, docker-api-build-test]
+    steps:
+      - name: Setup
+        uses: actions/checkout@v4
+
+      - name: Login to docker
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build docker image
+        run: cd api && make docker_latest
+
+      - name: Push docker image
+        run: cd api && make docker_push
+
+  docker-ui-build-push:
+    runs-on: ubuntu-latest
+    if: github.ref_type == 'tag' && startsWith(github.ref, 'refs/tags/v')
+    needs: [lint-ui, docker-ui-build-test]
+    steps:
+      - name: Setup
+        uses: actions/checkout@v4
+
+      - name: Login to docker
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build docker image
+        run: cd ui && make docker_latest
+
+      - name: Push docker image
+        run: cd ui && make docker_push
+
+  deploy:
+    runs-on: ubuntu-latest
+    if: github.ref_type == 'tag' && startsWith(github.ref, 'refs/tags/v')
+    needs: [docker-ui-build-push, docker-api-build-push]
+    steps:
+      - name: Setup
+        uses: actions/checkout@v4
+
+      - name: SCP new docker compose file 
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.MY_SOLID_APP_VPS_HOST }}
+          username: ${{ secrets.MY_SOLID_APP_VPS_USERNAME }}
+          port: ${{ secrets.MY_SOLID_APP_VPS_PORT }}
+          key: ${{ secrets.MY_SOLID_APP_VPS_SSH_KEY }}
+          source: 'docker-compose.prod.yml'
+          target: '~/'
+
+      - name: Deploy new docker containers 
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.MY_SOLID_APP_VPS_HOST }}
+          username: ${{ secrets.MY_SOLID_APP_VPS_USERNAME }}
+          port: ${{ secrets.MY_SOLID_APP_VPS_PORT }}
+          key: ${{ secrets.MY_SOLID_APP_VPS_SSH_KEY }}
+          script: |
+            export MY_SOLID_APP_DB_NAME=${{ secrets.MY_SOLID_APP_DB_NAME }}
+            export MY_SOLID_APP_DB_USER=${{ secrets.MY_SOLID_APP_DB_USER }}
+            export MY_SOLID_APP_DB_PASSWORD=${{ secrets.MY_SOLID_APP_DB_PASSWORD }}
+            export MY_SOLID_APP_SECRET_KEY=${{ secrets.MY_SOLID_APP_SECRET_KEY }}
+            export MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}
+            export MYSQL_DATABASE=${{ secrets.MY_SOLID_APP_DB_NAME }}
+            export MYSQL_USER=${{ secrets.MY_SOLID_APP_DB_USER }}
+            export MYSQL_PASSWORD=${{ secrets.MY_SOLID_APP_DB_PASSWORD }}
+            docker compose -f docker-compose.prod.yml down
+            docker compose -f docker-compose.prod.yml pull
+            docker compose -f docker-compose.prod.yml up -d
+            sleep 10
+            docker compose -f docker-compose.prod.yml run api flask db upgrade
