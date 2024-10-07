@@ -1,7 +1,7 @@
 from flask import Flask
 
-from app.extensions import api, login_manager, db
-from app.config import DevConfig, TestConfig, ProdConfig
+from app.config import DevConfig, ProdConfig, TestConfig
+from app.extensions import api, db, login_manager
 
 
 def create_app(config_object: DevConfig | ProdConfig | TestConfig = ProdConfig()):

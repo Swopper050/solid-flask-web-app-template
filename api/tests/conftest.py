@@ -2,9 +2,8 @@ import pytest
 
 from app.app import create_app
 from app.config import TestConfig
-from app.extensions import db as _db
-
 from app.db.user import User
+from app.extensions import db as _db
 
 
 @pytest.fixture
