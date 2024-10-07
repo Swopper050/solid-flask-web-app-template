@@ -1,5 +1,7 @@
-from app import app, db
-from app.db import User
+from app.app import create_app
+from app.config import DevConfig
+from app.db.user import User
+from app.extensions import db
 
 
 def add_users(db):
@@ -14,9 +16,8 @@ def add_users(db):
 
 
 def add_fixtures():
+    app = create_app(config_object=DevConfig())
     with app.app_context():
-        db.create_all()
-
         add_users(db)
 
 

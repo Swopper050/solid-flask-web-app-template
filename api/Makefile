@@ -56,10 +56,19 @@ test: ## Run tests
 	$(PYTEST)
 
 server: ## Start development server
-	$(DEV_ENV) flask --app server run
+	$(DEV_ENV) flask --app server --debug run
 
-fixtures: ## Adds initial fixtures to the database
+fixtures: db_upgrade ## Adds initial fixtures to the database
 	python scripts/add_fixtures.py
+
+migrate: ## Create database migration
+	flask --app server db migrate
+
+db_downgrade: ## Downgrade database
+	flask --app server db downgrade
+
+db_upgrade: ## Upgrade database
+	flask --app server db upgrade
 
 docker_latest: ## Build a docker container and tag it with the current git version tag and 'latest'
 	docker build -t $(DOCKERHUB_NAMESPACE)/my-solid-app-api:$(VERSION) -t $(DOCKERHUB_NAMESPACE)/my-solid-app-api:latest .

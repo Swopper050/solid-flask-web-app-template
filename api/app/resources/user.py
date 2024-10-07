@@ -2,9 +2,9 @@ from flask import request
 from flask_login import current_user, login_required
 from flask_restx import Resource
 
-from app import api, db
 from app.db.user import User, UserSchema
 from app.db.utils import update_model
+from app.extensions import api, db
 
 
 @api.route("/user/<int:id>")

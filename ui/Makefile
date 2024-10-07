@@ -1,7 +1,5 @@
 LINT_FILES=src/**
-
 DOCKERHUB_NAMESPACE=test
-
 VERSION = $(shell git describe --tags --always)
 
 

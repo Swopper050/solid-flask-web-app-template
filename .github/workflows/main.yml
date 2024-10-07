@@ -86,7 +86,7 @@ jobs:
   docker-api-build-push:
     runs-on: ubuntu-latest
     if: github.ref_type == 'tag' && startsWith(github.ref, 'refs/tags/v')
-    needs: [lint-api, tests-api, docker-api-build-test]
+    needs: [lint-ui, docker-ui-build-test, lint-api, tests-api, docker-api-build-test]
     steps:
       - name: Setup
         uses: actions/checkout@v4
@@ -98,15 +98,15 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build docker image
-        run: cd api && make docker_latest
+        run: cd api && make DOCKERHUB_NAMESPACE=${{ secrets.DOCKERHUB_NAMESPACE }} docker_latest
 
       - name: Push docker image
-        run: cd api && make docker_push
+        run: cd api && make DOCKERHUB_NAMESPACE=${{ secrets.DOCKERHUB_NAMESPACE }} docker_push
 
   docker-ui-build-push:
     runs-on: ubuntu-latest
     if: github.ref_type == 'tag' && startsWith(github.ref, 'refs/tags/v')
-    needs: [lint-ui, docker-ui-build-test]
+    needs: [lint-ui, docker-ui-build-test, lint-api, tests-api, docker-api-build-test]
     steps:
       - name: Setup
         uses: actions/checkout@v4
@@ -118,10 +118,10 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build docker image
-        run: cd ui && make docker_latest
+        run: cd ui && make DOCKERHUB_NAMESPACE=${{ secrets.DOCKERHUB_USERNAME }} docker_latest
 
       - name: Push docker image
-        run: cd ui && make docker_push
+        run: cd ui && make DOCKERHUB_NAMESPACE=${{ secrets.DOCKERHUB_NAMESPACE }} docker_push
 
   deploy:
     runs-on: ubuntu-latest
@@ -161,4 +161,4 @@ jobs:
             docker compose -f docker-compose.prod.yml pull
             docker compose -f docker-compose.prod.yml up -d
             sleep 10
-            docker compose -f docker-compose.prod.yml run api flask db upgrade
+            docker compose -f docker-compose.prod.yml run api make db_upgrade
