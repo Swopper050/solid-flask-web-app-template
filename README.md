@@ -15,6 +15,14 @@ A full stack template for an app and web application with backend. The repositor
    - 🐳 Building [Docker](https://www.docker.com/) containers
    - 💻 Automated single VPS deployment
 
+## Landing page
+![Landing page](./docs/images/landing_page.png "Landing page")
+
+## Register page
+![Landing page](./docs/images/register_page.png "Register page")
+
+## Register page
+![Landing page](./docs/images/home_page.png "Home page")
 
 ## Installation
 The template can be cloned into a new repository with the 'Use this template' button at the right top of this repository, or by using `git clone https://github.com/Swopper050/solid-flask-web-app-template.git`.
@@ -49,3 +57,7 @@ make server
 ```
 
 Now you can visit the local web application at http://localhost:5173
+
+
+## Deployment
+This project currently supports deployment onto a single VPS (frontend, backend and database all running on that VPS). For more information on how to do this, see the [deployment docs](docs/web_deployment.md).
