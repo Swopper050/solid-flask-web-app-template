@@ -8,6 +8,7 @@ import { LandingPage } from './pages/LandingPage'
 import { Home } from './pages/Home'
 import { BasePage } from './pages/BasePage'
 import { UserProfilePage } from './pages/UserProfilePage'
+import { NotFoundPage } from './pages/NotFoundPage'
 
 function ProtectedRoute(props: { route: () => JSXElement }): JSXElement {
   const { user, loading } = useUser()
@@ -49,5 +50,9 @@ export const routes: RouteDefinition[] = [
         route={() => <BasePage mainComponent={UserProfilePage} />}
       />
     ),
+  },
+  {
+    path: '**',
+    component: () => <NotFoundPage />,
   },
 ]
