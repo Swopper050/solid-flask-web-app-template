@@ -1,6 +1,5 @@
 import { JSXElement, Show } from 'solid-js'
 
-import { lazy } from 'solid-js'
 import { Navigate } from '@solidjs/router'
 import type { RouteDefinition } from '@solidjs/router'
 
@@ -8,6 +7,7 @@ import { useUser } from './context'
 import { LandingPage } from './pages/LandingPage'
 import { Home } from './pages/Home'
 import { BasePage } from './pages/BasePage'
+import { UserProfilePage } from './pages/UserProfilePage'
 
 function ProtectedRoute(props: { route: () => JSXElement }): JSXElement {
   const { user, loading } = useUser()
@@ -43,11 +43,11 @@ export const routes: RouteDefinition[] = [
     ),
   },
   {
-    path: '/about',
-    component: lazy(() => import('./pages/About')),
+    path: '/profile',
+    component: () => (
+      <ProtectedRoute
+        route={() => <BasePage mainComponent={UserProfilePage} />}
+      />
+    ),
   },
-  //{
-  //path: '**',
-  //component: lazy(() => import('./errors/404')),
-  //},
 ]
