@@ -7,19 +7,19 @@ export function UserProfilePage(): JSXElement {
 
   return (
     <div class="mt-4 ml-10">
+      <Show when={user().isAdmin}>
+        <p class="text-lg text-success mr-4 mb-6 col-span-4">
+          <i class="fa-solid fa-screwdriver-wrench mr-2" />
+          This user is an admin
+        </p>
+      </Show>
+
       <div class="grid grid-cols-12 gap-4">
         <p class="text-lg font-bold mr-4 col-span-1">Email:</p>
         <p class="text-lg col-span-2">{user().email}</p>
       </div>
 
       <ChangePassword />
-
-      <Show when={user().isAdmin}>
-        <p class="text-lg text-success font-bold mr-4 mt-6 col-span-4">
-          <i class="fa-solid fa-screwdriver-wrench mr-2" />
-          This user is an admin
-        </p>
-      </Show>
     </div>
   )
 }

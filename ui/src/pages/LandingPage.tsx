@@ -28,7 +28,7 @@ export function LandingPage(): JSXElement {
           fallback={
             <div class="flex-none ml-2">
               <A class="btn btn-ghost" href="/home">
-                <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                <i class="fa-solid fa-arrow-right-to-bracket" />
                 To the app
               </A>
             </div>
