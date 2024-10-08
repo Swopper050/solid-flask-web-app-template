@@ -65,6 +65,28 @@ class Logout(Resource):
         return {}, 200
 
 
+class ChangePasswordSchema(Schema):
+    current_password = fields.String(required=True)
+    new_password = fields.String(required=True)
+
+
+@api.route("/change_password")
+class ChangePassword(Resource):
+    @login_required
+    def post(self):
+        data: dict = ChangePasswordSchema().load(request.get_json())
+
+        if not current_user.is_correct_password(data.get("current_password")):
+            return {"error_message": "The current password is incorrect"}, 409
+
+        current_user.set_password(data.get("new_password"))
+
+        db.session.add(current_user)
+        db.session.commit()
+
+        return UserSchema().dump(current_user)
+
+
 @api.route("/whoami")
 class WhoAmI(Resource):
     @login_required

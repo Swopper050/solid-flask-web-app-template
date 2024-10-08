@@ -26,8 +26,9 @@ export function LandingPage(): JSXElement {
         <Show
           when={user() === null}
           fallback={
-            <div class="flex-none mx-1">
+            <div class="flex-none ml-2">
               <A class="btn btn-ghost" href="/home">
+                <i class="fa-solid fa-arrow-right-to-bracket"></i>
                 To the app
               </A>
             </div>

@@ -1,5 +1,5 @@
 import { createSignal, JSXElement, Show } from 'solid-js'
-import { useNavigate } from '@solidjs/router'
+import { A, useNavigate } from '@solidjs/router'
 import { clsx } from 'clsx'
 
 import { useUser } from '../context'
@@ -45,10 +45,10 @@ function ProfileMenu(): JSXElement {
 
       <ul class="menu dropdown-content bg-base-200 rounded-box">
         <li class="text-left">
-          <button class="btn btn-ghost text-left">
+          <A class="btn btn-ghost text-left" href="/profile">
             <i class="fa-regular fa-address-card" />
             Profile
-          </button>
+          </A>
         </li>
         <li class="text-left">
           <button
