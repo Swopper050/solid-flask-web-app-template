@@ -9,6 +9,8 @@ import api from '../api'
 import { useUser } from '../context'
 import { User } from '../models/User'
 
+import { isGoodPassword, passwordConditions } from './utils'
+
 export function RegisterModal(): JSXElement {
   const { setUser } = useUser()
   const [email, setEmail] = createSignal<string | null>(null)
@@ -26,7 +28,12 @@ export function RegisterModal(): JSXElement {
   }
 
   const formReady = () => {
-    return passwordsMatch() && password() !== null && email !== null
+    return (
+      email() !== null &&
+      passwordsMatch() &&
+      password() !== null &&
+      isGoodPassword(password())
+    )
   }
 
   const handleLogin = async () => {
@@ -74,7 +81,12 @@ export function RegisterModal(): JSXElement {
           />
         </label>
 
-        <label class="input input-bordered flex items-center gap-2 mb-3">
+        <label
+          class={clsx(
+            'input input-bordered flex items-center gap-2',
+            password() !== null && !isGoodPassword(password()) && 'input-error'
+          )}
+        >
           <PasswordIcon />
           <input
             type="password"
@@ -86,6 +98,13 @@ export function RegisterModal(): JSXElement {
             }
           />
         </label>
+        <Show when={password() !== null && !isGoodPassword(password())}>
+          <div class="label">
+            <span class="label-text-alt text-error">
+              {passwordConditions()}
+            </span>
+          </div>
+        </Show>
 
         <label
           class={clsx(
@@ -94,6 +113,7 @@ export function RegisterModal(): JSXElement {
             'flex',
             'items-center',
             'gap-2',
+            'mt-3',
             !passwordsMatch() && 'input-error'
           )}
         >

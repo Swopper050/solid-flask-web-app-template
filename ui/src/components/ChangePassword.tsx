@@ -6,6 +6,8 @@ import api from '../api'
 import { PasswordIcon } from './icons/Password'
 import { User } from '../models/User'
 
+import { isGoodPassword, passwordConditions } from './utils'
+
 export function ChangePassword(): JSXElement {
   const { setUser } = useUser()
   const [changingPassword, setChangingPassword] = createSignal(false)
@@ -89,7 +91,14 @@ export function ChangePassword(): JSXElement {
             />
           </label>
 
-          <label class="input input-bordered flex items-center my-2">
+          <label
+            class={clsx(
+              'input input-bordered flex items-center mt-2',
+              newPassword() !== null &&
+                !isGoodPassword(newPassword()) &&
+                'input-error'
+            )}
+          >
             <PasswordIcon />
             <input
               type="password"
@@ -101,8 +110,15 @@ export function ChangePassword(): JSXElement {
               }
             />
           </label>
+          <Show when={newPassword() !== null && !isGoodPassword(newPassword())}>
+            <div class="label">
+              <span class="label-text-alt text-error">
+                {passwordConditions()}
+              </span>
+            </div>
+          </Show>
 
-          <label class="input input-bordered flex items-center my-2">
+          <label class="input input-bordered flex items-center mt-2">
             <PasswordIcon />
             <input
               type="password"
@@ -116,9 +132,16 @@ export function ChangePassword(): JSXElement {
               }
             />
           </label>
+          <Show when={!(newPassword() === confirmNewPassword())}>
+            <div class="label">
+              <span class="label-text-alt text-error">
+                Passwords do not match
+              </span>
+            </div>
+          </Show>
 
           <Show when={errorMsg() !== null}>
-            <div role="alert" class="alert alert-error my-6">
+            <div role="alert" class="alert alert-error mt-6">
               <span>{errorMsg()}</span>
             </div>
           </Show>
@@ -126,9 +149,11 @@ export function ChangePassword(): JSXElement {
           <div>
             <button
               class={clsx(
-                'btn',
-                'btn-primary',
-                (submitting() || !canChangePassword()) && 'btn-disabled'
+                'btn btn-primary mt-6',
+                (submitting() ||
+                  !canChangePassword() ||
+                  !isGoodPassword(newPassword())) &&
+                  'btn-disabled'
               )}
               onClick={changePassword}
             >

@@ -1,3 +1,5 @@
+import re
+
 from flask import request
 from flask_login import current_user, login_required, login_user, logout_user
 from flask_restx import Resource
@@ -79,12 +81,25 @@ class ChangePassword(Resource):
         if not current_user.is_correct_password(data.get("current_password")):
             return {"error_message": "The current password is incorrect"}, 409
 
-        current_user.set_password(data.get("new_password"))
+        new_password = data.get("new_password")
+        if new_password is None or not password_matches_conditions(new_password):
+            return {"error_message": "New password does not match conditions"}, 409
+
+        current_user.set_password(new_password)
 
         db.session.add(current_user)
         db.session.commit()
 
         return UserSchema().dump(current_user)
+
+
+def password_matches_conditions(password: str) -> bool:
+    return (
+        len(password) >= 8
+        and re.search("[A-Z]", password) is not None
+        and re.search("[a-z]", password) is not None
+        and re.search("[0-9]", password) is not None
+    )
 
 
 @api.route("/whoami")
