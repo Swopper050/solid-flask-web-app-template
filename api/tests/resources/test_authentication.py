@@ -95,11 +95,30 @@ class TestAuthenticationAPI:
         # Now test the password change
         response = client.post(
             "/change_password",
-            json={"current_password": "password123", "new_password": "white_wolf"},
+            json={"current_password": "password123", "new_password": "White_wolf123"},
         )
 
         assert response.status_code == 200
-        assert user.is_correct_password("white_wolf")
+        assert user.is_correct_password("White_wolf123")
+
+    def test_change_password_wrong_conditions(self, client, user):
+        response = client.post(
+            "/login", json={"email": "user@test.com", "password": "password123"}
+        )
+
+        assert response.status_code == 200
+        assert user.is_correct_password("password123")
+
+        # New password that does not match the conditions
+        response = client.post(
+            "/change_password",
+            json={"current_password": "password123", "new_password": "white_wolf"},
+        )
+
+        assert response.status_code == 409
+        assert response.json == {
+            "error_message": "New password does not match conditions"
+        }
 
     def test_change_password_not_logged_in(self, client, user):
         assert user.is_correct_password("password123")
