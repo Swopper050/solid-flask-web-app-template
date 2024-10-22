@@ -8,6 +8,18 @@ MY_SOLID_APP_DB_PASSWORD = os.environ.get(
 MY_SOLID_APP_DB_HOST = os.environ.get("MY_SOLID_APP_DB_HOST", "127.0.0.1")
 MY_SOLID_APP_DB_PORT = os.environ.get("MY_SOLID_APP_DB_PORT", "3306")
 
+MY_SOLID_APP_SMTP_HOST = os.environ.get("MY_SOLID_APP_SMTP_HOST", "smtp.server.com")
+MY_SOLID_APP_SMTP_PORT = int(os.environ.get("MY_SOLID_APP_SMTP_PORT", 465))
+MY_SOLID_APP_EMAIL_SENDER = os.environ.get(
+    "MY_SOLID_APP_EMAIL_SENDER", "mysolidapp@mail.com"
+)
+MY_SOLID_APP_EMAIL_PASSWORD = os.environ.get(
+    "MY_SOLID_APP_EMAIL_PASSWORD", "stmp_password"
+)
+MY_SOLID_APP_EMAIL_RESET_TOKEN_EXPIRE_HOURS = int(
+    os.environ.get("MY_SOLID_APP_EMAIL_RESET_TOKEN_EXPIRE_HOURS", "1")
+)
+
 
 class BaseConfig:
     SECRET_KEY = os.environ.get("MY_SOLID_APP_SECRET_KEY", "secret_oohhhhhh")

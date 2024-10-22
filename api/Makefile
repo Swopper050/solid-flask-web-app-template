@@ -58,7 +58,7 @@ test: ## Run tests
 server: ## Start development server
 	$(DEV_ENV) flask --app server --debug run
 
-fixtures: db_upgrade ## Adds initial fixtures to the database
+fixtures: ## Adds initial fixtures to the database
 	python scripts/add_fixtures.py
 
 migrate: ## Create database migration

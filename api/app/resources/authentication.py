@@ -1,4 +1,5 @@
 import re
+import datetime as dt
 
 from flask import request
 from flask_login import current_user, login_required, login_user, logout_user
@@ -7,6 +8,7 @@ from marshmallow import Schema, fields
 
 from app.db.user import User, UserSchema
 from app.extensions import api, db, login_manager
+from app.mail_utils import send_email, FORGOT_PASSWORD_EMAIL_TEMPLATE
 
 
 @login_manager.user_loader
@@ -78,8 +80,25 @@ class ChangePassword(Resource):
     def post(self):
         data: dict = ChangePasswordSchema().load(request.get_json())
 
-        if not current_user.is_correct_password(data.get("current_password")):
-            return {"error_message": "The current password is incorrect"}, 409
+        user = User.query.filter_by(email=data.get("email")).first()
+        if user is None or not user.is_correct_password(data.get("password")):
+            return
+
+        user.set_password_reset_token()
+        send_email(user.email, FORGOT_PASSWORD_EMAIL_TEMPLATE)
+
+        return {}, 200
+
+
+class ForgotPasswordSchema(Schema):
+    email = fields.String(required=True)
+
+
+@api.route("/forgot_password")
+class ForgotPassword(Resource):
+    @login_required
+    def post(self):
+        data: dict = ForgotPasswordSchema().load(request.get_json())
 
         new_password = data.get("new_password")
         if new_password is None or not password_matches_conditions(new_password):

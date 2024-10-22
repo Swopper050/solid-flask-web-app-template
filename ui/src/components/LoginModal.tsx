@@ -1,5 +1,5 @@
 import { JSXElement, createSignal, Show } from 'solid-js'
-import { useNavigate } from '@solidjs/router'
+import { useNavigate, Link } from '@solidjs/router'
 import { clsx } from 'clsx'
 
 import { EmailIcon } from './icons/Email'
@@ -78,6 +78,10 @@ export function LoginModal(): JSXElement {
             }
           />
         </label>
+
+        <Link class="flex justify-center text-primary mt-4" href="/forgot-password">
+          Forgot password?
+        </Link>
 
         <Show when={errorMsg() !== null}>
           <div role="alert" class="alert alert-error my-6">
