@@ -81,6 +81,9 @@ class ChangePassword(Resource):
     def post(self):
         data: dict = ChangePasswordSchema().load(request.get_json())
 
+        if not current_user.is_correct_password(data.get("current_password")):
+            return {"error_message": "The current password is incorrect"}, 409
+
         new_password = data.get("new_password")
         if new_password is None or not password_matches_conditions(new_password):
             return {"error_message": "New password does not match conditions"}, 409
