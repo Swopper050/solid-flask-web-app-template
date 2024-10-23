@@ -1,17 +1,23 @@
 import smtplib
 import ssl
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from string import Template
 
 from app.config import (
+    MY_SOLID_APP_EMAIL_PASSWORD,
+    MY_SOLID_APP_EMAIL_RESET_TOKEN_EXPIRE_HOURS,
+    MY_SOLID_APP_EMAIL_SENDER,
+    MY_SOLID_APP_FRONTEND_URL,
     MY_SOLID_APP_SMTP_HOST,
     MY_SOLID_APP_SMTP_PORT,
-    MY_SOLID_APP_EMAIL_SENDER,
-    MY_SOLID_APP_EMAIL_PASSWORD,
 )
 
 
 def send_email(
+    *,
     receiver: str,
-    message: str,
+    message: MIMEMultipart,
     host=MY_SOLID_APP_SMTP_HOST,
     port=MY_SOLID_APP_SMTP_PORT,
     sender=MY_SOLID_APP_EMAIL_SENDER,
@@ -20,81 +26,28 @@ def send_email(
     context = ssl.create_default_context()
     with smtplib.SMTP_SSL(host, port, context=context) as server:
         server.login(sender, password)
-        server.sendmail(sender, receiver, message)
+        server.sendmail(sender, receiver, message.as_string())
 
 
-FORGOT_PASSWORD_EMAIL_TEMPLATE = """
-Subject: MySolidApp - Password reset
+def get_forgot_password_email_message(
+    *, receiver: str, reset_token: str, sender: str = MY_SOLID_APP_EMAIL_SENDER
+):
+    reset_link = (
+        f"{MY_SOLID_APP_FRONTEND_URL}/reset-password?"
+        f"email={receiver}&reset_token={reset_token}"
+    )
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 20px;
-            color: #333;
-        }
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        .header {
-            text-align: center;
-        }
-        .header img {
-            width: 100px;
-            margin-bottom: 20px;
-        }
-        h1 {
-            color: #333;
-        }
-        p {
-            font-size: 16px;
-            line-height: 1.5;
-            color: #555;
-        }
-        a.button {
-            display: inline-block;
-            background-color: #3498db;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 5px;
-            text-decoration: none;
-            margin-top: 20px;
-            font-weight: bold;
-        }
-        .footer {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 12px;
-            color: #777;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <img src="cid:logo_image" alt="Company Logo">
-            <h1>Password Reset Request</h1>
-        </div>
-        <p>Hello,</p>
-        <p>We received a request to reset your password for your account. Click the button below to reset your password:</p>
-        <a href="{reset_link}" class="button">Reset Password</a>
-        <p>If you didn't request a password reset, please ignore this email. This link will expire in 24 hours.</p>
-        <p>Thank you!</p>
-        <div class="footer">
-            <p>&copy; {year} Your Company. All rights reserved.</p>
-        </div>
-    </div>
-</body>
-</html>
-"""
+    message = MIMEMultipart("alternative")
+    message["Subject"] = "🛁 MySolidApp - Password reset"
+    message["From"] = sender
+    message["To"] = receiver
+
+    with open("./email_templates/forgot_password.html", "r") as file:
+        html_body = file.read()
+
+    html_body = Template(html_body).safe_substitute(
+        reset_link=reset_link, reset_hours=MY_SOLID_APP_EMAIL_RESET_TOKEN_EXPIRE_HOURS
+    )
+    message.attach(MIMEText(html_body, "html"))
+
+    return message

@@ -9,6 +9,7 @@ import { Home } from './pages/Home'
 import { BasePage } from './pages/BasePage'
 import { UserProfilePage } from './pages/UserProfilePage'
 import { ForgotPasswordPage } from './pages/ForgotPasswordPage'
+import { ResetPasswordPage } from './pages/ResetPasswordPage'
 import { NotFoundPage } from './pages/NotFoundPage'
 
 function ProtectedRoute(props: { route: () => JSXElement }): JSXElement {
@@ -55,6 +56,10 @@ export const routes: RouteDefinition[] = [
   {
     path: '/forgot-password',
     component: () => <ForgotPasswordPage />,
+  },
+  {
+    path: '/reset-password',
+    component: () => <ResetPasswordPage />,
   },
   {
     path: '**',

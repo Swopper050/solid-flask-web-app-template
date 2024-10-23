@@ -19,6 +19,9 @@ MY_SOLID_APP_EMAIL_PASSWORD = os.environ.get(
 MY_SOLID_APP_EMAIL_RESET_TOKEN_EXPIRE_HOURS = int(
     os.environ.get("MY_SOLID_APP_EMAIL_RESET_TOKEN_EXPIRE_HOURS", "1")
 )
+MY_SOLID_APP_FRONTEND_URL = os.environ.get(
+    "MY_SOLID_APP_FRONTEND_URL", "http://localhost:5173"
+)
 
 
 class BaseConfig:

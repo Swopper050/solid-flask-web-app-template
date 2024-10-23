@@ -79,7 +79,10 @@ export function LoginModal(): JSXElement {
           />
         </label>
 
-        <Link class="flex justify-center text-primary mt-4" href="/forgot-password">
+        <Link
+          class="flex justify-center text-primary mt-4"
+          href="/forgot-password"
+        >
           Forgot password?
         </Link>
 
