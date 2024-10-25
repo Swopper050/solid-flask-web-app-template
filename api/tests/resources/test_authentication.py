@@ -1,9 +1,12 @@
+from unittest.mock import patch
+
 from flask_login import current_user
 
 from app.db.user import User, UserSchema
+from app.extensions import mail
 
 
-class TestAuthenticationAPI:
+class TestRegisterAPI:
     def test_register(self, client, db, user):
         assert User.query.count() == 1
         response = client.post(
@@ -36,6 +39,8 @@ class TestAuthenticationAPI:
         }
         assert User.query.count() == 1
 
+
+class TestLoginAPI:
     def test_login(self, client, user):
         response = client.post(
             "/login", json={"email": "user@test.com", "password": "password123"}
@@ -64,6 +69,8 @@ class TestAuthenticationAPI:
             "error_message": "Could not login with the given email and password"
         }
 
+
+class TestLogoutAPI:
     def test_logout(self, client, user):
         # Login user
         response = client.post(
@@ -83,6 +90,8 @@ class TestAuthenticationAPI:
 
         assert response.status_code == 401
 
+
+class TestChangePasswordAPI:
     def test_change_password(self, client, user):
         # Login user
         response = client.post(
@@ -148,3 +157,59 @@ class TestAuthenticationAPI:
         assert response.status_code == 409
         assert response.json == {"error_message": "The current password is incorrect"}
         assert user.is_correct_password("password123")
+
+
+class TestForgotPasswordAPI:
+    @patch("app.db.user.time")
+    def test_forgot_password(self, time_mock, client, user):
+        time_mock.time.return_value = 12345
+
+        assert user.password_reset_token is None
+        assert user.password_reset_time is None
+
+        with mail.record_messages() as outbox:
+            response = client.post(
+                "/forgot_password",
+                json={"email": user.email},
+            )
+
+            assert response.status_code == 200
+            assert len(outbox) == 1
+            assert outbox[0].subject == "🛁 MySolidApp - Password reset"
+            assert outbox[0].recipients == [user.email]
+
+        assert user.password_reset_token is not None
+        assert user.password_reset_time == 12345
+
+    def test_forgot_password_user_does_not_exist(self, client, user):
+        with mail.record_messages() as outbox:
+            response = client.post(
+                "/forgot_password",
+                json={"email": "unknown@email.com"},
+            )
+
+            assert response.status_code == 200
+            assert len(outbox) == 0
+
+
+class TestResetPasswordAPI:
+    def test_reset_password(self, time_mock, client, user):
+        time_mock.time.return_value = 12345
+
+        assert user.password_reset_token is None
+        assert user.password_reset_time is None
+
+        # TODO
+        with mail.record_messages() as outbox:
+            response = client.post(
+                "/forgot_password",
+                json={"email": user.email},
+            )
+
+            assert response.status_code == 200
+            assert len(outbox) == 1
+            assert outbox[0].subject == "🛁 MySolidApp - Password reset"
+            assert outbox[0].recipients == [user.email]
+
+        assert user.password_reset_token is not None
+        assert user.password_reset_time == 12345

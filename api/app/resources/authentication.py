@@ -6,10 +6,10 @@ from flask_login import current_user, login_required, login_user, logout_user
 from flask_restx import Resource
 from marshmallow import Schema, fields
 
-from app.config import MY_SOLID_APP_EMAIL_RESET_TOKEN_EXPIRE_HOURS
+from app.config import MY_SOLID_APP_PASSWORD_RESET_TOKEN_EXPIRE_HOURS
 from app.db.user import User, UserSchema
 from app.extensions import api, db, login_manager
-from app.mail_utils import get_forgot_password_email_message, send_email
+from app.mail_utils import send_forgot_password_email
 
 
 @login_manager.user_loader
@@ -113,12 +113,7 @@ class ForgotPassword(Resource):
         db.session.add(user)
         db.session.commit()
 
-        send_email(
-            receiver=user.email,
-            message=get_forgot_password_email_message(
-                receiver=user.email, reset_token=reset_token
-            ),
-        )
+        send_forgot_password_email(receiver=user.email, reset_token=reset_token)
 
         return {}, 200
 
@@ -142,7 +137,7 @@ class ResetPassword(Resource):
             }, 400
 
         if (int(time.time()) - user.password_reset_time) > (
-            MY_SOLID_APP_EMAIL_RESET_TOKEN_EXPIRE_HOURS * 3600
+            MY_SOLID_APP_PASSWORD_RESET_TOKEN_EXPIRE_HOURS * 3600
         ):
             return {"error_message": "This token has expired"}, 410
 

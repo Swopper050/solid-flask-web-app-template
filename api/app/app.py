@@ -1,7 +1,7 @@
 from flask import Flask
 
 from app.config import DevConfig, ProdConfig, TestConfig
-from app.extensions import api, db, login_manager, migrate
+from app.extensions import api, db, login_manager, mail, migrate
 
 
 def create_app(config_object: DevConfig | ProdConfig | TestConfig = ProdConfig()):
@@ -12,5 +12,6 @@ def create_app(config_object: DevConfig | ProdConfig | TestConfig = ProdConfig()
     login_manager.init_app(app)
     api.init_app(app)
     migrate.init_app(app, db)
+    mail.init_app(app)
 
     return app
