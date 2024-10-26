@@ -1,8 +1,9 @@
 LINT_FILES=server.py app/ tests/ scripts/
 TEST_PATH=tests
-PYTEST=pytest $(TEST_PATH) --pythonwarnings=once
-VERSION = $(shell git describe --tags --always)
+PYTEST=pytest -k $(TEST_FILTER) $(TEST_PATH) --pythonwarnings=once
+PYTEST_COV=--cov=app/ --cov-report=term-missing
 
+VERSION = $(shell git describe --tags --always)
 DOCKERHUB_NAMESPACE=test
 
 DB_ROOT_PASSWORD=my_solid_app_db_root_password
@@ -55,10 +56,13 @@ formatlint: format lint ## Format code first, then run linters
 test: ## Run tests
 	$(PYTEST)
 
+test_cov: ## Run tests and show coverage
+	$(PYTEST) $(PYTEST_COV)
+
 server: ## Start development server
 	$(DEV_ENV) flask --app server --debug run
 
-fixtures: db_upgrade ## Adds initial fixtures to the database
+fixtures: ## Adds initial fixtures to the database
 	python scripts/add_fixtures.py
 
 migrate: ## Create database migration

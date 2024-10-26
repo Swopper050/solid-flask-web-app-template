@@ -1,9 +1,15 @@
+import datetime as dt
+import re
+from unittest.mock import patch
+
+import pytest
 from flask_login import current_user
 
 from app.db.user import User, UserSchema
+from app.extensions import mail
 
 
-class TestAuthenticationAPI:
+class TestRegisterAPI:
     def test_register(self, client, db, user):
         assert User.query.count() == 1
         response = client.post(
@@ -36,6 +42,8 @@ class TestAuthenticationAPI:
         }
         assert User.query.count() == 1
 
+
+class TestLoginAPI:
     def test_login(self, client, user):
         response = client.post(
             "/login", json={"email": "user@test.com", "password": "password123"}
@@ -64,6 +72,8 @@ class TestAuthenticationAPI:
             "error_message": "Could not login with the given email and password"
         }
 
+
+class TestLogoutAPI:
     def test_logout(self, client, user):
         # Login user
         response = client.post(
@@ -83,6 +93,8 @@ class TestAuthenticationAPI:
 
         assert response.status_code == 401
 
+
+class TestChangePasswordAPI:
     def test_change_password(self, client, user):
         # Login user
         response = client.post(
@@ -147,4 +159,204 @@ class TestAuthenticationAPI:
 
         assert response.status_code == 409
         assert response.json == {"error_message": "The current password is incorrect"}
+        assert user.is_correct_password("password123")
+
+
+class TestForgotPasswordAPI:
+    @patch("app.db.user.time")
+    def test_forgot_password(self, time_mock, client, user):
+        time_mock.time.return_value = 12345
+
+        assert user.password_reset_token is None
+        assert user.password_reset_time is None
+
+        with mail.record_messages() as outbox:
+            response = client.post(
+                "/forgot_password",
+                json={"email": user.email},
+            )
+
+            assert response.status_code == 200
+            assert len(outbox) == 1
+            assert outbox[0].subject == "🛁 MySolidApp - Password reset"
+            assert outbox[0].recipients == [user.email]
+
+        assert user.password_reset_token is not None
+        assert user.password_reset_time == 12345
+
+    def test_forgot_password_user_does_not_exist(self, client, user):
+        with mail.record_messages() as outbox:
+            response = client.post(
+                "/forgot_password",
+                json={"email": "unknown@email.com"},
+            )
+
+            assert response.status_code == 200
+            assert len(outbox) == 0
+
+
+class TestResetPasswordAPI:
+    @pytest.fixture
+    def now(self):
+        return dt.datetime(2024, 10, 26, 11, 5, 10)
+
+    @patch("app.db.user.time")
+    @patch("app.resources.authentication.time")
+    def test_reset_password(self, reset_time, user_time, client, user, now):
+        user_time.time.return_value = int((now - dt.timedelta(minutes=2)).timestamp())
+        reset_time.time.return_value = int(now.timestamp())
+
+        assert user.password_reset_token is None
+        assert user.password_reset_time is None
+        assert user.is_correct_password("password123")
+
+        with mail.record_messages() as outbox:
+            response = client.post(
+                "/forgot_password",
+                json={"email": user.email},
+            )
+
+            assert response.status_code == 200
+            assert len(outbox) == 1
+            assert outbox[0].subject == "🛁 MySolidApp - Password reset"
+            assert outbox[0].recipients == [user.email]
+            assert outbox[0].html is not None
+            reset_token = re.search(r"reset_token=([\w-]+)", outbox[0].html).group(1)
+
+        assert user.password_reset_token is not None
+        assert user.password_reset_time == int(
+            (now - dt.timedelta(minutes=2)).timestamp()
+        )
+        assert user.is_correct_password("password123")
+
+        response = client.post(
+            "/reset_password",
+            json={
+                "email": user.email,
+                "reset_token": reset_token,
+                "new_password": "Hello1234",
+            },
+        )
+
+        assert response.status_code == 200
+
+        assert user.password_reset_token is None
+        assert user.password_reset_time is None
+        assert user.is_correct_password("Hello1234")
+
+    @patch("app.db.user.time")
+    def test_reset_password_invalid_token(self, time_mock, client, user, now):
+        time_mock.time.return_value = int(now.timestamp())
+
+        with mail.record_messages():
+            response = client.post(
+                "/forgot_password",
+                json={"email": user.email},
+            )
+            assert response.status_code == 200
+
+        response = client.post(
+            "/reset_password",
+            json={
+                "email": user.email,
+                "reset_token": "wrong_token",
+                "new_password": "Hello1234",
+            },
+        )
+
+        assert response.status_code == 400
+        assert response.json == {
+            "error_message": "Could not reset password with the given token"
+        }
+
+        # Make sure the user reset tokens are not cleared yet.
+        assert user.password_reset_token is not None
+        assert user.password_reset_time == int(now.timestamp())
+        assert user.is_correct_password("password123")
+
+    def test_reset_password_invalid_email(self, client, user):
+        response = client.post(
+            "/reset_password",
+            json={
+                "email": "unknown@wow.nl",
+                "reset_token": "12345",
+                "new_password": "Hello1234",
+            },
+        )
+
+        assert response.status_code == 400
+        assert response.json == {
+            "error_message": "Could not reset password with the given token"
+        }
+
+    @patch("app.db.user.time")
+    @patch("app.resources.authentication.time")
+    def test_reset_password_expired_token(
+        self, reset_time, user_time, client, user, now
+    ):
+        # Mock the time such that the reset token was set 2 hours ago.
+        user_time.time.return_value = int((now - dt.timedelta(hours=2)).timestamp())
+        reset_time.time.return_value = int(now.timestamp())
+
+        with mail.record_messages() as outbox:
+            response = client.post(
+                "/forgot_password",
+                json={"email": user.email},
+            )
+            assert response.status_code == 200
+            assert len(outbox) == 1
+            assert outbox[0].html is not None
+            reset_token = re.search(r"reset_token=([\w-]+)", outbox[0].html).group(1)
+
+        response = client.post(
+            "/reset_password",
+            json={
+                "email": user.email,
+                "reset_token": reset_token,
+                "new_password": "Hello1234",
+            },
+        )
+
+        assert response.status_code == 410
+        assert response.json == {"error_message": "This token has expired"}
+
+        # Make sure the user reset tokens are not cleared yet.
+        assert user.password_reset_token is not None
+        assert user.is_correct_password("password123")
+
+    @patch("app.db.user.time")
+    @patch("app.resources.authentication.time")
+    def test_reset_password_new_password_invalid(
+        self, reset_time, user_time, client, user, now
+    ):
+        # Mock the time such that the reset token was set 2 minutes ago.
+        user_time.time.return_value = int((now - dt.timedelta(minutes=2)).timestamp())
+        reset_time.time.return_value = int(now.timestamp())
+
+        with mail.record_messages() as outbox:
+            response = client.post(
+                "/forgot_password",
+                json={"email": user.email},
+            )
+            assert response.status_code == 200
+            assert len(outbox) == 1
+            assert outbox[0].html is not None
+            reset_token = re.search(r"reset_token=([\w-]+)", outbox[0].html).group(1)
+
+        response = client.post(
+            "/reset_password",
+            json={
+                "email": user.email,
+                "reset_token": reset_token,
+                "new_password": "invalid",
+            },
+        )
+
+        assert response.status_code == 409
+        assert response.json == {
+            "error_message": "New password does not match conditions"
+        }
+
+        # Make sure the user reset tokens are not cleared yet.
+        assert user.password_reset_token is not None
         assert user.is_correct_password("password123")

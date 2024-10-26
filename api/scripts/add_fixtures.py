@@ -4,6 +4,12 @@ from app.db.user import User
 from app.extensions import db
 
 
+def clear_database():
+    db.reflect()
+    db.drop_all()
+    db.create_all()
+
+
 def add_users(db):
     user = User(
         email="admin@test.nl",
@@ -18,6 +24,7 @@ def add_users(db):
 def add_fixtures():
     app = create_app(config_object=DevConfig())
     with app.app_context():
+        clear_database()
         add_users(db)
 
 

@@ -1,12 +1,15 @@
 import re
+import time
 
 from flask import request
 from flask_login import current_user, login_required, login_user, logout_user
 from flask_restx import Resource
 from marshmallow import Schema, fields
 
+from app.config import MY_SOLID_APP_PASSWORD_RESET_TOKEN_EXPIRE_HOURS
 from app.db.user import User, UserSchema
 from app.extensions import api, db, login_manager
+from app.mail_utils import send_forgot_password_email
 
 
 @login_manager.user_loader
@@ -91,6 +94,64 @@ class ChangePassword(Resource):
         db.session.commit()
 
         return UserSchema().dump(current_user)
+
+
+class ForgotPasswordSchema(Schema):
+    email = fields.String(required=True)
+
+
+@api.route("/forgot_password")
+class ForgotPassword(Resource):
+    def post(self):
+        data: dict = ForgotPasswordSchema().load(request.get_json())
+
+        user = User.query.filter_by(email=data.get("email")).first()
+        if user is None:
+            return {}, 200
+
+        reset_token = user.set_password_reset_token()
+        db.session.add(user)
+        db.session.commit()
+
+        send_forgot_password_email(receiver=user.email, reset_token=reset_token)
+
+        return {}, 200
+
+
+class ResetPasswordSchema(Schema):
+    email = fields.String(required=True)
+    reset_token = fields.String(required=True)
+    new_password = fields.String(required=True)
+
+
+@api.route("/reset_password")
+class ResetPassword(Resource):
+    def post(self):
+        data: dict = ResetPasswordSchema().load(request.get_json())
+
+        reset_token = data.get("reset_token")
+        user = User.query.filter_by(email=data.get("email")).first()
+        if user is None or not user.check_password_reset_token(reset_token):
+            return {
+                "error_message": "Could not reset password with the given token"
+            }, 400
+
+        if (int(time.time()) - user.password_reset_time) > (
+            MY_SOLID_APP_PASSWORD_RESET_TOKEN_EXPIRE_HOURS * 3600
+        ):
+            return {"error_message": "This token has expired"}, 410
+
+        new_password = data.get("new_password")
+        if new_password is None or not password_matches_conditions(new_password):
+            return {"error_message": "New password does not match conditions"}, 409
+
+        user.set_password(new_password)
+        user.clear_password_reset_token()
+
+        db.session.add(user)
+        db.session.commit()
+
+        return {}, 200
 
 
 def password_matches_conditions(password: str) -> bool:
