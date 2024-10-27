@@ -16,19 +16,36 @@ On a version tag (i.e. v0.0.1) on the `main` branch, Github Actions runs a pipel
 
 
 ### Server requirements/configuration
-1. [Install docker with docker-compose](https://docs.docker.com/engine/install/ubuntu/).
-2. Setup firewall:
+1. Add user with root privileges for the server:
+```bash
+sudo adduser mysolidapp
+sudo usermod -aG sudo mysolidapp
+su - mysolidapp
+cd ~
+mkdir .ssh
+touch .ssh/authorized_keys
+# Add your public ssh key to the authorized keys2
+```
+2. [Install docker with docker compose](https://docs.docker.com/engine/install/ubuntu/). Make sure you can run docker without sudo, it is enabled as service and you are logged in (`docker login`).
+3. Setup firewall:
 ```bash
 sudo ufw allow OpenSSH
 sudo ufw allow http
 sudo ufw allow https
 sudo ufw enable
 ```
-3. Install certbot:
+
+### SSL certificates
+1. Install certbot:
 ```bash
-sudo apt install certbot 
+sudo apt install certbot
 ```
-4. Make sure the SSL certificates are renewed automatically by adding this to crontab:
+2. Add certificates for your domain:
+```bash
+sudo certbot certonly --standalone --preferred-challenges http -d www.mysolidapp.nl
+sudo certbot certonly --standalone --preferred-challenges http -d mysolidapp.nl
+```
+3. Make sure the SSL certificates are renewed automatically by adding this to crontab:
 ```bash
 0 1 * * * sudo certbet renew --standalone
 ```
@@ -65,6 +82,13 @@ MY_SOLID_APP_VPS_SSH_KEY=<private_ssh_key>
 MY_SOLID_APP_DB_NAME=<db_name>
 MY_SOLID_APP_DB_USER=<db_user>
 MY_SOLID_APP_DB_PASSWORD=<db_password>
-MY_SOLID_APP_SECRET_KEY=<flask_secret_key>
 MYSQL_ROOT_PASSWORD=<db_root_password>
+
+MY_SOLID_APP_SECRET_KEY=<flask_secret_key>
+
+MY_SOLID_APP_MAIL_SERVER=smtp.server.com
+MY_SOLID_APP_MAIL_PORT=465
+MY_SOLID_APP_MAIL_USERNAME=<mail_username>
+MY_SOLID_APP_MAIL_PASSWORD=<mail_password>
+MY_SOLID_APP_MAIL_DEFAULT_SENDER=<default_mail_address>
 ```
