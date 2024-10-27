@@ -75,11 +75,11 @@ db_upgrade: ## Upgrade database
 	flask --app server db upgrade
 
 docker_latest: ## Build a docker container and tag it with the current git version tag and 'latest'
-	docker build -t $(DOCKERHUB_NAMESPACE)/mysolidapp-api:$(VERSION) -t $(DOCKERHUB_NAMESPACE)/mysolidapp-api:latest .
+	docker build -t $(DOCKERHUB_NAMESPACE)/my-solid-app-api:$(VERSION) -t $(DOCKERHUB_NAMESPACE)/my-solid-app-api:latest .
 
 docker_push: ## Push the docker containers with the current git version tag and 'latest'
-	docker push $(DOCKERHUB_NAMESPACE)/mysolidapp-api:$(VERSION)
-	docker push $(DOCKERHUB_NAMESPACE)/mysolidapp-api:latest
+	docker push $(DOCKERHUB_NAMESPACE)/my-solid-app-api:$(VERSION)
+	docker push $(DOCKERHUB_NAMESPACE)/my-solid-app-api:latest
 
 docker_run: ## Run the api as a docker container
 	docker run \

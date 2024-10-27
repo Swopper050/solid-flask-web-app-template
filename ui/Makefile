@@ -25,8 +25,8 @@ server: ## Start the development server
 	pnpm run dev
 
 docker_latest: ## Build a docker container and tag it with the current git version tag and 'latest'
-	docker build -t $(DOCKERHUB_NAMESPACE)/mysolidapp-ui:$(VERSION) -t $(DOCKERHUB_NAMESPACE)/mysolidapp-ui:latest .
+	docker build -t $(DOCKERHUB_NAMESPACE)/my-solid-app-ui:$(VERSION) -t $(DOCKERHUB_NAMESPACE)/my-solid-app-ui:latest .
 
 docker_push: ## Push the odcker containers with the current git version tag and 'latest'
-	docker push $(DOCKERHUB_NAMESPACE)/mysolidapp-ui:$(VERSION)
-	docker push $(DOCKERHUB_NAMESPACE)/mysolidapp-ui:latest
+	docker push $(DOCKERHUB_NAMESPACE)/my-solid-app-ui:$(VERSION)
+	docker push $(DOCKERHUB_NAMESPACE)/my-solid-app-ui:latest
