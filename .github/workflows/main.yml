@@ -85,7 +85,7 @@ jobs:
 
   docker-api-build-push:
     runs-on: ubuntu-latest
-    if: github.ref_type == 'tag' && startsWith(github.ref, 'refs/tags/v')
+    # if: github.ref_type == 'tag' && startsWith(github.ref, 'refs/tags/v')
     needs: [lint-ui, docker-ui-build-test, lint-api, tests-api, docker-api-build-test]
     steps:
       - name: Setup
@@ -105,7 +105,7 @@ jobs:
 
   docker-ui-build-push:
     runs-on: ubuntu-latest
-    if: github.ref_type == 'tag' && startsWith(github.ref, 'refs/tags/v')
+    # if: github.ref_type == 'tag' && startsWith(github.ref, 'refs/tags/v')
     needs: [lint-ui, docker-ui-build-test, lint-api, tests-api, docker-api-build-test]
     steps:
       - name: Setup
@@ -125,7 +125,7 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
-    if: github.ref_type == 'tag' && startsWith(github.ref, 'refs/tags/v')
+    # if: github.ref_type == 'tag' && startsWith(github.ref, 'refs/tags/v')
     needs: [docker-ui-build-push, docker-api-build-push]
     steps:
       - name: Setup
@@ -157,6 +157,12 @@ jobs:
             export MYSQL_DATABASE=${{ secrets.MY_SOLID_APP_DB_NAME }}
             export MYSQL_USER=${{ secrets.MY_SOLID_APP_DB_USER }}
             export MYSQL_PASSWORD=${{ secrets.MY_SOLID_APP_DB_PASSWORD }}
+            export MY_SOLID_APP_MAIL_SERVER=${{ secrets.MY_SOLID_APP_MAIL_SERVER }}
+            export MY_SOLID_APP_MAIL_PORT=${{ secrets.MY_SOLID_APP_MAIL_PORT }}
+            export MY_SOLID_APP_MAIL_USERNAME=${{ secrets.MY_SOLID_APP_MAIL_USERNAME }}
+            export MY_SOLID_APP_MAIL_PASSWORD=${{ secrets.MY_SOLID_APP_MAIL_PASSWORD }}
+            export MY_SOLID_APP_MAIL_DEFAULT_SENDER=${{ secrets.MY_SOLID_APP_MAIL_DEFAULT_SENDER }}
+
             docker compose -f docker-compose.prod.yml down
             docker compose -f docker-compose.prod.yml pull
             docker compose -f docker-compose.prod.yml up -d
