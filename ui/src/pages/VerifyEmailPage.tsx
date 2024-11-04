@@ -3,12 +3,12 @@ import { A, useSearchParams } from '@solidjs/router'
 
 import { ThemeSwitcher } from '../components/ThemeSwitcher'
 
-import { useUser } from '../context';
+import { useUser } from '../context'
 import api from '../api'
 
 export function VerifyEmailPage(): JSXElement {
   const [searchParams] = useSearchParams()
-  const { fetchUser } = useUser();
+  const { fetchUser } = useUser()
 
   const [loading, setLoading] = createSignal(true)
   const [success, setSuccess] = createSignal(false)
@@ -28,12 +28,13 @@ export function VerifyEmailPage(): JSXElement {
         })
       )
       .then(async () => {
-        await fetchUser();
-        setSuccess(true);
+        await fetchUser()
+        setSuccess(true)
       })
       .catch((error) => {
         setErrorMsg(
-          error.response.data.error_message ?? 'Could not verify email, please try again later'
+          error.response.data.error_message ??
+            'Could not verify email, please try again later'
         )
       })
       .finally(() => {

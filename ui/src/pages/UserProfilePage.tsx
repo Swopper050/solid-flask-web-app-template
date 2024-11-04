@@ -18,10 +18,13 @@ export function UserProfilePage(): JSXElement {
         <p class="text-lg font-bold mr-4 col-span-1">Email:</p>
         <p class="text-lg col-span-2">
           {user().email}
-          <Show 
+          <Show
             when={user().isVerified}
             fallback={
-              <span class="ml-4 tooltip" data-tip="Your email is not verified yet">
+              <span
+                class="ml-4 tooltip"
+                data-tip="Your email is not verified yet"
+              >
                 <i class="fa-solid fa-triangle-exclamation text-warning" />
               </span>
             }

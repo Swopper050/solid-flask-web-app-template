@@ -9,7 +9,7 @@ from marshmallow import Schema, fields
 from app.config import MY_SOLID_APP_PASSWORD_RESET_TOKEN_EXPIRE_HOURS
 from app.db.user import User, UserSchema
 from app.extensions import api, db, login_manager
-from app.mail_utils import send_forgot_password_email, send_email_verification_email
+from app.mail_utils import send_email_verification_email, send_forgot_password_email
 
 
 @login_manager.user_loader

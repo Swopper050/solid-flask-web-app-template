@@ -42,11 +42,13 @@ export const UserProvider = (props: { children: JSXElement }) => {
   }
 
   onMount(() => {
-      fetchUser();
+    fetchUser()
   })
 
   return (
-    <UserContext.Provider value={{ user: user, setUser, loading: loading, fetchUser: fetchUser }}>
+    <UserContext.Provider
+      value={{ user: user, setUser, loading: loading, fetchUser: fetchUser }}
+    >
       {props.children}
     </UserContext.Provider>
   )
