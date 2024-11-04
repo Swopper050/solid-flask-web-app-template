@@ -13,6 +13,7 @@ import { User } from './models/User'
 interface UserContextAttributes {
   user: Accessor<User> | null
   setUser: (user: User | null) => void
+  fetchUser: () => Promise<void>
   loading: Accessor<boolean>
 }
 
@@ -22,7 +23,7 @@ export const UserProvider = (props: { children: JSXElement }) => {
   const [user, setUser] = createSignal<User | null>(null)
   const [loading, setLoading] = createSignal(true)
 
-  onMount(() => {
+  const fetchUser = async () => {
     api
       .get('/whoami')
       .then(async (response) => {
@@ -38,10 +39,14 @@ export const UserProvider = (props: { children: JSXElement }) => {
         setUser(null)
         setLoading(false)
       })
+  }
+
+  onMount(() => {
+      fetchUser();
   })
 
   return (
-    <UserContext.Provider value={{ user: user, setUser, loading: loading }}>
+    <UserContext.Provider value={{ user: user, setUser, loading: loading, fetchUser: fetchUser }}>
       {props.children}
     </UserContext.Provider>
   )

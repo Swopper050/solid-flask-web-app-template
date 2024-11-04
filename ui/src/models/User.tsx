@@ -5,6 +5,7 @@ export interface UserAttributes extends BaseModelAttributes {
   email: string
   name: string
   is_admin: boolean
+  is_verified: boolean
   access_token: string | null
 }
 
@@ -39,5 +40,9 @@ export class User extends BaseModel<UserAttributes> {
 
   get accessToken(): string | null {
     return super.get('access_token')
+  }
+
+  get isVerified(): boolean {
+    return super.get('is_verified')
   }
 }
