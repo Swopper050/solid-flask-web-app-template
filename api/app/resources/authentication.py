@@ -9,7 +9,7 @@ from marshmallow import Schema, fields
 from app.config import MY_SOLID_APP_PASSWORD_RESET_TOKEN_EXPIRE_HOURS
 from app.db.user import User, UserSchema
 from app.extensions import api, db, login_manager
-from app.mail_utils import send_forgot_password_email
+from app.mail_utils import send_email_verification_email, send_forgot_password_email
 
 
 @login_manager.user_loader
@@ -37,6 +37,14 @@ class Register(Resource):
         db.session.commit()
 
         login_user(new_user)
+
+        verification_token = new_user.set_email_verification_token()
+        send_email_verification_email(
+            receiver=new_user.email, verification_token=verification_token
+        )
+
+        db.session.add(new_user)
+        db.session.commit()
 
         return UserSchema().dump(new_user)
 
@@ -149,6 +157,45 @@ class ResetPassword(Resource):
         user.clear_password_reset_token()
 
         db.session.add(user)
+        db.session.commit()
+
+        return {}, 200
+
+
+class EmailVerificationSchema(Schema):
+    email = fields.String(required=True)
+    verification_token = fields.String(required=True)
+
+
+@api.route("/verify_email")
+class EmailVerification(Resource):
+    def post(self):
+        data: dict = EmailVerificationSchema().load(request.get_json())
+
+        verification_token = data.get("verification_token")
+        user = User.query.filter_by(email=data.get("email")).first()
+        if user is None or not user.check_email_verification_token(verification_token):
+            return {"error_message": "Could not verify email with the given token"}, 400
+
+        user.is_verified = True
+        user.clear_email_verification_token()
+
+        db.session.add(user)
+        db.session.commit()
+
+        return {}, 200
+
+
+@api.route("/resend_email_verification")
+class ResendEmailVerification(Resource):
+    @login_required
+    def post(self):
+        verification_token = current_user.set_email_verification_token()
+        send_email_verification_email(
+            receiver=current_user.email, verification_token=verification_token
+        )
+
+        db.session.add(current_user)
         db.session.commit()
 
         return {}, 200

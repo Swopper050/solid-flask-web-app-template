@@ -30,3 +30,25 @@ def send_forgot_password_email(*, receiver: str, reset_token: str):
     )
     message.html
     mail.send(message)
+
+
+def send_email_verification_email(*, receiver: str, verification_token: str):
+    verification_link = (
+        f"{MY_SOLID_APP_FRONTEND_URL}/verify-email?"
+        f"email={receiver}&verification_token={verification_token}"
+    )
+
+    with open("./email_templates/verify_email.html", "r") as file:
+        html_content = file.read()
+
+    html_content = Template(html_content).safe_substitute(
+        verification_link=verification_link
+    )
+
+    message = Message(
+        subject="🛁 MySolidApp - Email verification",
+        recipients=[receiver],
+        html=html_content,
+    )
+    message.html
+    mail.send(message)

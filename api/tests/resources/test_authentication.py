@@ -12,9 +12,17 @@ from app.extensions import mail
 class TestRegisterAPI:
     def test_register(self, client, db, user):
         assert User.query.count() == 1
-        response = client.post(
-            "/register", json={"email": "new@user.com", "password": "white_wolf"}
-        )
+
+        with mail.record_messages() as outbox:
+            response = client.post(
+                "/register", json={"email": "new@user.com", "password": "white_wolf"}
+            )
+
+            assert len(outbox) == 1
+            assert outbox[0].subject == "🛁 MySolidApp - Email verification"
+            assert outbox[0].recipients == ["new@user.com"]
+            assert outbox[0].html is not None
+            token = re.search(r"verification_token=([\w-]+)", outbox[0].html).group(1)
 
         assert response.status_code == 200
 
@@ -29,6 +37,7 @@ class TestRegisterAPI:
         assert not new_user.is_admin
         assert new_user.hashed_password is not None
         assert new_user.is_correct_password("white_wolf")
+        assert new_user.check_email_verification_token(token)
 
     def test_register_email_exists(self, client, user):
         assert User.query.count() == 1
@@ -360,3 +369,112 @@ class TestResetPasswordAPI:
         # Make sure the user reset tokens are not cleared yet.
         assert user.password_reset_token is not None
         assert user.is_correct_password("password123")
+
+
+class TestEmailVerificationAPI:
+    def test_verify_email(self, db, client, user):
+        token = user.set_email_verification_token()
+        db.session.add(user)
+        db.session.commit()
+
+        assert user.email_verification_token is not None
+        assert not user.is_verified
+
+        response = client.post(
+            "/verify_email",
+            json={
+                "email": user.email,
+                "verification_token": token,
+            },
+        )
+
+        assert response.status_code == 200
+        assert user.email_verification_token is None
+        assert user.is_verified
+
+    def test_email_verification_invalid_token(self, db, client, user):
+        user.set_email_verification_token()
+        db.session.add(user)
+        db.session.commit()
+
+        response = client.post(
+            "/verify_email",
+            json={
+                "email": user.email,
+                "verification_token": "geralt",
+            },
+        )
+
+        assert response.status_code == 400
+        assert response.json == {
+            "error_message": "Could not verify email with the given token"
+        }
+
+        # Make sure the user tokens are not cleared yet and user is not verified.
+        assert user.email_verification_token is not None
+        assert not user.is_verified
+
+    def test_verify_email_invalid_email(self, client, user):
+        response = client.post(
+            "/verify_email",
+            json={
+                "email": "unknown@wow.nl",
+                "verification_token": "12345",
+            },
+        )
+
+        assert response.status_code == 400
+        assert response.json == {
+            "error_message": "Could not verify email with the given token"
+        }
+
+
+class TestResendVerifyEmailAPI:
+    def test_resend_email_verification(self, db, client, logged_in_user):
+        logged_in_user.set_email_verification_token()
+        db.session.add(logged_in_user)
+        db.session.commit()
+
+        assert logged_in_user.email_verification_token is not None
+        assert not logged_in_user.is_verified
+
+        old_token = logged_in_user.email_verification_token
+
+        with mail.record_messages() as outbox:
+            response = client.post(
+                "/resend_email_verification",
+            )
+
+            assert response.status_code == 200
+            assert len(outbox) == 1
+            assert outbox[0].subject == "🛁 MySolidApp - Email verification"
+            assert outbox[0].recipients == [logged_in_user.email]
+            assert outbox[0].html is not None
+            new_token = re.search(r"verification_token=([\w-]+)", outbox[0].html).group(
+                1
+            )
+
+        assert logged_in_user.email_verification_token != old_token
+        assert logged_in_user.check_email_verification_token(new_token)
+        assert not logged_in_user.is_verified
+
+    def test_resend_email_verification_not_logged_in(self, db, client, user):
+        user.set_email_verification_token()
+        db.session.add(user)
+        db.session.commit()
+
+        assert user.email_verification_token is not None
+        assert not user.is_verified
+
+        old_token = user.email_verification_token
+
+        with mail.record_messages() as outbox:
+            response = client.post(
+                "/resend_email_verification",
+            )
+
+            assert response.status_code == 401
+            assert len(outbox) == 0
+
+        assert not user.is_verified
+        assert user.email_verification_token == old_token

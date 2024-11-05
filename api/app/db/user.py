@@ -22,6 +22,11 @@ class User(db.Model, UserMixin):
     password_reset_token: Mapped[str | None] = mapped_column(String(256), nullable=True)
     password_reset_time: Mapped[int | None] = mapped_column(nullable=True)
 
+    email_verification_token: Mapped[str | None] = mapped_column(
+        String(256), nullable=True
+    )
+    is_verified: Mapped[bool] = mapped_column(default=False)
+
     def set_password(self, password: str):
         self.hashed_password = generate_password_hash(password)
 
@@ -44,8 +49,23 @@ class User(db.Model, UserMixin):
         self.password_reset_token = None
         self.password_reset_time = None
 
+    def set_email_verification_token(self):
+        token = secrets.token_urlsafe(32)
+        self.email_verification_token = generate_password_hash(token)
+        return token
+
+    def check_email_verification_token(self, verification_token: str):
+        if self.email_verification_token is None:
+            return False
+
+        return check_password_hash(self.email_verification_token, verification_token)
+
+    def clear_email_verification_token(self):
+        self.email_verification_token = None
+
 
 class UserSchema(Schema):
     id = fields.Integer()
     email = fields.String(validate=validate.Length(max=100))
     is_admin = fields.Boolean()
+    is_verified = fields.Boolean()
