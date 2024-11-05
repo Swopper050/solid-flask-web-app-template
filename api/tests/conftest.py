@@ -66,3 +66,9 @@ def user(db):
     db.session.commit()
 
     return _user
+
+
+@pytest.fixture
+def logged_in_user(client, user):
+    client.post("/login", json={"email": user.email, "password": "password123"})
+    return user

@@ -186,6 +186,21 @@ class EmailVerification(Resource):
         return {}, 200
 
 
+@api.route("/resend_email_verification")
+class ResendEmailVerification(Resource):
+    @login_required
+    def post(self):
+        verification_token = current_user.set_email_verification_token()
+        send_email_verification_email(
+            receiver=current_user.email, verification_token=verification_token
+        )
+
+        db.session.add(current_user)
+        db.session.commit()
+
+        return {}, 200
+
+
 def password_matches_conditions(password: str) -> bool:
     return (
         len(password) >= 8
