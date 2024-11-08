@@ -27,6 +27,9 @@ class User(db.Model, UserMixin):
     )
     is_verified: Mapped[bool] = mapped_column(default=False)
 
+    two_factor_enabled: Mapped[bool] = mapped_column(default=False)
+    totp_secret: Mapped[str | None] = mapped_column(String(256), nullable=True)
+
     def set_password(self, password: str):
         self.hashed_password = generate_password_hash(password)
 
