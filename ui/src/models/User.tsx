@@ -7,6 +7,7 @@ export interface UserAttributes extends BaseModelAttributes {
   is_admin: boolean
   is_verified: boolean
   access_token: string | null
+  two_factor_enabled: boolean
 }
 
 export class User extends BaseModel<UserAttributes> {
@@ -44,5 +45,13 @@ export class User extends BaseModel<UserAttributes> {
 
   get isVerified(): boolean {
     return super.get('is_verified')
+  }
+
+  get twoFactorEnabled(): boolean {
+    return super.get('two_factor_enabled');
+  }
+
+  set twoFactorEnabled(enabled: boolean) {
+    super.set('two_factor_enabled', enabled)
   }
 }

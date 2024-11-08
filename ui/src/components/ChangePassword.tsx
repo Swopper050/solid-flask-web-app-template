@@ -60,7 +60,7 @@ export function ChangePassword(): JSXElement {
     <>
       <div class="flex items-center mt-6">
         <button
-          class="btn btn-primary"
+          class="btn btn-primary btn-sm"
           onClick={() => setChangingPassword(!changingPassword())}
         >
           Change password
@@ -149,7 +149,7 @@ export function ChangePassword(): JSXElement {
           <div>
             <button
               class={clsx(
-                'btn btn-primary mt-6',
+                'btn btn-primary btn-sm mt-4',
                 (submitting() ||
                   !canChangePassword() ||
                   !isGoodPassword(newPassword())) &&

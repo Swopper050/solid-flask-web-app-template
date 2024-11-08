@@ -1,6 +1,7 @@
 import { createSignal, JSXElement, Show } from 'solid-js'
 import { useUser } from '../context'
 import { ChangePassword } from '../components/ChangePassword'
+import { SetupMFAModal } from '../components/SetupMFAModal';
 import { clsx } from 'clsx'
 
 import api from '../api'
@@ -9,6 +10,7 @@ export function UserProfilePage(): JSXElement {
   const { user } = useUser()
 
   const [sending, setSending] = createSignal(false)
+  const [setupMFAModalOpen, setSetupMFAModalOpen] = createSignal(false)
 
   const resendVerificationMail = () => {
     setSending(true)
@@ -60,6 +62,18 @@ export function UserProfilePage(): JSXElement {
             </p>
           </Show>
         </p>
+      </div>
+
+      <div class="grid grid-cols-12 gap-4 mt-2">
+        <p class="text-lg font-bold mr-4 col-span-1">2FA enabled:</p>
+        <p class="text-lg col-span2">
+          {user().twoFactorEnabled}
+        </p>
+        <button class="btn btn-primary btn-sm" onClick={() => setSetupMFAModalOpen(true)}>
+          Setup 2FA
+        </button>
+
+        <SetupMFAModal isOpen={setupMFAModalOpen()} onClose={() => setSetupMFAModalOpen(false)} />
       </div>
 
       <ChangePassword />
