@@ -12,13 +12,20 @@ export function isGoodPassword(password: string): boolean {
 export function passwordConditions(): JSXElement {
   return (
     <>
-      <p>Password must contain:</p>
-      <ul>
-        <li>- 8 or more characters</li>
-        <li>- at least 1 uppercase letter</li>
-        <li>- at least 1 lowercase letter</li>
-        <li>- 1 digit</li>
-      </ul>
+      <div role="alert" class="alert alert-info">
+        <i class="fa-solid fa-info-circle mr-2" />
+        <div>
+          <h5>Password must contain:</h5>
+          <div class="text-xs">
+            <ul>
+              <li>• 8 or more characters</li>
+              <li>• at least 1 uppercase letter</li>
+              <li>• at least 1 lowercase letter</li>
+              <li>• 1 digit</li>
+            </ul>
+          </div>
+        </div>
+      </div>
     </>
   )
 }
