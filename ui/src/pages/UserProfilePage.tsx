@@ -1,4 +1,4 @@
-import { createSignal, JSXElement, Show } from 'solid-js'
+import { createEffect, createSignal, JSXElement, Show } from 'solid-js'
 import { useUser } from '../context'
 import { clsx } from 'clsx'
 
@@ -55,9 +55,8 @@ export function UserProfilePage(): JSXElement {
 }
 
 function createPasswordState() {
-  console.log('clicked')
-
   const { setUser } = useUser()
+
   const [currentPassword, setCurrentPassword] = createSignal<string | null>(
     null
   )
@@ -121,7 +120,6 @@ function ChangePasswordModal(props: {
   isOpen: boolean
   onClose: () => void
 }): JSXElement {
-
   const {
     changePassword,
     currentPassword,
@@ -135,16 +133,32 @@ function ChangePasswordModal(props: {
     confirmNewPassword,
     setConfirmNewPassword,
   } = createPasswordState()
-  
+
   // TODO show success in card where eisen also are checked.
   // TODO cut into smaller components
   // TODO save button
-
   return (
     <Modal
       title="Change password"
       isOpen={props.isOpen}
       onClose={props.onClose}
+      submitButton={
+        <button
+          class={clsx(
+            'btn btn-primary mt-6',
+            (submitting() ||
+              !canChangePassword() ||
+              !isGoodPassword(newPassword())) &&
+              'btn-disabled'
+          )}
+          onClick={changePassword}
+        >
+          <Show when={submitting()}>
+            <span class="loading loading-spinner" />
+          </Show>
+          Save
+        </button>
+      }
     >
       <>
         <div class="mt-5" />
@@ -158,102 +172,86 @@ function ChangePasswordModal(props: {
           </Show>
         </div>
 
-        <div class="my-2">
-          <label class="input input-bordered flex items-center my-2">
-            <PasswordIcon />
-            <input
-              type="password"
-              class="grow ml-2"
-              placeholder="Current password"
-              value={currentPassword()}
-              onInput={(e) =>
-                setCurrentPassword(
-                  e.target.value === '' ? null : e.target.value
-                )
-              }
-            />
-          </label>
-          <div class="mt-9" />
-
-          <label
-            class={clsx(
-              'input input-bordered flex items-center mt-2',
-              newPassword() !== null &&
-                !isGoodPassword(newPassword()) &&
-                'input-error'
-            )}
-          >
-            <PasswordIcon />
-            <input
-              type="password"
-              class="grow ml-2"
-              placeholder="New password"
-              value={newPassword()}
-              onInput={(e) =>
-                setNewPassword(e.target.value === '' ? null : e.target.value)
-              }
-            />
-          </label>
-          <Show
-            when={newPassword() !== null && !isGoodPassword(newPassword())}
-            fallback={<div class="mt-9" />}
-          >
-            <div class="label">
-              <span class="label-text-alt text-error">Not secure enough</span>
-            </div>
-          </Show>
-
-          <label class="input input-bordered flex items-center mt-2">
-            <PasswordIcon />
-            <input
-              type="password"
-              class="grow ml-2"
-              placeholder="New password"
-              value={confirmNewPassword()}
-              onInput={(e) =>
-                setConfirmNewPassword(
-                  e.target.value === '' ? null : e.target.value
-                )
-              }
-            />
-          </label>
-          <Show
-            when={!(newPassword() === confirmNewPassword())}
-            fallback={<div class="mt-9" />}
-          >
-            <div class="label">
-              <span class="label-text-alt text-error">
-                Passwords do not match
-              </span>
-            </div>
-          </Show>
-
-          <Show when={errorMsg() !== null}>
-            <div role="alert" class="alert alert-error mt-6">
-              <span>{errorMsg()}</span>
-            </div>
-          </Show>
-
-          <div>
-            <button
-              class={clsx(
-                'btn btn-primary mt-6',
-                (submitting() ||
-                  !canChangePassword() ||
-                  !isGoodPassword(newPassword())) &&
-                  'btn-disabled'
-              )}
-              onClick={changePassword}
-            >
-              <Show when={submitting()}>
-                <span class="loading loading-spinner" />
-              </Show>
-              Save
-            </button>
+        <Show when={errorMsg() !== null}>
+          <div role="alert" class="alert alert-error mt-6">
+            <span>{errorMsg()}</span>
           </div>
+        </Show>
+
+        <div class="my-2">
+          <PasswordField
+            value={currentPassword()}
+            onChange={setCurrentPassword}
+          />
+
+          <PasswordField
+            value={newPassword()}
+            onChange={setNewPassword}
+            validator={(value) => {
+              if (!isGoodPassword(value)) {
+                return 'DOM'
+              }
+
+              return ""
+            }}
+          />
+
+          <PasswordField
+            value={confirmNewPassword()}
+            onChange={setConfirmNewPassword}
+            validator={(value) => {
+              console.log(value, newPassword())
+              if (value !== newPassword()) {
+                return 'do no match'
+              }
+
+              return ""
+            }}
+          />
         </div>
       </>
     </Modal>
+  )
+}
+
+function PasswordField(props: {
+  value: string
+  onChange: (password: string) => void
+  validator?: (value: string) => string
+}): JSXElement {
+  const value = () => props.value
+  const [validationError, setValidationError] = createSignal('')
+
+  createEffect(() => {
+    if (props.validator !== undefined) {
+        console.log(value())
+      setValidationError(props.validator(value()))
+    }
+  })
+
+  return (
+    <>
+      <label
+        class={clsx(
+          'input input-bordered flex items-center mt-2',
+          validationError() !== '' && 'inputError'
+        )}
+      >
+        <PasswordIcon />
+        <input
+          type="password"
+          class="grow ml-2"
+          placeholder="Current password"
+          value={props.value}
+          onInput={(e) => props.onChange(e.target.value.trim())}
+        />
+      </label>
+      <Show when={validationError() !== ''} fallback={<div class="mt-9" />}>
+        <div class="label">
+          <span class="label-text-alt text-error">{validationError()}</span>
+        </div>
+      </Show>
+    </>
   )
 }
 
@@ -261,6 +259,7 @@ function Modal(props: {
   title: string
   isOpen: boolean
   children: JSXElement | JSXElement[]
+  submitButton?: JSXElement
   onClose: () => void
 }): JSXElement {
   const isOpen = () => props.isOpen
@@ -275,9 +274,16 @@ function Modal(props: {
           {props.children}
           <div class="modal-action">
             <form method="dialog">
-              <button onClick={() => props.onClose()} class="btn">
-                Close
-              </button>
+              <Show
+                when={props.submitButton}
+                fallback={
+                  <button onClick={() => props.onClose()} class="btn">
+                    Close
+                  </button>
+                }
+              >
+                {props.submitButton}
+              </Show>
             </form>
           </div>
         </div>
