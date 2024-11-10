@@ -12,6 +12,7 @@ services:
       MYSQL_PASSWORD: my_solid_app_password
 
   mail: 
+    name: my-solid-app-maildev
     image: maildev/maildev
     command: 
       - "--incoming-user=mysolidapp@mail.com"
