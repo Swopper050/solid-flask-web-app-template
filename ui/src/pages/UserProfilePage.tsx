@@ -1,4 +1,4 @@
-import { createEffect, createSignal, JSXElement, Show } from 'solid-js'
+import { createSignal, JSXElement, Show } from 'solid-js'
 import { useUser } from '../context'
 import { clsx } from 'clsx'
 
@@ -189,10 +189,10 @@ function ChangePasswordModal(props: {
             onChange={setNewPassword}
             validator={(value) => {
               if (!isGoodPassword(value)) {
-                return 'DOM'
+                return 'Password does not match requirements.'
               }
 
-              return ""
+              return ''
             }}
           />
 
@@ -200,12 +200,11 @@ function ChangePasswordModal(props: {
             value={confirmNewPassword()}
             onChange={setConfirmNewPassword}
             validator={(value) => {
-              console.log(value, newPassword())
               if (value !== newPassword()) {
-                return 'do no match'
+                return 'Passwords do not match.'
               }
 
-              return ""
+              return ''
             }}
           />
         </div>
@@ -216,34 +215,30 @@ function ChangePasswordModal(props: {
 
 function PasswordField(props: {
   value: string
+  placeholder?: string
   onChange: (password: string) => void
   validator?: (value: string) => string
 }): JSXElement {
-  const value = () => props.value
   const [validationError, setValidationError] = createSignal('')
-
-  createEffect(() => {
-    if (props.validator !== undefined) {
-        console.log(value())
-      setValidationError(props.validator(value()))
-    }
-  })
 
   return (
     <>
       <label
         class={clsx(
           'input input-bordered flex items-center mt-2',
-          validationError() !== '' && 'inputError'
+          validationError() !== '' && 'input-error'
         )}
       >
         <PasswordIcon />
         <input
           type="password"
           class="grow ml-2"
-          placeholder="Current password"
+          placeholder={props.placeholder ?? 'Password'}
           value={props.value}
           onInput={(e) => props.onChange(e.target.value.trim())}
+          onBlur={(e) =>
+            setValidationError(props.validator(e.target.value.trim()))
+          }
         />
       </label>
       <Show when={validationError() !== ''} fallback={<div class="mt-9" />}>
