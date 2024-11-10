@@ -10,3 +10,13 @@ services:
       MYSQL_DATABASE: my_solid_app_db
       MYSQL_USER: my_solid_app_user
       MYSQL_PASSWORD: my_solid_app_password
+
+  mail: 
+    image: maildev/maildev
+    container_name: my-solid-app-maildev
+    command: 
+      - "--incoming-user=mysolidapp@mail.com"
+      - "--incoming-pass=12345678"
+    ports:
+      - "1080:1080" 
+      - "1025:1025"

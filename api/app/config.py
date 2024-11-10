@@ -24,12 +24,12 @@ class BaseConfig:
         f"{MY_SOLID_APP_DB_NAME}"
     )
 
-    MAIL_SERVER = os.environ.get("MY_SOLID_APP_MAIL_SERVER", "stmp.server.com")
-    MAIL_PORT = int(os.environ.get("MY_SOLID_APP_MAIL_PORT", 465))
+    MAIL_SERVER = os.environ.get("MY_SOLID_APP_MAIL_SERVER", "localhost")
+    MAIL_PORT = int(os.environ.get("MY_SOLID_APP_MAIL_PORT", 1025))
     MAIL_USE_TLS = False
-    MAIL_USE_SSL = True
+    MAIL_USE_SSL = os.environ.get("MY_SOLID_APP_MAIL_USE_SSL") == "True"
     MAIL_USERNAME = os.environ.get("MY_SOLID_APP_MAIL_USERNAME", "mysolidapp@mail.com")
-    MAIL_PASSWORD = os.environ.get("MY_SOLID_APP_MAIL_PASSWORD", "mysolidapp@mail.com")
+    MAIL_PASSWORD = os.environ.get("MY_SOLID_APP_MAIL_PASSWORD", "12345678")
     MAIL_DEFAULT_SENDER = os.environ.get(
         "MY_SOLID_APP_MAIL_DEFAULT_SENDER", "mysolidapp@mail.com"
     )
