@@ -1,8 +1,24 @@
-[tool.black]
-line_length = 89
+[tool.ruff]
+line-length = 89
+indent-width =4 
 
-[tool.isort]
-line_length = 89
-multi_line_output = 3
-include_trailing_comma = true
-src_paths=['app.py', 'app/', 'tests/']
+[tool.ruff.lint]
+select = [
+    # Pyflakes
+    "F",
+    # pycodestyle
+    "E4",
+    "E7",
+    "E9",
+    # isort
+    "I",
+    # pep8-naming
+    "N",
+]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = [
+    # Allow using star imports in __init__.py modules for giving easy access to
+    # all exports defined in a package
+    "F401", "F403", "F405",
+]
