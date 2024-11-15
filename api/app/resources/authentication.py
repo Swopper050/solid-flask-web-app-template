@@ -1,6 +1,9 @@
 import re
 import time
 
+import pyotp
+from flask import jsonify
+
 from flask import request
 from flask_login import current_user, login_required, login_user, logout_user
 from flask_restx import Resource
@@ -45,6 +48,40 @@ class Register(Resource):
 
         db.session.add(new_user)
         db.session.commit()
+class Enable2FASchema(Schema):
+    totp_code = fields.String(required=True)
+
+
+@api.route("/enable_2fa")
+class Enable2FA(Resource):
+    @login_required
+    def post(self):
+        if current_user.is_2fa_enabled:
+            return {"error_message": "2FA is already enabled."}, 400
+
+        secret = pyotp.random_base32()
+        current_user.set_totp_secret(secret)
+
+        db.session.add(current_user)
+        db.session.commit()
+
+        return jsonify({"secret": secret})
+
+
+@api.route("/verify_2fa")
+class Verify2FA(Resource):
+    @login_required
+    def post(self):
+        data: dict = Enable2FASchema().load(request.get_json())
+
+        if current_user.verify_totp(data.get("totp_code")):
+            current_user.is_2fa_enabled = True
+            db.session.add(current_user)
+            db.session.commit()
+            return {}, 200
+
+        return {"error_message": "Invalid TOTP code."}, 400
+
 
         return UserSchema().dump(new_user)
 

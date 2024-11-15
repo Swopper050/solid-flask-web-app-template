@@ -27,6 +27,17 @@ class User(db.Model, UserMixin):
     )
     is_verified: Mapped[bool] = mapped_column(default=False)
 
+    totp_secret: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    is_2fa_enabled: Mapped[bool] = mapped_column(default=False)
+
+    def set_totp_secret(self, secret: str):
+        self.totp_secret = generate_password_hash(secret)
+
+    def verify_totp(self, totp_code: str) -> bool:
+        if self.totp_secret is None:
+            return False
+        return pyotp.TOTP(self.totp_secret).verify(totp_code)
+
     def set_password(self, password: str):
         self.hashed_password = generate_password_hash(password)
 
