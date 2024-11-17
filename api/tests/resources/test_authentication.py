@@ -3,6 +3,7 @@ import re
 from unittest.mock import patch
 
 import pytest
+from flask import session
 from flask_login import current_user
 
 from app.db.user import User, UserSchema
@@ -66,7 +67,7 @@ class TestLoginAPI:
             "/login", json={"email": "dijkstra@test.com", "password": "password123"}
         )
 
-        assert response.status_code == 409
+        assert response.status_code == 401
         assert response.json == {
             "error_message": "Could not login with the given email and password"
         }
@@ -76,10 +77,23 @@ class TestLoginAPI:
             "/login", json={"email": "user@test.com", "password": "gooseberries"}
         )
 
-        assert response.status_code == 409
+        assert response.status_code == 401
         assert response.json == {
             "error_message": "Could not login with the given email and password"
         }
+
+    def test_login_with_2fa_enabled(self, db, client, user):
+        user.two_factor_enabled = True
+        db.session.add(user)
+        db.session.commit()
+
+        with client:
+            response = client.post(
+                "/login", json={"email": "user@test.com", "password": "password123"}
+            )
+
+            assert response.status_code == 200
+            assert session["partially_authenticated_user"] == user.id
 
 
 class TestLogoutAPI:

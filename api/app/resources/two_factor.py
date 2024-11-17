@@ -1,20 +1,21 @@
-from io import BytesIO
 import base64
+from io import BytesIO
+
+import pyotp
+import qrcode
 from flask import request
 from flask_login import current_user, login_required
 from flask_restx import Resource
-import pyotp
-import qrcode
 from marshmallow import Schema, fields
 
 from app.extensions import api, db
 
 
 @api.route("/generate_2fa_secret")
-class GenerateTOTPSecret(Resource):
+class Generate2FASecret(Resource):
     @login_required
     def get(self):
-        if current_user.two_factor_enabled and False:
+        if current_user.two_factor_enabled:
             return {"error_message": "2FA is already enabled"}, 400
 
         totp = pyotp.TOTP(pyotp.random_base32())
@@ -31,22 +32,19 @@ class GenerateTOTPSecret(Resource):
         }, 200
 
 
-class SetupTOTPSchema(Schema):
+class Enable2FASchema(Schema):
     totp_code = fields.String(required=True)
     totp_secret = fields.String(required=True)
 
 
-@api.route("/setup_2fa")
-class SetupTOTP(Resource):
+@api.route("/enable_2fa")
+class Enable2FA(Resource):
     @login_required
     def post(self):
-        if current_user.two_factor_enabled and False:
-            return {"error_message": "2FA is already enabled"}
+        if current_user.two_factor_enabled:
+            return {"error_message": "2FA is already enabled"}, 400
 
-        import time
-
-        time.sleep(2)
-        data: dict = SetupTOTPSchema().load(request.get_json())
+        data: dict = Enable2FASchema().load(request.get_json())
         totp_secret: str = data.get("totp_secret")
         totp_code: str = data.get("totp_code")
 
@@ -56,6 +54,32 @@ class SetupTOTP(Resource):
 
         current_user.totp_secret = totp_secret
         current_user.two_factor_enabled = True
+        db.session.add(current_user)
+        db.session.commit()
+
+        return {}, 200
+
+
+class Disable2FASchema(Schema):
+    totp_code = fields.String(required=True)
+
+
+@api.route("/disable_2fa")
+class Disable2FA(Resource):
+    @login_required
+    def post(self):
+        if not current_user.two_factor_enabled:
+            return {"error_message": "2FA is already disable"}, 400
+
+        data: dict = Disable2FASchema().load(request.get_json())
+        totp_code: str = data.get("totp_code")
+
+        totp = pyotp.TOTP(current_user.totp_secret)
+        if not totp.verify(totp_code):
+            return {"error_message": "Incorrect 2FA code"}, 401
+
+        current_user.totp_secret = None
+        current_user.two_factor_enabled = False
         db.session.add(current_user)
         db.session.commit()
 

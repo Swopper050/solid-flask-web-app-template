@@ -1,12 +1,14 @@
 import secrets
 import time
 
+from cryptography.fernet import Fernet
 from flask_login import UserMixin
 from marshmallow import Schema, fields, validate
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column
 from werkzeug.security import check_password_hash, generate_password_hash
 
+from app.config import MY_SOLID_APP_FERNET_SECRET_KEY
 from app.extensions import db
 
 
@@ -28,7 +30,7 @@ class User(db.Model, UserMixin):
     is_verified: Mapped[bool] = mapped_column(default=False)
 
     two_factor_enabled: Mapped[bool] = mapped_column(default=False)
-    totp_secret: Mapped[str | None] = mapped_column(String(256), nullable=True)
+    encrypted_totp_secret: Mapped[str | None] = mapped_column(String(256), nullable=True)
 
     def set_password(self, password: str):
         self.hashed_password = generate_password_hash(password)
@@ -65,6 +67,27 @@ class User(db.Model, UserMixin):
 
     def clear_email_verification_token(self):
         self.email_verification_token = None
+
+    @property
+    def totp_secret(self):
+        if self.encrypted_totp_secret is None:
+            return None
+
+        return (
+            Fernet(MY_SOLID_APP_FERNET_SECRET_KEY)
+            .decrypt(self.encrypted_totp_secret.encode())
+            .decode()
+        )
+
+    @totp_secret.setter
+    def totp_secret(self, totp_secret: str | None):
+        if totp_secret is None:
+            self.encrypted_totp_secret = None
+            return
+
+        self.encrypted_totp_secret = (
+            Fernet(MY_SOLID_APP_FERNET_SECRET_KEY).encrypt(totp_secret.encode()).decode()
+        )
 
 
 class UserSchema(Schema):

@@ -1,7 +1,8 @@
 import { createSignal, JSXElement, Show } from 'solid-js'
 import { useUser } from '../context'
 import { ChangePassword } from '../components/ChangePassword'
-import { Setup2FAModal } from '../components/Setup2FAModal';
+import { Enable2FAModal } from '../components/Enable2FAModal'
+import { Disable2FAModal } from '../components/Disable2FAModal'
 import { clsx } from 'clsx'
 
 import api from '../api'
@@ -26,20 +27,17 @@ export function UserProfilePage(): JSXElement {
       </Show>
 
       <div class="grid grid-cols-12 gap-4">
-        <p class="text-lg font-bold mr-4 col-span-1">Email:</p>
-        <p class="text-lg col-span-2">
-          {user().email}
+        <p class="text-lg font-bold mr-4 col-span-2">Email:</p>
+        <p class="text-lg col-span-2">{user().email}</p>
+        <p class="text-lg col-span-1">
           <Show
             when={user().isVerified}
             fallback={
               <>
-                <span
-                  class="ml-4 tooltip"
-                  data-tip="Your email is not verified yet"
-                >
+                <span class="tooltip" data-tip="Your email is not verified yet">
                   <i class="fa-solid fa-triangle-exclamation text-warning" />
                 </span>
-                <span class="ml-4 tooltip" data-tip="Resend verification mail">
+                <span class="ml-2 tooltip" data-tip="Resend verification mail">
                   <button
                     class={clsx(
                       'btn btn-ghost btn-sm',
@@ -56,7 +54,7 @@ export function UserProfilePage(): JSXElement {
               </>
             }
           >
-            <p class="ml-4 tooltip" data-tip="Your email has been verified">
+            <p class="tooltip" data-tip="Your email has been verified">
               <i class="fa-solid fa-check text-success" />
             </p>
           </Show>
@@ -64,24 +62,36 @@ export function UserProfilePage(): JSXElement {
       </div>
 
       <div class="grid grid-cols-12 gap-4 mt-2">
-        <p class="text-lg font-bold mr-4 col-span-1">2FA enabled:</p>
-        <p class="text-lg col-span-1">
-          {user().twoFactorEnabled ? "Yes" : "No"}
+        <p class="text-lg font-bold mr-4 col-span-2">2FA enabled:</p>
+        <p class="text-lg col-span-2">
+          {user().twoFactorEnabled ? 'Yes' : 'No'}
         </p>
 
-        <input
-          type="checkbox"
-          class="toggle"
-          checked={user().twoFactorEnabled}
-          onClick={() => {
-            if (user().twoFactorEnabled) {
-              document.getElementById('disable_2fa_modal').showModal()
-            } else {
-              document.getElementById('setup_2fa_modal').showModal()
-            }
+        <p>
+          <Show when={user().twoFactorEnabled}>
+            <button
+              onClick={() =>
+                document.getElementById('disable_2fa_modal').showModal()
+              }
+            >
+              <i class="fa-solid fa-toggle-on" />
+            </button>
 
-          }}
-        />
+            <Disable2FAModal />
+          </Show>
+
+          <Show when={!user().twoFactorEnabled}>
+            <button
+              onClick={() =>
+                document.getElementById('enable_2fa_modal').showModal()
+              }
+            >
+              <i class="fa-solid fa-toggle-off" />
+            </button>
+
+            <Enable2FAModal />
+          </Show>
+        </p>
       </div>
 
       <ChangePassword />
