@@ -1,11 +1,16 @@
-import { createSignal, JSXElement, Show } from 'solid-js'
+import { createSignal, JSX, JSXElement, Show, splitProps } from 'solid-js'
 import { useUser } from '../context'
 import { clsx } from 'clsx'
 
 import api from '../api'
 import { PasswordIcon } from '../components/icons/Password'
-import { isGoodPassword, passwordConditions } from '../components/utils'
 import { User } from '../models/User'
+import {
+  createForm,
+  minLength,
+  pattern,
+  SubmitHandler,
+} from '@modular-forms/solid'
 
 export function UserProfilePage(): JSXElement {
   const { user } = useUser()
@@ -54,199 +59,164 @@ export function UserProfilePage(): JSXElement {
   )
 }
 
-function createPasswordState() {
+type ChangePasswordFormData = {
+  oldPassword: string
+  newPassword: string
+  confirmNewPassword: string
+}
+
+type ResponseData = {
+  success: boolean
+  message: string
+}
+
+function ChangePasswordForm(): JSXElement {
+  const [, { Form, Field }] = createForm<ChangePasswordFormData>()
+
   const { setUser } = useUser()
+  const [response, setResponse] = createSignal<ResponseData | undefined>()
 
-  const [currentPassword, setCurrentPassword] = createSignal<string | null>(
-    null
+  const onSubmit: SubmitHandler<ChangePasswordFormData> = async (values) => {
+    const response = await fetch('/api/change_password', {
+      method: 'POST',
+      credentials: 'include',
+      body: JSON.stringify({
+        current_password: values.oldPassword,
+        new_password: values.newPassword,
+      }),
+      headers: new Headers({ 'Content-Type': 'application/json' }),
+    })
+
+    if (response.status != 409) {
+      setResponse({
+        success: false,
+        message: 'Failed to update password',
+      })
+    }
+
+    if (response.status == 200) {
+      const data = await response.json()
+      setUser(new User(data))
+
+      setResponse({
+        success: true,
+        message: 'Successfully updated password',
+      })
+    }
+  }
+
+  return (
+    <Form onSubmit={onSubmit}>
+      <Show when={response()?.success}>
+        <div>succes</div>
+      </Show>
+      <Show when={!response()?.success}>
+        <div>failed</div>
+      </Show>
+      <Field name="oldPassword">
+        {(field, props) => (
+          <TextInput
+            {...props}
+            type="password"
+            value={field.value}
+            error={field.error}
+            placeholder="Current password"
+          />
+        )}
+      </Field>
+      <Field
+        name="newPassword"
+        validate={[
+          minLength(8, 'You password must have 8 characters or more.'),
+          pattern(/[A-Z]/, 'Must contain 1 uppercase letter '),
+          pattern(/[a-z]/, 'Must contain 1 lower case capitol'),
+          pattern(/[0-9]/, 'Must contain 1 digit'),
+        ]}
+      >
+        {(field, props) => (
+          <TextInput
+            {...props}
+            type="password"
+            value={field.value}
+            error={field.error}
+            placeholder="New password"
+          />
+        )}
+      </Field>
+      <Field
+        name="confirmNewPassword"
+        // TODO fix validation
+      >
+        {(field, props) => (
+          <TextInput
+            {...props}
+            type="password"
+            value={field.value}
+            error={field.error}
+            placeholder="Confirm new password"
+          />
+        )}
+      </Field>
+      <button class="mt-4 btn btn-primary " type="submit">
+        Change
+      </button>
+    </Form>
   )
-  const [newPassword, setNewPassword] = createSignal<string | null>(null)
-  const [confirmNewPassword, setConfirmNewPassword] = createSignal<
-    string | null
-  >(null)
-  const [errorMsg, setErrorMsg] = createSignal<string | null>(null)
-  const [successMsg, setSuccessMsg] = createSignal<string | null>(null)
-  const [submitting, setSubmitting] = createSignal(false)
-
-  const canChangePassword = () => {
-    return (
-      currentPassword() !== null &&
-      newPassword() !== null &&
-      newPassword() === confirmNewPassword()
-    )
-  }
-
-  const changePassword = () => {
-    setSubmitting(true)
-    setErrorMsg(null)
-
-    api
-      .post(
-        '/change_password',
-        JSON.stringify({
-          current_password: currentPassword(),
-          new_password: newPassword(),
-        })
-      )
-      .then((response) => {
-        setUser(new User(response.data))
-        setSuccessMsg('Password changed successfully')
-        setTimeout(() => setSuccessMsg(null), 5000)
-      })
-      .catch((error) => {
-        setErrorMsg(error.response.data.error_message)
-      })
-      .finally(() => {
-        setSubmitting(false)
-      })
-  }
-
-  return {
-    changePassword,
-    currentPassword,
-    setNewPassword,
-    setCurrentPassword,
-    newPassword,
-    errorMsg,
-    submitting,
-    successMsg,
-    canChangePassword,
-    confirmNewPassword,
-    setConfirmNewPassword,
-  }
 }
 
 function ChangePasswordModal(props: {
   isOpen: boolean
   onClose: () => void
 }): JSXElement {
-  const {
-    changePassword,
-    currentPassword,
-    setNewPassword,
-    setCurrentPassword,
-    newPassword,
-    errorMsg,
-    submitting,
-    successMsg,
-    canChangePassword,
-    confirmNewPassword,
-    setConfirmNewPassword,
-  } = createPasswordState()
-
-  // TODO show success in card where eisen also are checked.
-  // TODO cut into smaller components
-  // TODO save button
   return (
     <Modal
       title="Change password"
       isOpen={props.isOpen}
       onClose={props.onClose}
-      submitButton={
-        <button
-          class={clsx(
-            'btn btn-primary mt-6',
-            (submitting() ||
-              !canChangePassword() ||
-              !isGoodPassword(newPassword())) &&
-              'btn-disabled'
-          )}
-          onClick={changePassword}
-        >
-          <Show when={submitting()}>
-            <span class="loading loading-spinner" />
-          </Show>
-          Save
-        </button>
-      }
     >
-      <>
-        <div class="mt-5" />
-        {passwordConditions()}
-        <div class="flex items-center mt-6">
-          <Show when={successMsg() !== null}>
-            <p class="text-base text-success ml-6">
-              <i class="fa-solid fa-check mr-2" />
-              {successMsg()}
-            </p>
-          </Show>
-        </div>
-
-        <Show when={errorMsg() !== null}>
-          <div role="alert" class="alert alert-error mt-6">
-            <span>{errorMsg()}</span>
-          </div>
-        </Show>
-
-        <div class="my-2">
-          <PasswordField
-            value={currentPassword()}
-            onChange={setCurrentPassword}
-          />
-
-          <PasswordField
-            value={newPassword()}
-            onChange={setNewPassword}
-            validator={(value) => {
-              if (!isGoodPassword(value)) {
-                return 'Password does not match requirements.'
-              }
-
-              return ''
-            }}
-          />
-
-          <PasswordField
-            value={confirmNewPassword()}
-            onChange={setConfirmNewPassword}
-            validator={(value) => {
-              if (value !== newPassword()) {
-                return 'Passwords do not match.'
-              }
-
-              return ''
-            }}
-          />
-        </div>
-      </>
+      <ChangePasswordForm />
     </Modal>
   )
 }
 
-function PasswordField(props: {
-  value: string
+type TextInputProps = {
+  name: string
+  type: 'text' | 'email' | 'tel' | 'password' | 'url' | 'date'
+  label?: string
   placeholder?: string
-  onChange: (password: string) => void
-  validator?: (value: string) => string
-}): JSXElement {
-  const [validationError, setValidationError] = createSignal('')
+  value: string | undefined
+  error: string
+  required?: boolean
+  ref: (element: HTMLInputElement) => void
+  onInput: JSX.EventHandler<HTMLInputElement, InputEvent>
+  onChange: JSX.EventHandler<HTMLInputElement, Event>
+  onBlur: JSX.EventHandler<HTMLInputElement, FocusEvent>
+}
 
+export function TextInput(props: TextInputProps) {
+  const [, inputProps] = splitProps(props, ['value', 'label', 'error'])
   return (
-    <>
+    <div>
       <label
+        for={props.name}
         class={clsx(
           'input input-bordered flex items-center mt-2',
-          validationError() !== '' && 'input-error'
+          props.error !== '' && 'input-error'
         )}
       >
+        {props.label} {props.required && <span>*</span>}
         <PasswordIcon />
         <input
-          type="password"
           class="grow ml-2"
-          placeholder={props.placeholder ?? 'Password'}
-          value={props.value}
-          onInput={(e) => props.onChange(e.target.value.trim())}
-          onBlur={(e) =>
-            setValidationError(props.validator(e.target.value.trim()))
-          }
+          {...inputProps}
+          id={props.name}
+          value={props.value || ''}
+          aria-invalid={!!props.error}
+          aria-errormessage={`${props.name}-error`}
         />
       </label>
-      <Show when={validationError() !== ''} fallback={<div class="mt-9" />}>
-        <div class="label">
-          <span class="label-text-alt text-error">{validationError()}</span>
-        </div>
-      </Show>
-    </>
+      {props.error && <div id={`${props.name}-error`}>{props.error}</div>}
+    </div>
   )
 }
 
@@ -254,33 +224,22 @@ function Modal(props: {
   title: string
   isOpen: boolean
   children: JSXElement | JSXElement[]
-  submitButton?: JSXElement
   onClose: () => void
 }): JSXElement {
   const isOpen = () => props.isOpen
 
-  // TODO let user pass in own close handler
-  // TODO migrate to components
   return (
     <>
       <dialog class={clsx('modal', isOpen() ? 'modal-open' : 'modal-close')}>
         <div class="modal-box">
+          <button
+            class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4"
+            onClick={() => props.onClose()}
+          >
+            ✕
+          </button>
           <h3 class="font-bold text-lg">{props.title}</h3>
           {props.children}
-          <div class="modal-action">
-            <form method="dialog">
-              <Show
-                when={props.submitButton}
-                fallback={
-                  <button onClick={() => props.onClose()} class="btn">
-                    Close
-                  </button>
-                }
-              >
-                {props.submitButton}
-              </Show>
-            </form>
-          </div>
         </div>
       </dialog>
     </>
