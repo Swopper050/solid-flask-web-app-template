@@ -48,7 +48,7 @@ services:
 
   db:
     image: mariadb:latest
-    container_name: mariadb_db
+    container_name: my-solid-app-mariadb
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: $MYSQL_ROOT_PASSWORD
