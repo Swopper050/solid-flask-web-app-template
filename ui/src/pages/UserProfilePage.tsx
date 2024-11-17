@@ -1,7 +1,7 @@
 import { createSignal, JSXElement, Show } from 'solid-js'
 import { useUser } from '../context'
 import { ChangePassword } from '../components/ChangePassword'
-import { SetupMFAModal } from '../components/SetupMFAModal';
+import { Setup2FAModal } from '../components/Setup2FAModal';
 import { clsx } from 'clsx'
 
 import api from '../api'
@@ -10,7 +10,6 @@ export function UserProfilePage(): JSXElement {
   const { user } = useUser()
 
   const [sending, setSending] = createSignal(false)
-  const [setupMFAModalOpen, setSetupMFAModalOpen] = createSignal(false)
 
   const resendVerificationMail = () => {
     setSending(true)
@@ -66,14 +65,23 @@ export function UserProfilePage(): JSXElement {
 
       <div class="grid grid-cols-12 gap-4 mt-2">
         <p class="text-lg font-bold mr-4 col-span-1">2FA enabled:</p>
-        <p class="text-lg col-span2">
-          {user().twoFactorEnabled}
+        <p class="text-lg col-span-1">
+          {user().twoFactorEnabled ? "Yes" : "No"}
         </p>
-        <button class="btn btn-primary btn-sm" onClick={() => setSetupMFAModalOpen(true)}>
-          Setup 2FA
-        </button>
 
-        <SetupMFAModal isOpen={setupMFAModalOpen()} onClose={() => setSetupMFAModalOpen(false)} />
+        <input
+          type="checkbox"
+          class="toggle"
+          checked={user().twoFactorEnabled}
+          onClick={() => {
+            if (user().twoFactorEnabled) {
+              document.getElementById('disable_2fa_modal').showModal()
+            } else {
+              document.getElementById('setup_2fa_modal').showModal()
+            }
+
+          }}
+        />
       </div>
 
       <ChangePassword />

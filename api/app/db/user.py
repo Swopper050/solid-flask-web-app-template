@@ -72,3 +72,4 @@ class UserSchema(Schema):
     email = fields.String(validate=validate.Length(max=100))
     is_admin = fields.Boolean()
     is_verified = fields.Boolean()
+    two_factor_enabled = fields.Boolean()

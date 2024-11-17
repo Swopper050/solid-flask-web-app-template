@@ -50,8 +50,4 @@ export class User extends BaseModel<UserAttributes> {
   get twoFactorEnabled(): boolean {
     return super.get('two_factor_enabled');
   }
-
-  set twoFactorEnabled(enabled: boolean) {
-    super.set('two_factor_enabled', enabled)
-  }
 }
