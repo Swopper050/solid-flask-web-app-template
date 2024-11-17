@@ -1,14 +1,22 @@
-import { createSignal, JSX, JSXElement, Show, splitProps } from 'solid-js'
+import {
+  createSignal,
+  JSX,
+  JSXElement,
+  Match,
+  Show,
+  splitProps,
+  Switch,
+} from 'solid-js'
 import { useUser } from '../context'
 import { clsx } from 'clsx'
 
-import api from '../api'
+import api, { changePassword, PostResponse } from '../api'
 import { PasswordIcon } from '../components/icons/Password'
-import { User } from '../models/User'
 import {
   createForm,
   minLength,
   pattern,
+  reset,
   SubmitHandler,
 } from '@modular-forms/solid'
 
@@ -65,54 +73,36 @@ type ChangePasswordFormData = {
   confirmNewPassword: string
 }
 
-type ResponseData = {
-  success: boolean
-  message: string
-}
-
 function ChangePasswordForm(): JSXElement {
-  const [, { Form, Field }] = createForm<ChangePasswordFormData>()
-
+  const [changePasswordForm, { Form, Field }] =
+    createForm<ChangePasswordFormData>()
+  const [response, setResponse] = createSignal<PostResponse | undefined>(
+    undefined
+  )
   const { setUser } = useUser()
-  const [response, setResponse] = createSignal<ResponseData | undefined>()
 
   const onSubmit: SubmitHandler<ChangePasswordFormData> = async (values) => {
-    const response = await fetch('/api/change_password', {
-      method: 'POST',
-      credentials: 'include',
-      body: JSON.stringify({
-        current_password: values.oldPassword,
-        new_password: values.newPassword,
-      }),
-      headers: new Headers({ 'Content-Type': 'application/json' }),
-    })
+    changePassword(values.oldPassword, values.newPassword, setResponse, setUser)
 
-    if (response.status != 409) {
-      setResponse({
-        success: false,
-        message: 'Failed to update password',
-      })
-    }
-
-    if (response.status == 200) {
-      const data = await response.json()
-      setUser(new User(data))
-
-      setResponse({
-        success: true,
-        message: 'Successfully updated password',
-      })
-    }
+    reset(changePasswordForm)
   }
 
   return (
     <Form onSubmit={onSubmit}>
-      <Show when={response()?.success}>
-        <div>succes</div>
-      </Show>
-      <Show when={!response()?.success}>
-        <div>failed</div>
-      </Show>
+      <Switch>
+        <Match when={response() !== undefined && response().loading}>
+          <div>loading</div>
+        </Match>
+
+        <Match when={response() !== undefined && response().success}>
+          <div>succes</div>
+        </Match>
+
+        <Match when={response() !== undefined && !response().success}>
+          <div>failed</div>
+        </Match>
+      </Switch>
+
       <Field name="oldPassword">
         {(field, props) => (
           <TextInput
