@@ -52,7 +52,7 @@ ruff: ## Run ruff lint check
 
 lint: format_check ruff  ## Run ruff format and ruff lint 
 
-formatlint: ruff format $(LINT_FILES) ## Format code first, then run linters
+formatlint: ruff_fix format lint $(LINT_FILES) ## Format code first, then run linters
 
 test: ## Run tests
 	$(PYTEST)
@@ -62,6 +62,9 @@ test_cov: ## Run tests and show coverage
 
 server: ## Start development server
 	$(DEV_ENV) flask --app server --debug run
+
+database:  ## Creates an empty database
+	python scripts/empty_database.py
 
 fixtures: ## Adds initial fixtures to the database
 	python scripts/add_fixtures.py

@@ -163,6 +163,7 @@ jobs:
             export MY_SOLID_APP_MAIL_USERNAME=${{ secrets.MY_SOLID_APP_MAIL_USERNAME }}
             export MY_SOLID_APP_MAIL_PASSWORD=${{ secrets.MY_SOLID_APP_MAIL_PASSWORD }}
             export MY_SOLID_APP_MAIL_DEFAULT_SENDER=${{ secrets.MY_SOLID_APP_MAIL_DEFAULT_SENDER }}
+            export MY_SOLID_APP_FERNET_SECRET_KEY=${{ secrets.MY_SOLID_APP_FERNET_SECRET_KEY }}
 
             docker compose -f docker-compose.prod.yml down
             docker compose -f docker-compose.prod.yml pull

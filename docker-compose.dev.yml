@@ -2,7 +2,6 @@ services:
   db:
     image: mariadb:latest
     container_name: my-solid-app-mariadb
-    restart: always
     ports:
       - "3306:3306"
     environment:

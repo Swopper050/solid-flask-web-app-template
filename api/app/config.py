@@ -16,6 +16,12 @@ MY_SOLID_APP_FRONTEND_URL = os.environ.get(
 )
 
 
+MY_SOLID_APP_FERNET_SECRET_KEY = os.environ.get(
+    "MY_SOLID_APP_FERNET_SECRET_KEY", "kxmkv6vw7AMDx92BH9JSEZ7_PQqPyYsWZBAGzP0kXys="
+)
+""" Key used for encrypting. The default key is used for development purposes only. """
+
+
 class BaseConfig:
     SECRET_KEY = os.environ.get("MY_SOLID_APP_SECRET_KEY", "secret_oohhhhhh")
     SQLALCHEMY_DATABASE_URI = (
