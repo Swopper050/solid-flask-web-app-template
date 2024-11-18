@@ -18,11 +18,11 @@ jobs:
     if: |
       ${{
         github.event.label.name == 'fix-me' ||
-        (github.event_name == 'issue_comment' && 
+        (github.event_name == 'issue_comment' &&
         startsWith(github.event.comment.body, vars.OPENHANDS_MACRO || '@openhands-agent') &&
         (github.event.comment.author_association == 'OWNER' || github.event.comment.author_association == 'COLLABORATOR' || github.event.comment.author_association == 'MEMBER'))
       }}
-    uses: All-Hands-AI/openhands-resolver/.github/workflows/openhands-resolver.yml@main
+    uses: All-Hands-AI/OpenHands/.github/workflows/openhands-resolver.yml@main
     with:
       macro: ${{ vars.OPENHANDS_MACRO || '@openhands-agent' }}
       max_iterations: 50
