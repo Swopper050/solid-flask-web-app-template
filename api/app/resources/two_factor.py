@@ -69,7 +69,7 @@ class Disable2FA(Resource):
     @login_required
     def post(self):
         if not current_user.two_factor_enabled:
-            return {"error_message": "2FA is already disable"}, 400
+            return {"error_message": "2FA is already disabled"}, 400
 
         data: dict = Disable2FASchema().load(request.get_json())
         totp_code: str = data.get("totp_code")

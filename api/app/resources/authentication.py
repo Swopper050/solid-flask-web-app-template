@@ -88,12 +88,21 @@ class Login2FA(Resource):
         user_id = session.get("partially_authenticated_user")
 
         user = User.query.filter_by(email=data.get("email")).first()
-        if user is None or user_id is None or user.id != user_id:
-            return {"error_message": "Could not login with the given code"}, 401
+        if (
+            user is None
+            or not user.two_factor_enabled
+            or user_id is None
+            or user.id != user_id
+        ):
+            return {
+                "error_message": "Could not login with the given email and code"
+            }, 401
 
         totp = pyotp.TOTP(user.totp_secret)
         if not totp.verify(totp_code):
-            return {"error_message": "Could not login with the given code"}, 401
+            return {
+                "error_message": "Could not login with the given email and code"
+            }, 401
 
         session.pop("partially_authenticated_user", None)
 

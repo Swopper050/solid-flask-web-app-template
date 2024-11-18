@@ -2,6 +2,7 @@ import datetime as dt
 import re
 from unittest.mock import patch
 
+import pyotp
 import pytest
 from flask import session
 from flask_login import current_user
@@ -94,6 +95,128 @@ class TestLoginAPI:
 
             assert response.status_code == 200
             assert session["partially_authenticated_user"] == user.id
+
+
+class TestLogin2FAAPI:
+    @pytest.fixture
+    def totp(self):
+        return pyotp.TOTP(pyotp.random_base32())
+
+    @pytest.fixture
+    def user_with_2fa(self, db, user, totp):
+        user.two_factor_enabled = True
+        user.totp_secret = totp.secret
+        db.session.add(user)
+        db.session.commit()
+
+        return user
+
+    def test_login_2fa(self, client, user_with_2fa, totp):
+        with client:
+            # First part of the login
+            response = client.post(
+                "/login", json={"email": user_with_2fa.email, "password": "password123"}
+            )
+
+            assert response.status_code == 200
+            assert session["partially_authenticated_user"] == user_with_2fa.id
+
+            assert not current_user.is_authenticated
+
+            # Now do the two factor login
+            print(user_with_2fa.totp_secret)
+            print(totp.now())
+            print(totp.verify(totp.now()))
+
+            response = client.post(
+                "/login_2fa",
+                json={"email": user_with_2fa.email, "totp_code": totp.now()},
+            )
+
+            assert response.status_code == 200
+            assert response.json == UserSchema().dump(user_with_2fa)
+            assert "partially_authenticated_user" not in session
+
+            assert current_user.is_authenticated
+
+    def test_login_2fa_wrong_email(self, client, user_with_2fa, totp):
+        with client:
+            response = client.post(
+                "/login", json={"email": user_with_2fa.email, "password": "password123"}
+            )
+            assert response.status_code == 200
+
+            response = client.post(
+                "/login_2fa",
+                json={"email": "dijkstra@test.com", "totp_code": totp.now()},
+            )
+            assert response.status_code == 401
+            assert response.json == {
+                "error_message": "Could not login with the given email and code"
+            }
+
+    def test_login_2fa_not_enabled(self, client, user, totp):
+        with client:
+            response = client.post(
+                "/login_2fa",
+                json={"email": user.email, "totp_code": totp.now()},
+            )
+            assert response.status_code == 401
+            assert response.json == {
+                "error_message": "Could not login with the given email and code"
+            }
+
+    def test_login_2fa_session_not_set(self, client, user_with_2fa, totp):
+        with client:
+            # Omit password login first
+
+            response = client.post(
+                "/login_2fa",
+                json={"email": user_with_2fa.email, "totp_code": totp.now()},
+            )
+            assert response.status_code == 401
+            assert response.json == {
+                "error_message": "Could not login with the given email and code"
+            }
+
+    def test_login_2fa_session_for_different_user(
+        self, client, user_with_2fa, admin, totp
+    ):
+        with client:
+            # Login for user
+            response = client.post(
+                "/login", json={"email": user_with_2fa.email, "password": "password123"}
+            )
+            assert response.status_code == 200
+
+            # Try to do the 2FA login for another user
+            response = client.post(
+                "/login_2fa",
+                json={"email": admin.email, "totp_code": totp.now()},
+            )
+            assert response.status_code == 401
+            assert response.json == {
+                "error_message": "Could not login with the given email and code"
+            }
+
+    def test_login_2fa_wrong_code(self, client, user_with_2fa, totp):
+        with client:
+            response = client.post(
+                "/login", json={"email": user_with_2fa.email, "password": "password123"}
+            )
+            assert response.status_code == 200
+
+            response = client.post(
+                "/login_2fa",
+                json={
+                    "email": user_with_2fa.email,
+                    "totp_code": f"{int(totp.now()) + 1}",
+                },
+            )
+            assert response.status_code == 401
+            assert response.json == {
+                "error_message": "Could not login with the given email and code"
+            }
 
 
 class TestLogoutAPI:
@@ -492,3 +615,15 @@ class TestResendVerifyEmailAPI:
 
         assert not user.is_verified
         assert user.email_verification_token == old_token
+
+
+class TestWhoAmIAPI:
+    def test_whoami(self, client, logged_in_user):
+        response = client.get("/whoami")
+
+        assert response.status_code == 200
+        assert response.json == UserSchema().dump(logged_in_user)
+
+    def test_whoami_not_logged_in(self, client, user):
+        response = client.get("/whoami")
+        assert response.status_code == 401
