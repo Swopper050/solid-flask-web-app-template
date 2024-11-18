@@ -67,7 +67,6 @@ class Login(Resource):
             }, 401
 
         if user.two_factor_enabled:
-            session.permanent = True
             session.pop("partially_authenticated_user", None)
             session["partially_authenticated_user"] = user.id
         else:

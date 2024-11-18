@@ -1,5 +1,4 @@
 import os
-from datetime import timedelta
 
 MY_SOLID_APP_DB_NAME = os.environ.get("MY_SOLID_APP_DB_NAME", "my_solid_app_db")
 MY_SOLID_APP_DB_USER = os.environ.get("MY_SOLID_APP_DB_USER", "my_solid_app_user")
@@ -16,13 +15,14 @@ MY_SOLID_APP_FRONTEND_URL = os.environ.get(
     "MY_SOLID_APP_FRONTEND_URL", "http://localhost:5173"
 )
 
+
 MY_SOLID_APP_FERNET_SECRET_KEY = os.environ.get(
     "MY_SOLID_APP_FERNET_SECRET_KEY", "kxmkv6vw7AMDx92BH9JSEZ7_PQqPyYsWZBAGzP0kXys="
 )
+""" Key used for encrypting. The default key is used for development purposes only. """
 
 
 class BaseConfig:
-    PERMANENT_SESSION_LIFETIME = timedelta(seconds=300)
     SECRET_KEY = os.environ.get("MY_SOLID_APP_SECRET_KEY", "secret_oohhhhhh")
     SQLALCHEMY_DATABASE_URI = (
         f"mysql://{MY_SOLID_APP_DB_USER}:{MY_SOLID_APP_DB_PASSWORD}@"

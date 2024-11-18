@@ -1,15 +1,14 @@
 import secrets
 import time
 
-from cryptography.fernet import Fernet
 from flask_login import UserMixin
 from marshmallow import Schema, fields, validate
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from app.config import MY_SOLID_APP_FERNET_SECRET_KEY
 from app.extensions import db
+from app.fernet import decrypt, encrypt
 
 
 class User(db.Model, UserMixin):
@@ -73,11 +72,7 @@ class User(db.Model, UserMixin):
         if self.encrypted_totp_secret is None:
             return None
 
-        return (
-            Fernet(MY_SOLID_APP_FERNET_SECRET_KEY)
-            .decrypt(self.encrypted_totp_secret.encode())
-            .decode()
-        )
+        return decrypt(self.encrypted_totp_secret)
 
     @totp_secret.setter
     def totp_secret(self, totp_secret: str | None):
@@ -85,14 +80,12 @@ class User(db.Model, UserMixin):
             self.encrypted_totp_secret = None
             return
 
-        self.encrypted_totp_secret = (
-            Fernet(MY_SOLID_APP_FERNET_SECRET_KEY).encrypt(totp_secret.encode()).decode()
-        )
+        self.encrypted_totp_secret = encrypt(totp_secret)
 
 
 class UserSchema(Schema):
     id = fields.Integer()
     email = fields.String(validate=validate.Length(max=100))
     is_admin = fields.Boolean()
-    is_verified = fields.Boolean()
-    two_factor_enabled = fields.Boolean()
+    is_verified = fields.Boolean(dump_only=True)
+    two_factor_enabled = fields.Boolean(dump_only=True)
