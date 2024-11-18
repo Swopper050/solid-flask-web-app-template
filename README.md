@@ -2,10 +2,13 @@
 A full stack template for an app and web application with backend. The repository contains:
  - 🖥️ A frontend build in [Typescript](https://www.typescriptlang.org/) with [SolidJS](https://www.solidjs.com/) and [daisyui](https://daisyui.com/):
    - 🪪 Registering and logging in with user management
+   - 🔑 2 Factor Authentication
+   - 🔓 Password recovery with email
+   - ✅ User email verification
    - 🌗 Dark theme support
    - 📝 Code formatting with [ESLint](https://eslint.org/) and [Prettier](https://prettier.io/)
  - 🗄️ A backend built in [Python](https://www.python.org/) with [Flask](https://flask.palletsprojects.com/en/3.0.x/) and [SQLAlchemy](https://www.sqlalchemy.org/):
-   - 🧍 User management with cookies using [Flask-Login](https://flask-login.readthedocs.io/en/latest/)
+   - 🧍 User login management with cookies using [Flask-Login](https://flask-login.readthedocs.io/en/latest/)
    - 💿 Database migrations using [Alembic](https://alembic.sqlalchemy.org/en/latest/)
    - 🧪 Tests with [pytest](https://docs.pytest.org/en/stable/)
    - 📝 Code formatting with [black](https://github.com/psf/black), [isort](https://pycqa.github.io/isort/) and [flake8](https://flake8.pycqa.org/en/latest/)
