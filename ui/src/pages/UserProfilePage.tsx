@@ -1,24 +1,29 @@
 import {
+  createEffect,
   createSignal,
   JSX,
   JSXElement,
-  Match,
   Show,
   splitProps,
-  Switch,
 } from 'solid-js'
 import { useUser } from '../context'
 import { clsx } from 'clsx'
 
-import api, { changePassword, PostResponse } from '../api'
+import api, { changePassword } from '../api'
 import { PasswordIcon } from '../components/icons/Password'
 import {
+  clearResponse,
   createForm,
+  getValue,
   minLength,
   pattern,
   reset,
+  setResponse,
   SubmitHandler,
+  value,
 } from '@modular-forms/solid'
+
+import { User, UserAttributes } from '../models/User'
 
 export function UserProfilePage(): JSXElement {
   const { user } = useUser()
@@ -37,19 +42,15 @@ export function UserProfilePage(): JSXElement {
       <div class="grid grid-cols-3 gap-4">
         <p class="text-lg font-bold mr-4 col-span-1">Email:</p>
         <p class="text-lg col-span-1">{user().email}</p>
-        <p class="col-span-1">
-          <Show when={user().isVerified} fallback={<VerifyEmailWarning />}>
-            <p class="ml-4 tooltip" data-tip="Your email has been verified">
-              <i class="fa-solid fa-check text-success" />
-            </p>
-          </Show>
+        <p class="text-lg col-span-1">
+          <i class="fa-solid fa-check text-success" />
         </p>
       </div>
 
       <div class="grid grid-cols-3 gap-4">
         <p class="text-lg font-bold mr-4 col-span-1">Password:</p>
         <p class="text-lg col-span-1">*******</p>
-        <p class="ml-4 tooltip" data-tip="Your email has been verified">
+        <p class="ml-4 tooltip" data-tip="Change password">
           <button
             class={clsx('btn btn-ghost btn-sm')}
             onClick={() => setOpenPasswordModal(true)}
@@ -68,42 +69,68 @@ export function UserProfilePage(): JSXElement {
 }
 
 type ChangePasswordFormData = {
-  oldPassword: string
+  currentPassword: string
   newPassword: string
   confirmNewPassword: string
 }
 
-function ChangePasswordForm(): JSXElement {
-  const [changePasswordForm, { Form, Field }] =
-    createForm<ChangePasswordFormData>()
-  const [response, setResponse] = createSignal<PostResponse | undefined>(
-    undefined
-  )
+function ChangePasswordForm(props: { onSubmitted: () => void }): JSXElement {
+  const [changePasswordForm, { Form, Field }] = createForm<
+    ChangePasswordFormData,
+    UserAttributes
+  >()
+
   const { setUser } = useUser()
+  const saved = () => {
+    return changePasswordForm.submitted === true
+  }
+
+  createEffect(() => {
+    if (saved()) {
+      if (changePasswordForm.response.status === 'success') {
+        setUser(new User(changePasswordForm.response.data))
+      }
+    }
+  })
 
   const onSubmit: SubmitHandler<ChangePasswordFormData> = async (values) => {
-    changePassword(values.oldPassword, values.newPassword, setResponse, setUser)
+    const response = await changePassword(
+      values.currentPassword,
+      values.newPassword
+    )
 
+    if (response.status != 200) {
+      setResponse(changePasswordForm, {
+        status: 'error',
+        message: 'Failed to update password.',
+      })
+
+      return
+    }
+
+    const data = await response.json()
+
+    setResponse(changePasswordForm, {
+      status: 'success',
+      data: data,
+    })
+
+    props.onSubmitted()
+
+    clearResponse(changePasswordForm)
     reset(changePasswordForm)
   }
 
   return (
     <Form onSubmit={onSubmit}>
-      <Switch>
-        <Match when={response() !== undefined && response().loading}>
-          <div>loading</div>
-        </Match>
+      <Show when={changePasswordForm.response.status === 'error'}>
+        <div role="alert" class="mt-2 mb-2 alert alert-error">
+          <i class="fa-solid fa-circle-exclamation" />{' '}
+          <span>{changePasswordForm.response.message}</span>
+        </div>
+      </Show>
 
-        <Match when={response() !== undefined && response().success}>
-          <div>succes</div>
-        </Match>
-
-        <Match when={response() !== undefined && !response().success}>
-          <div>failed</div>
-        </Match>
-      </Switch>
-
-      <Field name="oldPassword">
+      <Field name="currentPassword">
         {(field, props) => (
           <TextInput
             {...props}
@@ -118,9 +145,9 @@ function ChangePasswordForm(): JSXElement {
         name="newPassword"
         validate={[
           minLength(8, 'You password must have 8 characters or more.'),
-          pattern(/[A-Z]/, 'Must contain 1 uppercase letter '),
-          pattern(/[a-z]/, 'Must contain 1 lower case capitol'),
-          pattern(/[0-9]/, 'Must contain 1 digit'),
+          pattern(/[A-Z]/, 'Must contain 1 uppercase letter.'),
+          pattern(/[a-z]/, 'Must contain 1 lower case letter.'),
+          pattern(/[0-9]/, 'Must contain 1 digit.'),
         ]}
       >
         {(field, props) => (
@@ -135,7 +162,17 @@ function ChangePasswordForm(): JSXElement {
       </Field>
       <Field
         name="confirmNewPassword"
-        // TODO fix validation
+        validate={[
+          value(
+            getValue(changePasswordForm, 'newPassword', {
+              shouldActive: false,
+              shouldTouched: true,
+              shouldDirty: true,
+              shouldValid: true,
+            }),
+            "Passwords don't match"
+          ),
+        ]}
       >
         {(field, props) => (
           <TextInput
@@ -148,7 +185,10 @@ function ChangePasswordForm(): JSXElement {
         )}
       </Field>
       <button class="mt-4 btn btn-primary " type="submit">
-        Change
+        <Show when={changePasswordForm.submitting} fallback="Change">
+          <span class="loading loading-spinner" />
+          Saving
+        </Show>
       </button>
     </Form>
   )
@@ -164,7 +204,7 @@ function ChangePasswordModal(props: {
       isOpen={props.isOpen}
       onClose={props.onClose}
     >
-      <ChangePasswordForm />
+      <ChangePasswordForm onSubmitted={props.onClose} />
     </Modal>
   )
 }
@@ -190,7 +230,7 @@ export function TextInput(props: TextInputProps) {
       <label
         for={props.name}
         class={clsx(
-          'input input-bordered flex items-center mt-2',
+          'input input-bordered flex items-center mt-4',
           props.error !== '' && 'input-error'
         )}
       >
