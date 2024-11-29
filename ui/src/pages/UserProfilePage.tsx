@@ -15,12 +15,12 @@ import {
   clearResponse,
   createForm,
   getValue,
+  MaybeValue,
   minLength,
   pattern,
   reset,
   setResponse,
   SubmitHandler,
-  value,
 } from '@modular-forms/solid'
 
 import { User, UserAttributes } from '../models/User'
@@ -31,40 +31,84 @@ export function UserProfilePage(): JSXElement {
   const [openPasswordModal, setOpenPasswordModal] = createSignal(false)
 
   return (
-    <div class="mt-4 ml-10">
-      <Show when={user().isAdmin}>
-        <p class="text-lg text-success mr-4 mb-6 col-span-4">
-          <i class="fa-solid fa-screwdriver-wrench mr-2" />
-          This user is an admin
-        </p>
-      </Show>
+    <>
+      <div class="mt-4 ml-10">
+        <Show when={user().isAdmin}>
+          <p class="text-lg text-success mr-4 mb-6 col-span-4">
+            <i class="fa-solid fa-screwdriver-wrench mr-2" />
+            This user is an admin
+          </p>
+        </Show>
 
-      <div class="grid grid-cols-3 gap-4">
-        <p class="text-lg font-bold mr-4 col-span-1">Email:</p>
-        <p class="text-lg col-span-1">{user().email}</p>
-        <p class="text-lg col-span-1">
-          <i class="fa-solid fa-check text-success" />
-        </p>
+        <div>
+          <table class="table">
+            <tbody>
+              <tr>
+                <td>Email:</td>
+                <td>{user().email}</td>
+                <td>
+                  <VerifyEmailButton />
+                </td>
+              </tr>
+              <tr>
+                <td>Password:</td>
+                <td>*********</td>
+                <td>
+                  <p class="tooltip" data-tip="Change password">
+                    <button
+                      class={clsx('btn btn-ghost btn-sm')}
+                      onClick={() => setOpenPasswordModal(true)}
+                    >
+                      <i class="fa-solid fa-edit" />
+                    </button>
+                  </p>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <ChangePasswordModal
+          isOpen={openPasswordModal()}
+          onClose={() => setOpenPasswordModal(false)}
+        />
       </div>
+    </>
+  )
+}
 
-      <div class="grid grid-cols-3 gap-4">
-        <p class="text-lg font-bold mr-4 col-span-1">Password:</p>
-        <p class="text-lg col-span-1">*******</p>
-        <p class="ml-4 tooltip" data-tip="Change password">
-          <button
-            class={clsx('btn btn-ghost btn-sm')}
-            onClick={() => setOpenPasswordModal(true)}
-          >
-            <i class="fa-solid fa-edit" />
-          </button>
-        </p>
-      </div>
+function VerifyEmailButton(): JSXElement {
+  const { user } = useUser()
+  const [sending, setSending] = createSignal(false)
 
-      <ChangePasswordModal
-        isOpen={openPasswordModal()}
-        onClose={() => setOpenPasswordModal(false)}
-      />
-    </div>
+  const resendVerificationMail = () => {
+    setSending(true)
+    api.post('/resend_email_verification').finally(() => setSending(false))
+  }
+
+  return (
+    <p
+      class="tooltip"
+      data-tip={user().isVerified ? 'Resend verification' : 'Verify email'}
+    >
+      <button
+        class={clsx('btn btn-ghost btn-sm', sending() && 'btn-disabled')}
+        onClick={resendVerificationMail}
+      >
+        <Show
+          when={sending()}
+          fallback={
+            <i
+              class={clsx(
+                user().isVerified ? 'fa-solid fa-warning' : 'fa-solid fa-check'
+              )}
+            />
+          }
+        >
+          <button class="loading loading-ball loading-sm" />
+        </Show>
+      </button>
+    </p>
   )
 }
 
@@ -74,6 +118,8 @@ type ChangePasswordFormData = {
   confirmNewPassword: string
 }
 
+type Value = MaybeValue<string | number>
+
 function ChangePasswordForm(props: { onSubmitted: () => void }): JSXElement {
   const [changePasswordForm, { Form, Field }] = createForm<
     ChangePasswordFormData,
@@ -81,8 +127,18 @@ function ChangePasswordForm(props: { onSubmitted: () => void }): JSXElement {
   >()
 
   const { setUser } = useUser()
+
   const saved = () => {
     return changePasswordForm.submitted === true
+  }
+
+  const newPassword = () => {
+    return getValue(changePasswordForm, 'newPassword', {
+      shouldActive: false,
+      shouldTouched: true,
+      shouldDirty: true,
+      shouldValid: true,
+    })
   }
 
   createEffect(() => {
@@ -119,6 +175,15 @@ function ChangePasswordForm(props: { onSubmitted: () => void }): JSXElement {
 
     clearResponse(changePasswordForm)
     reset(changePasswordForm)
+  }
+
+  /**
+   * Custom validator that checks whether the new password matches the new password.
+   */
+  const mustMatch = (error: string): ((value: Value) => string) => {
+    return (value: Value) => {
+      return value !== newPassword() ? error : ''
+    }
   }
 
   return (
@@ -162,17 +227,7 @@ function ChangePasswordForm(props: { onSubmitted: () => void }): JSXElement {
       </Field>
       <Field
         name="confirmNewPassword"
-        validate={[
-          value(
-            getValue(changePasswordForm, 'newPassword', {
-              shouldActive: false,
-              shouldTouched: true,
-              shouldDirty: true,
-              shouldValid: true,
-            }),
-            "Passwords don't match"
-          ),
-        ]}
+        validate={[mustMatch("Passwords don't match")]}
       >
         {(field, props) => (
           <TextInput
@@ -272,34 +327,6 @@ function Modal(props: {
           {props.children}
         </div>
       </dialog>
-    </>
-  )
-}
-
-function VerifyEmailWarning(): JSXElement {
-  const [sending, setSending] = createSignal(false)
-
-  const resendVerificationMail = () => {
-    setSending(true)
-    api.post('/resend_email_verification').finally(() => setSending(false))
-  }
-
-  return (
-    <>
-      <span class="ml-4 tooltip" data-tip="Your email is not verified yet">
-        <i class="fa-solid fa-triangle-exclamation text-warning" />
-      </span>
-      <span class="ml-4 tooltip" data-tip="Resend verification mail">
-        <button
-          class={clsx('btn btn-ghost btn-sm', sending() && 'btn-disabled')}
-          onClick={resendVerificationMail}
-        >
-          <Show when={sending()}>
-            <span class="loading loading-ball loading-sm" />
-          </Show>
-          <i class="fa-solid fa-arrow-rotate-left" />
-        </button>
-      </span>
     </>
   )
 }

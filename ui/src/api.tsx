@@ -5,12 +5,6 @@ api.defaults.headers.post['Content-Type'] = 'application/json'
 
 export default api
 
-export type PostResponse = {
-  success?: boolean
-  loading?: boolean
-  message?: string
-}
-
 export async function changePassword(
   currentPassword: string,
   newPassword: string
@@ -21,12 +15,12 @@ export async function changePassword(
   })
 }
 
-export async function post(url: string, data: any) {
+export async function post(url: string, data: object) {
   return fetch(url, {
     method: 'POST',
     credentials: 'include',
     body: JSON.stringify({
-      data,
+      ...data,
     }),
     headers: new Headers({ 'Content-Type': 'application/json' }),
   })
