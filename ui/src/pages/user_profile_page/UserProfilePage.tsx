@@ -5,13 +5,14 @@ import { clsx } from 'clsx'
 
 import api from '../../api'
 import { ChangePasswordForm } from './ChangePasswordForm'
-import { Modal } from '../../components/Modal'
+import { Modal, ModalBaseProps } from '../../components/Modal'
 import { Enable2FAModal } from '../../components/Enable2FAModal'
 import { Disable2FAModal } from '../../components/Disable2FAModal'
 
 export function UserProfilePage(): JSXElement {
   const { user } = useUser()
   const [openPasswordModal, setOpenPasswordModal] = createSignal(false)
+  const [openDeleteAccountModal, setOpenDeleteAccountModal] = createSignal(false)
 
   return (
     <>
@@ -65,9 +66,7 @@ export function UserProfilePage(): JSXElement {
         <div class="mt-4">
           <button
             class="btn btn-error"
-            onClick={() =>
-              document.getElementById('delete_account_modal').showModal()
-            }
+            onClick={() => setOpenDeleteAccountModal(true)}
           >
             <i class="fa-solid fa-trash" />
             Delete account
@@ -79,7 +78,11 @@ export function UserProfilePage(): JSXElement {
           onClose={() => setOpenPasswordModal(false)}
         />
 
-        <DeleteAccountModal />
+        <DeleteAccountModal
+          isOpen={openDeleteAccountModal()}
+          onClose={() => setOpenDeleteAccountModal(false)}
+        />
+
       </div>
     </>
   )
@@ -133,20 +136,24 @@ function VerifyEmailButton(): JSXElement {
 function Toggle2FAButton(): JSXElement {
   const { user } = useUser()
 
+  const [openEnable2FAModal, setOpenEnable2FAModal] = createSignal(false)
+  const [openDisable2FAModal, setOpenDisable2FAModal] = createSignal(false)
+
   return (
     <>
       <Show when={user().twoFactorEnabled}>
         <p class="tooltip tooltip-left" data-tip="Disable 2FA">
           <button
             class="btn btn-ghost btn-sm"
-            onClick={() =>
-              document.getElementById('disable_2fa_modal').showModal()
-            }
+            onClick={() => setOpenDisable2FAModal(true)}
           >
             <i class="fa-solid fa-toggle-on text-success" />
           </button>
 
-          <Disable2FAModal />
+          <Disable2FAModal 
+            isOpen={openDisable2FAModal()}
+            onClose={() => setOpenDisable2FAModal(false)}
+          />
         </p>
       </Show>
 
@@ -154,24 +161,22 @@ function Toggle2FAButton(): JSXElement {
         <p class="tooltip tooltip-left" data-tip="Enable 2FA">
           <button
             class="btn btn-ghost btn-sm"
-            onClick={() =>
-              document.getElementById('enable_2fa_modal').showModal()
-            }
+            onClick={() => setOpenEnable2FAModal(true)}
           >
             <i class="fa-solid fa-toggle-off text-error" />
           </button>
 
-          <Enable2FAModal />
+          <Enable2FAModal 
+            isOpen={openEnable2FAModal()}
+            onClose={() => setOpenEnable2FAModal(false)}
+          />
         </p>
       </Show>
     </>
   )
 }
 
-function ChangePasswordModal(props: {
-  isOpen: boolean
-  onClose: () => void
-}): JSXElement {
+function ChangePasswordModal(props: ModalBaseProps): JSXElement {
   return (
     <Modal
       title="Change password"
@@ -183,15 +188,13 @@ function ChangePasswordModal(props: {
   )
 }
 
-function DeleteAccountModal(): JSXElement {
+function DeleteAccountModal(props: ModalBaseProps): JSXElement {
   const { setUser } = useUser()
 
   const [deleting, setDeleting] = createSignal(false)
   const [errorMsg, setErrorMsg] = createSignal<string | null>(null)
 
   const navigate = useNavigate()
-
-  let modalRef: HTMLDialogElement | undefined
 
   const deleteAccount = async () => {
     setDeleting(true)
@@ -201,7 +204,6 @@ function DeleteAccountModal(): JSXElement {
       .delete('/delete_account')
       .then(() => {
         setUser(null)
-        modalRef?.close()
         navigate('/home')
       })
       .catch((error) => {
@@ -215,9 +217,11 @@ function DeleteAccountModal(): JSXElement {
   }
 
   return (
-    <dialog id="delete_account_modal" ref={modalRef} class="modal">
-      <div class="modal-box text-center">
-        <h3 class="text-lg font-bold">Deleting account</h3>
+    <Modal
+      title="Deleting account"
+      isOpen={props.isOpen}
+      onClose={props.onClose}
+    >
         <p class="py-4">Are you sure you want to delete your account?</p>
         <p>This action cannot be undone.</p>
 
@@ -227,9 +231,9 @@ function DeleteAccountModal(): JSXElement {
           </div>
         </Show>
 
-        <div class="modal-action justify-center">
+        <div class="modal-action">
           <form method="dialog">
-            <button class={clsx('btn mr-2', deleting() && 'btn-disabled')}>
+            <button class={clsx('btn mr-2', deleting() && 'btn-disabled')} onClick={props.onClose}>
               Cancel
             </button>
           </form>
@@ -244,7 +248,6 @@ function DeleteAccountModal(): JSXElement {
             Delete
           </button>
         </div>
-      </div>
-    </dialog>
+    </Modal>
   )
 }

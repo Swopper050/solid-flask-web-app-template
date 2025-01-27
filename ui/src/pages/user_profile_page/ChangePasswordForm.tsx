@@ -93,13 +93,6 @@ export function ChangePasswordForm(props: {
 
   return (
     <Form onSubmit={onSubmit}>
-      <Show when={changePasswordForm.response.status === 'error'}>
-        <div role="alert" class="mt-2 mb-2 alert alert-error">
-          <i class="fa-solid fa-circle-exclamation" />{' '}
-          <span>{changePasswordForm.response.message}</span>
-        </div>
-      </Show>
-
       <Field name="currentPassword">
         {(field, props) => (
           <TextInput
@@ -144,6 +137,14 @@ export function ChangePasswordForm(props: {
           />
         )}
       </Field>
+
+      <Show when={changePasswordForm.response.status === 'error'}>
+        <div role="alert" class="mt-2 mb-2 alert alert-error">
+          <i class="fa-solid fa-circle-exclamation" />{' '}
+          <span>{changePasswordForm.response.message}</span>
+        </div>
+      </Show>
+
       <button class="mt-4 btn btn-primary" type="submit">
         <Show when={changePasswordForm.submitting} fallback="Change password">
           <span class="loading loading-spinner" />

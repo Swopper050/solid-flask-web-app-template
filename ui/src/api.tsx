@@ -15,6 +15,26 @@ export async function changePassword(
   })
 }
 
+export async function passwordLogin(
+  email: string,
+  password: string
+) {
+  return post('api/login', {
+    email: email,
+    password: password,
+  })
+}
+
+export async function totpLogin(
+  email: string,
+  totpCode: string
+) {
+  return post('api/login_2fa', {
+    email: email,
+    totp_code: totpCode,
+  })
+}
+
 export async function post(url: string, data: object) {
   return fetch(url, {
     method: 'POST',

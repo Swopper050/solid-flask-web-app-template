@@ -1,6 +1,11 @@
 import clsx from 'clsx'
 import { JSXElement } from 'solid-js'
 
+export interface ModalBaseProps {
+  isOpen: boolean
+  onClose: () => void
+}
+
 export function Modal(props: {
   title: string
   isOpen: boolean
@@ -11,7 +16,7 @@ export function Modal(props: {
 
   return (
     <>
-      <dialog class={clsx('modal', isOpen() ? 'modal-open' : 'modal-close')}>
+      <dialog class={clsx('modal z-[1000]', isOpen() ? 'modal-open' : 'modal-close')}>
         <div class="modal-box">
           <button
             class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4"
