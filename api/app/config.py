@@ -16,6 +16,12 @@ MY_SOLID_APP_FRONTEND_URL = os.environ.get(
 )
 
 
+MY_SOLID_APP_FERNET_SECRET_KEY = os.environ.get(
+    "MY_SOLID_APP_FERNET_SECRET_KEY", "kxmkv6vw7AMDx92BH9JSEZ7_PQqPyYsWZBAGzP0kXys="
+)
+""" Key used for encrypting. The default key is used for development purposes only. """
+
+
 class BaseConfig:
     SECRET_KEY = os.environ.get("MY_SOLID_APP_SECRET_KEY", "secret_oohhhhhh")
     SQLALCHEMY_DATABASE_URI = (
@@ -27,7 +33,7 @@ class BaseConfig:
     MAIL_SERVER = os.environ.get("MY_SOLID_APP_MAIL_SERVER", "localhost")
     MAIL_PORT = int(os.environ.get("MY_SOLID_APP_MAIL_PORT", 1025))
     MAIL_USE_TLS = False
-    MAIL_USE_SSL = False
+    MAIL_USE_SSL = os.environ.get("MY_SOLID_APP_MAIL_USE_SSL") == "True"
     MAIL_USERNAME = os.environ.get("MY_SOLID_APP_MAIL_USERNAME", "mysolidapp@mail.com")
     MAIL_PASSWORD = os.environ.get("MY_SOLID_APP_MAIL_PASSWORD", "12345678")
     MAIL_DEFAULT_SENDER = os.environ.get(

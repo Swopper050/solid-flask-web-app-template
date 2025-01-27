@@ -2,7 +2,6 @@ services:
   db:
     image: mariadb:latest
     container_name: my-solid-app-mariadb
-    restart: always
     ports:
       - "3306:3306"
     environment:
@@ -13,6 +12,7 @@ services:
 
   mail: 
     image: maildev/maildev
+    container_name: my-solid-app-maildev
     command: 
       - "--incoming-user=mysolidapp@mail.com"
       - "--incoming-pass=12345678"

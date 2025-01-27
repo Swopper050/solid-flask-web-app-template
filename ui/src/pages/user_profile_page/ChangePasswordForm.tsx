@@ -144,8 +144,8 @@ export function ChangePasswordForm(props: {
           />
         )}
       </Field>
-      <button class="mt-4 btn btn-primary " type="submit">
-        <Show when={changePasswordForm.submitting} fallback="Change">
+      <button class="mt-4 btn btn-primary" type="submit">
+        <Show when={changePasswordForm.submitting} fallback="Change password">
           <span class="loading loading-spinner" />
           Saving
         </Show>

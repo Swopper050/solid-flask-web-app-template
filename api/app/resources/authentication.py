@@ -1,7 +1,8 @@
 import re
 import time
 
-from flask import request
+import pyotp
+from flask import request, session
 from flask_login import current_user, login_required, login_user, logout_user
 from flask_restx import Resource
 from marshmallow import Schema, fields
@@ -63,7 +64,47 @@ class Login(Resource):
         if user is None or not user.is_correct_password(data.get("password")):
             return {
                 "error_message": "Could not login with the given email and password"
-            }, 409
+            }, 401
+
+        if user.two_factor_enabled:
+            session.pop("partially_authenticated_user", None)
+            session["partially_authenticated_user"] = user.id
+        else:
+            login_user(user)
+
+        return UserSchema().dump(user)
+
+
+class Login2FASchema(Schema):
+    email = fields.String(required=True)
+    totp_code = fields.String(required=True)
+
+
+@api.route("/login_2fa")
+class Login2FA(Resource):
+    def post(self):
+        data: dict = Login2FASchema().load(request.get_json())
+        totp_code: str = data.get("totp_code")
+        user_id = session.get("partially_authenticated_user")
+
+        user = User.query.filter_by(email=data.get("email")).first()
+        if (
+            user is None
+            or not user.two_factor_enabled
+            or user_id is None
+            or user.id != user_id
+        ):
+            return {
+                "error_message": "Could not login with the given email and code"
+            }, 401
+
+        totp = pyotp.TOTP(user.totp_secret)
+        if not totp.verify(totp_code):
+            return {
+                "error_message": "Could not login with the given email and code"
+            }, 401
+
+        session.pop("partially_authenticated_user", None)
 
         login_user(user)
 

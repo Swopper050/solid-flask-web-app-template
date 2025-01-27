@@ -43,7 +43,7 @@ function ProfileMenu(): JSXElement {
         <DotsIcon />
       </summary>
 
-      <ul class="menu dropdown-content bg-base-200 rounded-box">
+      <ul class="menu dropdown-content bg-base-200 rounded-box z-[100]">
         <li class="text-left">
           <A class="btn btn-ghost text-left" href="/profile">
             <i class="fa-regular fa-address-card" />

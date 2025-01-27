@@ -1,6 +1,5 @@
 import clsx from 'clsx'
 import { JSX, splitProps } from 'solid-js'
-import { PasswordIcon } from './icons/Password'
 
 type TextInputProps = {
   name: string
@@ -28,7 +27,6 @@ export function TextInput(props: TextInputProps) {
         )}
       >
         {props.label} {props.required && <span>*</span>}
-        <PasswordIcon />
         <input
           class="grow ml-2"
           {...inputProps}

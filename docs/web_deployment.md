@@ -85,6 +85,7 @@ MY_SOLID_APP_DB_PASSWORD=<db_password>
 MYSQL_ROOT_PASSWORD=<db_root_password>
 
 MY_SOLID_APP_SECRET_KEY=<flask_secret_key>
+MY_SOLID_APP_FERNET_SECRET_KEY=<fernet_secret_key>
 
 MY_SOLID_APP_MAIL_SERVER=smtp.server.com
 MY_SOLID_APP_MAIL_PORT=465

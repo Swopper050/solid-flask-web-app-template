@@ -38,20 +38,21 @@ deps_prod: pip ## Install production dependencies
 
 deps: deps_prod deps_dev ## Install all dependencies
 
-format: ## Format code with black and isort
-	isort --filter-files $(LINT_FILES)
-	black $(LINT_FILES)
+format: ## Format code ruff 
+	ruff format  $(LINT_FILES)
 
-format_check: ## Check code with black and isort
-	isort --check-only --filter-files $(LINT_FILES)
-	black --check $(LINT_FILES)
+format_check: ## Check code format with ruff 
+	ruff format --check $(LINT_FILES)
 
-flake8: ## Run flake8 lint check
-	flake8 $(LINT_FILES)
+ruff_fix: ## Run ruff lint check with auto fix
+	ruff check --fix $(LINT_FILES)
 
-lint: format_check flake8 ## Run isort, black and flake8
+ruff: ## Run ruff lint check
+	ruff check $(LINT_FILES)
 
-formatlint: format lint ## Format code first, then run linters
+lint: format_check ruff  ## Run ruff format and ruff lint 
+
+formatlint: ruff_fix format lint $(LINT_FILES) ## Format code first, then run linters
 
 test: ## Run tests
 	$(PYTEST)
@@ -61,6 +62,9 @@ test_cov: ## Run tests and show coverage
 
 server: ## Start development server
 	$(DEV_ENV) flask --app server --debug run
+
+database:  ## Creates an empty database
+	python scripts/empty_database.py
 
 fixtures: ## Adds initial fixtures to the database
 	python scripts/add_fixtures.py
