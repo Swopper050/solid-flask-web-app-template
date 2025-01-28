@@ -1,4 +1,4 @@
-import { JSXElement, Show } from 'solid-js'
+import { JSXElement, Show, createSignal } from 'solid-js'
 import { A } from '@solidjs/router'
 
 import puppy from '/puppy.jpg'
@@ -11,6 +11,8 @@ import { useUser } from '../context'
 
 export function LandingPage(): JSXElement {
   const { user } = useUser()
+  const [openLoginModal, setOpenLoginModal] = createSignal(false)
+  const [openRegisterModal, setOpenRegisterModal] = createSignal(false)
 
   return (
     <>
@@ -37,23 +39,19 @@ export function LandingPage(): JSXElement {
           <div class="flex-none mx-1">
             <button
               class="btn btn-ghost"
-              onClick={() => document.getElementById('login_modal').showModal()}
+              onClick={() => setOpenLoginModal(true)}
             >
               Login
             </button>
-            <LoginModal />
           </div>
 
           <div class="flex-none mx-1">
             <button
               class="btn btn-ghost"
-              onClick={() =>
-                document.getElementById('register_modal').showModal()
-              }
+              onClick={() => setOpenRegisterModal(true)}
             >
               Register
             </button>
-            <RegisterModal />
           </div>
         </Show>
       </div>
@@ -98,6 +96,16 @@ export function LandingPage(): JSXElement {
           </div>
         </div>
       </div>
+
+      <LoginModal
+        isOpen={openLoginModal()}
+        onClose={() => setOpenLoginModal(false)}
+      />
+
+      <RegisterModal
+        isOpen={openRegisterModal()}
+        onClose={() => setOpenRegisterModal(false)}
+      />
     </>
   )
 }

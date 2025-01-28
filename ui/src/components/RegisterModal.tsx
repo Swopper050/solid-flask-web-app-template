@@ -1,163 +1,172 @@
-import { JSXElement, createSignal, Show } from 'solid-js'
+import { JSXElement, Show } from 'solid-js'
 import { useNavigate } from '@solidjs/router'
 import { clsx } from 'clsx'
 
+import {
+  clearResponse,
+  createForm,
+  reset,
+  minLength,
+  getValue,
+  pattern,
+  email,
+  required,
+  setResponse,
+  SubmitHandler,
+} from '@modular-forms/solid'
+
 import { EmailIcon } from './icons/Email'
 import { PasswordIcon } from './icons/Password'
-import api from '../api'
+import { register } from '../api'
 
 import { useUser } from '../context'
 import { User } from '../models/User'
 
-import { isGoodPassword, passwordConditions } from './utils'
+import { TextInput } from './TextInput'
+import { Modal, ModalBaseProps } from './Modal'
 
-export function RegisterModal(): JSXElement {
+type RegisterFormData = {
+  email: string
+  password: string
+  checkPassword: string
+}
+
+export function RegisterModal(props: ModalBaseProps): JSXElement {
   const { setUser } = useUser()
-  const [email, setEmail] = createSignal<string | null>(null)
-  const [password, setPassword] = createSignal<string | null>(null)
-  const [checkPassword, setCheckPassword] = createSignal<string | null>(null)
-  const [errorMsg, setErrorMsg] = createSignal<string | null>(null)
-  const [submitting, setSubmitting] = createSignal(false)
+
+  const [registerForm, Register] = createForm<RegisterFormData>()
 
   const navigate = useNavigate()
 
-  let registerModalRef: HTMLDialogElement | undefined
-
-  const passwordsMatch = () => {
-    return password() === checkPassword()
+  const newPassword = () => {
+    return getValue(registerForm, 'password', {
+      shouldActive: false,
+      shouldTouched: true,
+      shouldDirty: true,
+      shouldValid: true,
+    })
   }
 
-  const formReady = () => {
-    return (
-      email() !== null &&
-      passwordsMatch() &&
-      password() !== null &&
-      isGoodPassword(password())
-    )
+  const mustMatch = (
+    error: string
+  ): ((value: string | undefined) => string) => {
+    return (value: string | undefined) => {
+      return value !== newPassword() ? error : ''
+    }
   }
 
-  const handleLogin = async () => {
-    setSubmitting(true)
+  const onSubmit: SubmitHandler<RegisterFormData> = async (values) => {
+    const response = await register(values.email, values.password)
 
-    api
-      .post(
-        '/register',
-        JSON.stringify({ email: email(), password: password() })
-      )
-      .then((response) => {
-        setUser(new User(response.data))
-        registerModalRef?.close()
-        navigate('/home')
+    if (response.status != 200) {
+      setResponse(registerForm, {
+        status: 'error',
+        message: (await response.json()).error_message,
       })
-      .catch((error) => {
-        setErrorMsg(error.response.data.error_message)
-      })
-      .finally(() => {
-        setSubmitting(false)
-      })
+      return
+    }
+
+    const data = await response.json()
+    setUser(new User(data))
+    setResponse(registerForm, { status: 'success', data: data })
+
+    onClose()
+    navigate('/home')
+  }
+
+  const onClose = () => {
+    clearResponse(registerForm)
+    reset(registerForm)
   }
 
   return (
-    <dialog ref={registerModalRef} id="register_modal" class="modal">
-      <div class="modal-box">
-        <h3 class="flex justify-center text-lg font-bold mb-6">Register</h3>
-
-        <form method="dialog">
-          <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
-            ✕
-          </button>
-        </form>
-
-        <label class="input input-bordered flex items-center gap-2 mb-3">
-          <EmailIcon />
-          <input
-            type="text"
-            class="grow"
-            placeholder="your@email.com"
-            value={email()}
-            onInput={(e) =>
-              setEmail(e.target.value === '' ? null : e.target.value)
-            }
-          />
-        </label>
-
-        <label
-          class={clsx(
-            'input input-bordered flex items-center gap-2',
-            password() !== null && !isGoodPassword(password()) && 'input-error'
-          )}
+    <Modal
+      title="Register"
+      isOpen={props.isOpen}
+      onClose={() => {
+        onClose()
+        props.onClose()
+      }}
+    >
+      <Register.Form onSubmit={onSubmit}>
+        <Register.Field
+          name="email"
+          validate={[
+            required('Please enter an email'),
+            email('Please enter a valid email'),
+          ]}
         >
-          <PasswordIcon />
-          <input
-            type="password"
-            class="grow"
-            placeholder="Your password"
-            value={password()}
-            onInput={(e) =>
-              setPassword(e.target.value === '' ? null : e.target.value)
-            }
-          />
-        </label>
-        <Show when={password() !== null && !isGoodPassword(password())}>
-          <div class="label">
-            <span class="label-text-alt text-error">
-              {passwordConditions()}
-            </span>
-          </div>
-        </Show>
-
-        <label
-          class={clsx(
-            'input',
-            'input-bordered',
-            'flex',
-            'items-center',
-            'gap-2',
-            'mt-3',
-            !passwordsMatch() && 'input-error'
+          {(field, props) => (
+            <TextInput
+              {...props}
+              type="email"
+              value={field.value}
+              error={field.error}
+              placeholder="your@email.com"
+              icon={<EmailIcon />}
+            />
           )}
+        </Register.Field>
+
+        <Register.Field
+          name="password"
+          validate={[
+            minLength(8, 'Your password must have 8 characters or more.'),
+            pattern(/[A-Z]/, 'Must contain 1 uppercase letter.'),
+            pattern(/[a-z]/, 'Must contain 1 lower case letter.'),
+            pattern(/[0-9]/, 'Must contain 1 digit.'),
+          ]}
         >
-          <PasswordIcon />
-          <input
-            type="password"
-            class="grow"
-            placeholder="Confirm password"
-            value={checkPassword()}
-            onInput={(e) =>
-              setCheckPassword(e.target.value === '' ? null : e.target.value)
-            }
-          />
-        </label>
-        <Show when={!passwordsMatch()}>
-          <div class="label">
-            <span class="label-text-alt text-error">
-              Passwords do not match
-            </span>
+          {(field, props) => (
+            <TextInput
+              {...props}
+              type="password"
+              value={field.value}
+              error={field.error}
+              placeholder="Password"
+              icon={<PasswordIcon />}
+            />
+          )}
+        </Register.Field>
+
+        <Register.Field
+          name="checkPassword"
+          validate={[mustMatch("Passwords don't match")]}
+        >
+          {(field, props) => (
+            <TextInput
+              {...props}
+              type="password"
+              value={field.value}
+              error={field.error}
+              placeholder="Confirm password"
+              icon={<PasswordIcon />}
+            />
+          )}
+        </Register.Field>
+
+        <Show when={registerForm.response.status === 'error'}>
+          <div role="alert" class="mt-4 alert alert-error">
+            <i class="fa-solid fa-circle-exclamation" />{' '}
+            <span>{registerForm.response.message}</span>
           </div>
         </Show>
 
-        <Show when={errorMsg() !== null}>
-          <div role="alert" class="alert alert-error my-6">
-            <span>{errorMsg()}</span>
-          </div>
-        </Show>
-
-        <div class="modal-action flex justify-center">
+        <div class="modal-action">
           <button
             class={clsx(
-              'btn',
-              'btn-primary',
-              (submitting() || !formReady()) && 'btn-disabled'
+              'mt-4 btn btn-primary',
+              registerForm.submitting && 'btn-disabled'
             )}
-            onClick={handleLogin}
+            type="submit"
           >
-            <Show when={submitting()}>
+            <Show when={registerForm.submitting} fallback="Register">
               <span class="loading loading-spinner" />
+              Register
             </Show>
-            Register
           </button>
         </div>
-      </div>
-    </dialog>
+      </Register.Form>
+    </Modal>
   )
 }

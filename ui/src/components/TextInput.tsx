@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import { JSX, splitProps } from 'solid-js'
+import { JSX, splitProps, JSXElement } from 'solid-js'
 
 type TextInputProps = {
   name: string
@@ -8,6 +8,7 @@ type TextInputProps = {
   placeholder?: string
   value: string | undefined
   error: string
+  icon?: JSXElement
   required?: boolean
   ref: (element: HTMLInputElement) => void
   onInput: JSX.EventHandler<HTMLInputElement, InputEvent>
@@ -27,6 +28,7 @@ export function TextInput(props: TextInputProps) {
         )}
       >
         {props.label} {props.required && <span>*</span>}
+        {props.icon}
         <input
           class="grow ml-2"
           {...inputProps}

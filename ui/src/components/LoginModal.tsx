@@ -2,127 +2,151 @@ import { JSXElement, createSignal, Show } from 'solid-js'
 import { useNavigate, Link } from '@solidjs/router'
 import { clsx } from 'clsx'
 
+import {
+  clearResponse,
+  createForm,
+  reset,
+  minLength,
+  maxLength,
+  pattern,
+  email,
+  required,
+  setResponse,
+  SubmitHandler,
+} from '@modular-forms/solid'
+
 import { EmailIcon } from './icons/Email'
 import { PasswordIcon } from './icons/Password'
-import api from '../api'
+import { passwordLogin, totpLogin } from '../api'
 
 import { User } from '../models/User'
 import { useUser } from '../context'
+import { TextInput } from './TextInput'
+import { Modal, ModalBaseProps } from './Modal'
 
-export function LoginModal(): JSXElement {
+type LoginFormData = {
+  email: string
+  password: string
+}
+
+type TotpFormData = {
+  totpCode: string
+}
+
+export function LoginModal(props: ModalBaseProps): JSXElement {
   const { setUser } = useUser()
-  const [email, setEmail] = createSignal<string | null>(null)
-  const [password, setPassword] = createSignal<string | null>(null)
-  const [errorMsg, setErrorMsg] = createSignal<string | null>(null)
-  const [submitting, setSubmitting] = createSignal(false)
+  const [currentEmail, setCurrentEmail] = createSignal<string | null>(null)
+  const [loginForm, Login] = createForm<LoginFormData>()
+  const [totpForm, Totp] = createForm<TotpFormData>()
 
-  const [totpCode, setTotpCode] = createSignal<string | null>(null)
   const [at2FAStep, setAt2FAStep] = createSignal(false)
 
   const navigate = useNavigate()
 
   let loginModalRef: HTMLDialogElement | undefined
 
-  const formReady = () => {
-    return email() !== null && password() !== null
+  const onPasswordLogin: SubmitHandler<LoginFormData> = async (values) => {
+    const response = await passwordLogin(values.email, values.password)
+
+    if (response.status != 200) {
+      setResponse(loginForm, {
+        status: 'error',
+        message: (await response.json()).error_message,
+      })
+      return
+    }
+
+    const data = await response.json()
+    const user = new User(data)
+    setResponse(loginForm, { status: 'success', data: data })
+    setCurrentEmail(values.email)
+
+    if (user.twoFactorEnabled) {
+      setAt2FAStep(true)
+    } else {
+      setUser(user)
+      loginModalRef?.close()
+      onClose()
+      navigate('/home')
+    }
   }
 
-  const handlePasswordLogin = async () => {
-    setSubmitting(true)
+  const onTotpLogin: SubmitHandler<TotpFormData> = async (values) => {
+    const response = await totpLogin(currentEmail(), values.totpCode)
 
-    api
-      .post('/login', JSON.stringify({ email: email(), password: password() }))
-      .then((response) => {
-        const user = new User(response.data)
-        if (user.twoFactorEnabled) {
-          setAt2FAStep(true)
-        } else {
-          setUser(user)
-          loginModalRef?.close()
-          onClose()
-          navigate('/home')
-        }
+    if (response.status != 200) {
+      setResponse(totpForm, {
+        status: 'error',
+        message: (await response.json()).error_message,
       })
-      .catch((error) => {
-        setErrorMsg(error.response.data.error_message)
-      })
-      .finally(() => {
-        setSubmitting(false)
-      })
-  }
+      return
+    }
 
-  const handle2FALogin = async () => {
-    setSubmitting(true)
+    const data = await response.json()
+    const user = new User(data)
+    setResponse(loginForm, { status: 'success', data: data })
 
-    api
-      .post(
-        '/login_2fa',
-        JSON.stringify({ email: email(), totp_code: totpCode() })
-      )
-      .then((response) => {
-        setUser(new User(response.data))
-        loginModalRef?.close()
-        onClose()
-        navigate('/home')
-      })
-      .catch((error) => {
-        setErrorMsg(error.response.data.error_message)
-      })
-      .finally(() => {
-        setSubmitting(false)
-      })
+    setUser(user)
+    loginModalRef?.close()
+    onClose()
+    navigate('/home')
   }
 
   const onClose = () => {
-    setEmail(null)
-    setPassword(null)
-    setErrorMsg(null)
-    setSubmitting(false)
-    setTotpCode(null)
-    setAt2FAStep(false)
+    clearResponse(loginForm)
+    clearResponse(totpForm)
+    reset(loginForm)
+    reset(totpForm)
   }
 
   return (
-    <dialog ref={loginModalRef} id="login_modal" class="modal">
-      <div class="modal-box">
-        <h3 class="flex justify-center text-lg font-bold mb-6">Login</h3>
+    <Modal
+      title="Login"
+      isOpen={props.isOpen}
+      onClose={() => {
+        onClose()
+        props.onClose()
+      }}
+    >
+      <Login.Form onSubmit={onPasswordLogin}>
+        <Login.Field
+          name="email"
+          validate={[
+            required('Please enter your email'),
+            email('The email address is badly formatted'),
+          ]}
+        >
+          {(field, props) => (
+            <TextInput
+              {...props}
+              type="email"
+              value={field.value}
+              error={field.error}
+              placeholder="your@email.com"
+              icon={<EmailIcon />}
+            />
+          )}
+        </Login.Field>
 
-        <form method="dialog">
-          <button
-            class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
-            onClick={onClose}
-          >
-            ✕
-          </button>
-        </form>
+        <Login.Field name="password">
+          {(field, props) => (
+            <TextInput
+              {...props}
+              type="password"
+              value={field.value}
+              error={field.error}
+              placeholder="Password"
+              icon={<PasswordIcon />}
+            />
+          )}
+        </Login.Field>
 
-        <label class="input input-bordered flex items-center gap-2 mb-3">
-          <EmailIcon />
-          <input
-            type="text"
-            class="grow"
-            placeholder="your@email.com"
-            value={email()}
-            disabled={at2FAStep()}
-            onInput={(e) =>
-              setEmail(e.target.value === '' ? null : e.target.value)
-            }
-          />
-        </label>
-
-        <label class="input input-bordered flex items-center gap-2">
-          <PasswordIcon />
-          <input
-            type="password"
-            class="grow"
-            placeholder="Your password"
-            value={password()}
-            disabled={at2FAStep()}
-            onInput={(e) =>
-              setPassword(e.target.value === '' ? null : e.target.value)
-            }
-          />
-        </label>
+        <Show when={loginForm.response.status === 'error'}>
+          <div role="alert" class="alert alert-error my-4">
+            <i class="fa-solid fa-circle-exclamation" />{' '}
+            <span>{loginForm.response.message}</span>
+          </div>
+        </Show>
 
         <Show when={!at2FAStep()}>
           <Link
@@ -131,64 +155,75 @@ export function LoginModal(): JSXElement {
           >
             Forgot password?
           </Link>
-        </Show>
 
-        <Show when={at2FAStep()}>
-          <p class="py-4">
-            Enter the 6-digit code generated by your authenticator app.
-          </p>
-
-          <input
-            type="text"
-            class="input input-bordered w-full"
-            placeholder=""
-            value={totpCode()}
-            onInput={(e) => setTotpCode(e.target.value)}
-          />
-        </Show>
-
-        <Show when={errorMsg() !== null}>
-          <div role="alert" class="alert alert-error my-6">
-            <span>{errorMsg()}</span>
-          </div>
-        </Show>
-
-        <Show when={!at2FAStep()}>
-          <div class="modal-action flex justify-center">
+          <div class="modal-action">
             <button
               class={clsx(
-                'btn',
-                'btn-primary',
-                (submitting() || !formReady()) && 'btn-disabled'
+                'btn btn-primary',
+                loginForm.submitting && 'btn-disabled'
               )}
-              onClick={handlePasswordLogin}
+              type="submit"
             >
-              <Show when={submitting()}>
+              <Show when={loginForm.submitting} fallback="Login">
                 <span class="loading loading-spinner" />
+                Login
               </Show>
-              Login
             </button>
           </div>
         </Show>
+      </Login.Form>
 
-        <Show when={at2FAStep()}>
-          <div class="modal-action flex justify-center">
+      <Show when={at2FAStep()}>
+        <div class="divider text-center mt-4" />
+
+        <p class="pb-4">
+          Enter the 6-digit code generated by your authenticator app.
+        </p>
+
+        <Totp.Form onSubmit={onTotpLogin}>
+          <Totp.Field
+            name="totpCode"
+            validate={[
+              required('Please enter a 6-digit code'),
+              minLength(6, 'The code must be exactly 6 digits'),
+              maxLength(6, 'The code must be exactly 6 digits'),
+              pattern(/^\d{6}$/, 'The code must be exactly 6 digits'),
+            ]}
+          >
+            {(field, props) => (
+              <TextInput
+                {...props}
+                type="text"
+                value={field.value}
+                error={field.error}
+                placeholder="123456"
+              />
+            )}
+          </Totp.Field>
+
+          <Show when={loginForm.response.status === 'error'}>
+            <div role="alert" class="alert alert-error my-4">
+              <i class="fa-solid fa-circle-exclamation" />{' '}
+              <span>{loginForm.response.message}</span>
+            </div>
+          </Show>
+
+          <div class="modal-action">
             <button
               class={clsx(
-                'btn',
-                'btn-primary',
-                (submitting() || totpCode().length !== 6) && 'btn-disabled'
+                'btn btn-primary',
+                totpForm.submitting && 'btn-disabled'
               )}
-              onClick={handle2FALogin}
+              type="submit"
             >
-              <Show when={submitting()}>
+              <Show when={totpForm.submitting} fallback="Login">
                 <span class="loading loading-spinner" />
+                Login
               </Show>
-              Login
             </button>
           </div>
-        </Show>
-      </div>
-    </dialog>
+        </Totp.Form>
+      </Show>
+    </Modal>
   )
 }

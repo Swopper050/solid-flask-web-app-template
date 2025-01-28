@@ -1,6 +1,11 @@
 import clsx from 'clsx'
 import { JSXElement } from 'solid-js'
 
+export interface ModalBaseProps {
+  isOpen: boolean
+  onClose: () => void
+}
+
 export function Modal(props: {
   title: string
   isOpen: boolean
