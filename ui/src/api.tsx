@@ -15,30 +15,72 @@ export async function changePassword(
   })
 }
 
-export async function passwordLogin(
+export async function forgotPassword(email: string) {
+  return post('api/forgot_password', {
+    email: email,
+  })
+}
+
+export async function resetPassword(
   email: string,
-  password: string
+  resetToken: string,
+  newPassword: string
 ) {
+  return post('api/reset_password', {
+    email: email,
+    reset_token: resetToken,
+    new_password: newPassword,
+  })
+}
+
+export async function passwordLogin(email: string, password: string) {
   return post('api/login', {
     email: email,
     password: password,
   })
 }
 
-export async function totpLogin(
-  email: string,
-  totpCode: string
-) {
+export async function totpLogin(email: string, totpCode: string) {
   return post('api/login_2fa', {
     email: email,
     totp_code: totpCode,
   })
 }
 
+export async function register(email: string, password: string) {
+  return post('api/register', {
+    email: email,
+    password: password,
+  })
+}
+
+export async function generate2FASecret() {
+  return get('api/generate_2fa_secret')
+}
+
+export async function enable2FA(totpSecret: string, totpCode: string) {
+  return post('api/enable_2fa', {
+    totp_secret: totpSecret,
+    totp_code: totpCode,
+  })
+}
+
+export async function disable2FA(totpCode: string) {
+  return post('api/disable_2fa', {
+    totp_code: totpCode,
+  })
+}
+
+export async function get(url: string) {
+  return fetch(url, {
+    method: 'GET',
+    headers: new Headers({ 'Content-Type': 'application/json' }),
+  })
+}
+
 export async function post(url: string, data: object) {
   return fetch(url, {
     method: 'POST',
-    credentials: 'include',
     body: JSON.stringify({
       ...data,
     }),

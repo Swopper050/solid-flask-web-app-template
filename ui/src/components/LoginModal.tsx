@@ -1,5 +1,6 @@
 import { JSXElement, createSignal, Show } from 'solid-js'
 import { useNavigate, Link } from '@solidjs/router'
+import { clsx } from 'clsx'
 
 import {
   clearResponse,
@@ -16,7 +17,7 @@ import {
 
 import { EmailIcon } from './icons/Email'
 import { PasswordIcon } from './icons/Password'
-import {passwordLogin, totpLogin} from '../api'
+import { passwordLogin, totpLogin } from '../api'
 
 import { User } from '../models/User'
 import { useUser } from '../context'
@@ -34,9 +35,9 @@ type TotpFormData = {
 
 export function LoginModal(props: ModalBaseProps): JSXElement {
   const { setUser } = useUser()
-  const [ currentEmail, setCurrentEmail ] = createSignal<string | null>(null)
-  const [loginForm, Login ] = createForm<LoginFormData>()
-  const [totpForm, Totp ] = createForm<TotpFormData>()
+  const [currentEmail, setCurrentEmail] = createSignal<string | null>(null)
+  const [loginForm, Login] = createForm<LoginFormData>()
+  const [totpForm, Totp] = createForm<TotpFormData>()
 
   const [at2FAStep, setAt2FAStep] = createSignal(false)
 
@@ -48,13 +49,16 @@ export function LoginModal(props: ModalBaseProps): JSXElement {
     const response = await passwordLogin(values.email, values.password)
 
     if (response.status != 200) {
-      setResponse(loginForm, {status: "error", message: (await response.json()).error_message})
+      setResponse(loginForm, {
+        status: 'error',
+        message: (await response.json()).error_message,
+      })
       return
     }
 
     const data = await response.json()
     const user = new User(data)
-    setResponse(loginForm, {status: "success", data: data})
+    setResponse(loginForm, { status: 'success', data: data })
     setCurrentEmail(values.email)
 
     if (user.twoFactorEnabled) {
@@ -71,14 +75,16 @@ export function LoginModal(props: ModalBaseProps): JSXElement {
     const response = await totpLogin(currentEmail(), values.totpCode)
 
     if (response.status != 200) {
-      setResponse(totpForm, {status: "error", message: (await response.json()).error_message})
+      setResponse(totpForm, {
+        status: 'error',
+        message: (await response.json()).error_message,
+      })
       return
     }
 
-
     const data = await response.json()
     const user = new User(data)
-    setResponse(loginForm, {status: "success", data: data})
+    setResponse(loginForm, { status: 'success', data: data })
 
     setUser(user)
     loginModalRef?.close()
@@ -97,14 +103,17 @@ export function LoginModal(props: ModalBaseProps): JSXElement {
     <Modal
       title="Login"
       isOpen={props.isOpen}
-      onClose={props.onClose}
+      onClose={() => {
+        onClose()
+        props.onClose()
+      }}
     >
       <Login.Form onSubmit={onPasswordLogin}>
         <Login.Field
           name="email"
           validate={[
-            required("Please enter your email"),
-            email("The email address is badly formatted"),
+            required('Please enter your email'),
+            email('The email address is badly formatted'),
           ]}
         >
           {(field, props) => (
@@ -114,26 +123,26 @@ export function LoginModal(props: ModalBaseProps): JSXElement {
               value={field.value}
               error={field.error}
               placeholder="your@email.com"
+              icon={<EmailIcon />}
             />
           )}
         </Login.Field>
 
-        <Login.Field
-          name="password"
-        >
+        <Login.Field name="password">
           {(field, props) => (
             <TextInput
               {...props}
               type="password"
               value={field.value}
               error={field.error}
-              placeholder="**********"
+              placeholder="Password"
+              icon={<PasswordIcon />}
             />
           )}
         </Login.Field>
 
         <Show when={loginForm.response.status === 'error'}>
-          <div role="alert" class="mt-2 mb-2 alert alert-error">
+          <div role="alert" class="alert alert-error my-4">
             <i class="fa-solid fa-circle-exclamation" />{' '}
             <span>{loginForm.response.message}</span>
           </div>
@@ -147,12 +156,20 @@ export function LoginModal(props: ModalBaseProps): JSXElement {
             Forgot password?
           </Link>
 
-          <button class="mt-4 btn btn-primary" type="submit">
-            <Show when={loginForm.submitting} fallback="Login">
-              <span class="loading loading-spinner" />
-              Login
-            </Show>
-          </button>
+          <div class="modal-action">
+            <button
+              class={clsx(
+                'btn btn-primary',
+                loginForm.submitting && 'btn-disabled'
+              )}
+              type="submit"
+            >
+              <Show when={loginForm.submitting} fallback="Login">
+                <span class="loading loading-spinner" />
+                Login
+              </Show>
+            </button>
+          </div>
         </Show>
       </Login.Form>
 
@@ -167,10 +184,10 @@ export function LoginModal(props: ModalBaseProps): JSXElement {
           <Totp.Field
             name="totpCode"
             validate={[
-              required("Please enter a 6-digit code"),
-              minLength(6, "The code must be exactly 6 digits"),
-              maxLength(6, "The code must be exactly 6 digits"),
-              pattern(/^\d{6}$/, "The code must be exactly 6 digits"),
+              required('Please enter a 6-digit code'),
+              minLength(6, 'The code must be exactly 6 digits'),
+              maxLength(6, 'The code must be exactly 6 digits'),
+              pattern(/^\d{6}$/, 'The code must be exactly 6 digits'),
             ]}
           >
             {(field, props) => (
@@ -185,18 +202,26 @@ export function LoginModal(props: ModalBaseProps): JSXElement {
           </Totp.Field>
 
           <Show when={loginForm.response.status === 'error'}>
-            <div role="alert" class="alert alert-error">
+            <div role="alert" class="alert alert-error my-4">
               <i class="fa-solid fa-circle-exclamation" />{' '}
               <span>{loginForm.response.message}</span>
             </div>
           </Show>
 
-          <button class="mt-4 btn btn-primary" type="submit">
-            <Show when={totpForm.submitting} fallback="Login">
-              <span class="loading loading-spinner" />
-              Login
-            </Show>
-          </button>
+          <div class="modal-action">
+            <button
+              class={clsx(
+                'btn btn-primary',
+                totpForm.submitting && 'btn-disabled'
+              )}
+              type="submit"
+            >
+              <Show when={totpForm.submitting} fallback="Login">
+                <span class="loading loading-spinner" />
+                Login
+              </Show>
+            </button>
+          </div>
         </Totp.Form>
       </Show>
     </Modal>

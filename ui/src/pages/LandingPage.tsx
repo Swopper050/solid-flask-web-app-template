@@ -43,10 +43,6 @@ export function LandingPage(): JSXElement {
             >
               Login
             </button>
-            <LoginModal 
-              isOpen={openLoginModal()}
-              onClose={() => setOpenLoginModal(false)}
-            />
           </div>
 
           <div class="flex-none mx-1">
@@ -56,10 +52,6 @@ export function LandingPage(): JSXElement {
             >
               Register
             </button>
-            <RegisterModal 
-              isOpen={openRegisterModal()}
-              onClose={() => setOpenRegisterModal(false)}
-            />
           </div>
         </Show>
       </div>
@@ -104,6 +96,16 @@ export function LandingPage(): JSXElement {
           </div>
         </div>
       </div>
+
+      <LoginModal
+        isOpen={openLoginModal()}
+        onClose={() => setOpenLoginModal(false)}
+      />
+
+      <RegisterModal
+        isOpen={openRegisterModal()}
+        onClose={() => setOpenRegisterModal(false)}
+      />
     </>
   )
 }

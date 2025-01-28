@@ -8,7 +8,7 @@ type TextInputProps = {
   placeholder?: string
   value: string | undefined
   error: string
-  icon?: JSXElement,
+  icon?: JSXElement
   required?: boolean
   ref: (element: HTMLInputElement) => void
   onInput: JSX.EventHandler<HTMLInputElement, InputEvent>
@@ -28,6 +28,7 @@ export function TextInput(props: TextInputProps) {
         )}
       >
         {props.label} {props.required && <span>*</span>}
+        {props.icon}
         <input
           class="grow ml-2"
           {...inputProps}

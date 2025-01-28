@@ -1,36 +1,43 @@
-import { createSignal, JSXElement, Show } from 'solid-js'
+import { JSXElement, Show } from 'solid-js'
 import { A } from '@solidjs/router'
 import { clsx } from 'clsx'
 
 import { ThemeSwitcher } from '../components/ThemeSwitcher'
 import { EmailIcon } from '../components/icons/Email'
+import { TextInput } from '../components/TextInput'
 
-import api from '../api'
+import {
+  createForm,
+  email,
+  required,
+  setResponse,
+  SubmitHandler,
+} from '@modular-forms/solid'
+
+import { forgotPassword } from '../api'
+
+type ForgotPasswordFormData = {
+  email: string
+}
 
 export function ForgotPasswordPage(): JSXElement {
-  const [email, setEmail] = createSignal<string | null>(null)
-  const [errorMsg, setErrorMsg] = createSignal<string | null>(null)
-  const [submitting, setSubmitting] = createSignal(false)
-  const [success, setSuccess] = createSignal(false)
+  const [forgotPasswordForm, ForgotPassword] =
+    createForm<ForgotPasswordFormData>()
 
-  const requestPasswordReset = async () => {
-    setSubmitting(true)
-    setSuccess(false)
-    setErrorMsg(null)
+  const onPasswordReset: SubmitHandler<ForgotPasswordFormData> = async (
+    values
+  ) => {
+    const response = await forgotPassword(values.email)
 
-    api
-      .post('/forgot_password', JSON.stringify({ email: email() }))
-      .then(() => {
-        setSuccess(true)
+    if (response.status != 200) {
+      setResponse(forgotPasswordForm, {
+        status: 'error',
+        message: (await response.json()).error_message,
       })
-      .catch((error) => {
-        setErrorMsg(
-          error.response.data.error_message ?? 'Could not reset password'
-        )
-      })
-      .finally(() => {
-        setSubmitting(false)
-      })
+      return
+    }
+
+    setResponse(forgotPasswordForm, { status: 'success' })
   }
 
   return (
@@ -47,56 +54,70 @@ export function ForgotPasswordPage(): JSXElement {
       </div>
 
       <div class="flex justify-center mt-20">
-        <label class="input input-bordered flex items-center gap-2 mb-3 w-80">
-          <EmailIcon />
-          <input
-            type="text"
-            class="grow"
-            placeholder="your@email.com"
-            value={email()}
-            disabled={success()}
-            onInput={(e) =>
-              setEmail(e.target.value === '' ? null : e.target.value)
-            }
-          />
-        </label>
-      </div>
+        <ForgotPassword.Form onSubmit={onPasswordReset}>
+          <ForgotPassword.Field
+            name="email"
+            validate={[
+              required('Please enter your email'),
+              email('Please enter a valid email'),
+            ]}
+          >
+            {(field, props) => (
+              <TextInput
+                {...props}
+                type="email"
+                value={field.value}
+                error={field.error}
+                placeholder="your@email.com"
+                icon={<EmailIcon />}
+              />
+            )}
+          </ForgotPassword.Field>
 
-      <Show when={success()}>
-        <div class="flex justify-center mt-4">
-          <div role="alert" class="alert alert-success w-80">
-            <span>
-              If a user with this email exists, a reset password mail has been
-              sent
-            </span>
-          </div>
-        </div>
-      </Show>
-
-      <Show when={errorMsg() !== null}>
-        <div class="flex justify-center mt-4">
-          <div role="alert" class="alert alert-error w-80">
-            <span>{errorMsg()}</span>
-          </div>
-        </div>
-      </Show>
-
-      <div class="flex justify-center mt-10">
-        <A class="btn btn-primary btn-outline" href="/home">
-          Back to home
-        </A>
-        <button
-          class={clsx(
-            'btn btn-primary ml-4',
-            (email() === null || success() || submitting()) && 'btn-disabled'
-          )}
-          onClick={requestPasswordReset}
-        >
-          <Show when={submitting()}>
-            <span class="loading loading-spinner" />
+          <Show when={forgotPasswordForm.response.status === 'success'}>
+            <div class="flex justify-center mt-4">
+              <div role="alert" class="alert alert-success w-80">
+                <span>
+                  If a user with this email exists, a reset password mail has
+                  been sent
+                </span>
+              </div>
+            </div>
           </Show>
-          Reset password
-        </button>
+
+          <Show when={forgotPasswordForm.response.status === 'error'}>
+            <div class="flex justify-center mt-4">
+              <div role="alert" class="alert alert-error w-80">
+                <i class="fa-solid fa-circle-exclamation" />{' '}
+                <span>{forgotPasswordForm.response.message}</span>
+              </div>
+            </div>
+          </Show>
+
+          <div class="flex justify-center mt-10">
+            <A class="btn btn-primary btn-outline" href="/home">
+              Back to home
+            </A>
+
+            <button
+              class={clsx(
+                'btn btn-primary ml-4',
+                (forgotPasswordForm.response.status === 'success' ||
+                  forgotPasswordForm.submitting) &&
+                  'btn-disabled'
+              )}
+              type="submit"
+            >
+              <Show
+                when={forgotPasswordForm.submitting}
+                fallback="Reset password"
+              >
+                <span class="loading loading-spinner" />
+                Resetting
+              </Show>
+            </button>
+          </div>
+        </ForgotPassword.Form>
       </div>
     </>
   )
