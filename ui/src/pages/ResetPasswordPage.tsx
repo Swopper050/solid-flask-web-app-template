@@ -35,7 +35,7 @@ export function ResetPasswordPage(): JSXElement {
       values.password
     )
 
-    if (response.status != 200) {
+    if (response.status !== 200) {
       setResponse(resetPasswordForm, {
         status: 'error',
         message: (await response.json()).error_message,

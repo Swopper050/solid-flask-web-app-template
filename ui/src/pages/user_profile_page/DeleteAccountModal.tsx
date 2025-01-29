@@ -3,7 +3,7 @@ import { useNavigate } from '@solidjs/router'
 import { useUser } from '../../context'
 import { clsx } from 'clsx'
 
-import api from '../../api'
+import { deleteAccount } from '../../api'
 import { Modal, ModalBaseProps } from '../../components/Modal'
 
 export function DeleteAccountModal(props: ModalBaseProps): JSXElement {
@@ -14,24 +14,22 @@ export function DeleteAccountModal(props: ModalBaseProps): JSXElement {
 
   const navigate = useNavigate()
 
-  const deleteAccount = async () => {
+  const onDeleteAccount = async () => {
     setDeleting(true)
     setErrorMsg(null)
 
-    api
-      .delete('/delete_account')
-      .then(() => {
-        setUser(null)
-        navigate('/home')
-      })
-      .catch((error) => {
-        setErrorMsg(
-          error.response.data.error_message ?? 'Could not delete account'
-        )
-      })
-      .finally(() => {
-        setDeleting(false)
-      })
+    const response = await deleteAccount()
+    if (response.status !== 200) {
+      setErrorMsg(
+        (await response.json()).error_message ?? 'Could not delete account'
+      )
+      setDeleting(false)
+      return
+    }
+
+    setUser(null)
+    setDeleting(false)
+    navigate('/home')
   }
 
   return (
@@ -61,7 +59,7 @@ export function DeleteAccountModal(props: ModalBaseProps): JSXElement {
 
         <button
           class={clsx('btn btn-error', deleting() && 'btn-disabled')}
-          onClick={deleteAccount}
+          onClick={onDeleteAccount}
         >
           <Show when={deleting()}>
             <span class="loading loading-ball" />

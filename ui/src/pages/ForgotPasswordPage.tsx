@@ -28,7 +28,7 @@ export function ForgotPasswordPage(): JSXElement {
   ) => {
     const response = await forgotPassword(values.email)
 
-    if (response.status != 200) {
+    if (response.status !== 200) {
       setResponse(forgotPasswordForm, {
         status: 'error',
         message: (await response.json()).error_message,
