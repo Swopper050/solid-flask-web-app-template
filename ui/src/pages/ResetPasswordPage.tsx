@@ -3,7 +3,6 @@ import { A, useSearchParams } from '@solidjs/router'
 import { clsx } from 'clsx'
 
 import { ThemeSwitcher } from '../components/ThemeSwitcher'
-import { PasswordIcon } from '../components/icons/Password'
 import { TextInput } from '../components/TextInput'
 
 import {
@@ -95,7 +94,7 @@ export function ResetPasswordPage(): JSXElement {
                   value={field.value}
                   error={field.error}
                   placeholder="New password"
-                  icon={<PasswordIcon />}
+                  icon={<i class="fa-solid fa-key" />}
                 />
               )}
             </ResetPassword.Field>
@@ -114,7 +113,7 @@ export function ResetPasswordPage(): JSXElement {
                   value={field.value}
                   error={field.error}
                   placeholder="Confirm new password"
-                  icon={<PasswordIcon />}
+                  icon={<i class="fa-solid fa-key" />}
                 />
               )}
             </ResetPassword.Field>

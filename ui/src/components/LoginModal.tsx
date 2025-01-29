@@ -15,8 +15,6 @@ import {
   SubmitHandler,
 } from '@modular-forms/solid'
 
-import { EmailIcon } from './icons/Email'
-import { PasswordIcon } from './icons/Password'
 import { passwordLogin, totpLogin } from '../api'
 
 import { User } from '../models/User'
@@ -123,7 +121,7 @@ export function LoginModal(props: ModalBaseProps): JSXElement {
               value={field.value}
               error={field.error}
               placeholder="your@email.com"
-              icon={<EmailIcon />}
+              icon={<i class="fa-solid fa-envelope" />}
             />
           )}
         </Login.Field>
@@ -136,7 +134,7 @@ export function LoginModal(props: ModalBaseProps): JSXElement {
               value={field.value}
               error={field.error}
               placeholder="Password"
-              icon={<PasswordIcon />}
+              icon={<i class="fa-solid fa-key" />}
             />
           )}
         </Login.Field>
