@@ -6,7 +6,7 @@ import { render } from 'solid-js/web'
 import { Router } from '@solidjs/router'
 import App from './App'
 import { UserProvider } from './context/UserProvider'
-import { I18nProvider } from './context/I18nProvider'
+import { LocaleProvider } from './context/LocaleProvider'
 
 const root = document.getElementById('root')
 
@@ -20,11 +20,11 @@ render(
   () => (
     <Router>
       <UserProvider>
-        <I18nProvider>
+        <LocaleProvider>
           <Suspense>
             <App />
           </Suspense>
-        </I18nProvider>
+        </LocaleProvider>
       </UserProvider>
     </Router>
   ),

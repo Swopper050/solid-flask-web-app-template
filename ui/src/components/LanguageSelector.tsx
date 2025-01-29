@@ -1,9 +1,9 @@
 import { createEffect, JSXElement, For } from 'solid-js'
 
-import { useI18n, locales } from '../context/I18nProvider'
+import { useLocale, locales } from '../context/LocaleProvider'
 
 export function LanguageSelector(): JSXElement {
-  const { locale, setLocale } = useI18n()
+  const { locale, setLocale } = useLocale()
 
   let detailsRef: HTMLDetailsElement | undefined
 
@@ -12,12 +12,12 @@ export function LanguageSelector(): JSXElement {
   })
 
   return (
-    <details ref={detailsRef} class="dropdown">
+    <details ref={detailsRef} class="dropdown dropdown-end">
       <summary class="btn btn-sm btn-ghost">
         {countryCodeToFlag(locale())}
       </summary>
 
-      <ul class="menu dropdown-content bg-base-100 rounded-box shadow">
+      <ul class="menu dropdown-content bg-base-100 rounded-box shadow z-[100]">
         <For each={locales}>
           {(language) => (
             <li>
@@ -28,7 +28,7 @@ export function LanguageSelector(): JSXElement {
                   detailsRef?.removeAttribute('open')
                 }}
               >
-                <div class="flex items-center gap-2">
+                <div class="flex gap-2">
                   <span>{countryCodeToFlag(language)}</span>
                   <span>{language}</span>
                 </div>

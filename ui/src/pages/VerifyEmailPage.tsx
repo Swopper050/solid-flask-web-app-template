@@ -2,11 +2,15 @@ import { createSignal, JSXElement, Show, onMount } from 'solid-js'
 import { A, useSearchParams } from '@solidjs/router'
 
 import { ThemeSwitcher } from '../components/ThemeSwitcher'
+import { LanguageSelector } from '../components/LanguageSelector'
 
 import { useUser } from '../context/UserProvider'
+import { useLocale } from '../context/LocaleProvider'
 import { verifyEmail } from '../api'
 
 export function VerifyEmailPage(): JSXElement {
+  const { t } = useLocale()
+
   const [searchParams] = useSearchParams()
   const { fetchUser } = useUser()
 
@@ -39,10 +43,11 @@ export function VerifyEmailPage(): JSXElement {
       <div class="navbar fixed bg-base-100 top-0 left-0">
         <div class="flex-1" />
         <ThemeSwitcher />
+        <LanguageSelector />
       </div>
 
       <div class="flex justify-center items-center mt-40">
-        <h1 class="text-4xl text-center font-bold">{'Verifying email'}</h1>
+        <h1 class="text-4xl text-center font-bold">{t('verifying_email')}</h1>
       </div>
 
       <Show when={loading()}>
@@ -62,7 +67,7 @@ export function VerifyEmailPage(): JSXElement {
       <Show when={success()}>
         <div class="flex justify-center mt-10">
           <div role="alert" class="alert alert-success w-80">
-            <span>Successfully verified email</span>
+            <span>{t('successfully_verified_email')}</span>
           </div>
         </div>
       </Show>
@@ -70,7 +75,7 @@ export function VerifyEmailPage(): JSXElement {
       <Show when={!loading()}>
         <div class="flex justify-center mt-10">
           <A class="btn btn-primary btn-outline" href="/home">
-            Back to home
+            {t('back_to_home')}
           </A>
         </div>
       </Show>

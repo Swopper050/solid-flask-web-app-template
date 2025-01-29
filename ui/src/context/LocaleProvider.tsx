@@ -18,26 +18,21 @@ export type Locale = (typeof locales)[number]
 export type TranslationKeys = typeof en.dict
 export type Translations = i18n.Flatten<TranslationKeys>
 
-function delay(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms))
-}
-
 export async function fetchDictionary(locale: Locale): Promise<Translations> {
   const dict: Translations = (await import(`../locales/${locale}.ts`)).dict
-  await delay(1500)
   return i18n.flatten(dict) // flatten the dictionary to make all nested keys available top-level
 }
 
-type I18nContextType = {
+type LocaleContextType = {
   locale: () => Locale
   setLocale: (newLocale: Locale) => void
   translations: () => Translations
   t: i18n.Translator<Translations>
 }
 
-const I18nContext = createContext<I18nContextType>()
+const LocaleContext = createContext<LocaleContextType>()
 
-export function I18nProvider(props: { children: JSXElement }) {
+export function LocaleProvider(props: { children: JSXElement }) {
   const [locale, setLocale] = createSignal<Locale>(
     (localStorage.getItem('locale') as Locale) ?? 'en'
   )
@@ -59,7 +54,7 @@ export function I18nProvider(props: { children: JSXElement }) {
   }
 
   return (
-    <I18nContext.Provider
+    <LocaleContext.Provider
       value={{ locale, setLocale: updateLocale, translations, t }}
     >
       <Suspense
@@ -72,12 +67,13 @@ export function I18nProvider(props: { children: JSXElement }) {
       >
         <Show when={translations()}>{props.children}</Show>
       </Suspense>
-    </I18nContext.Provider>
+    </LocaleContext.Provider>
   )
 }
 
-export function useI18n() {
-  const context = useContext(I18nContext)
-  if (!context) throw new Error('useI18n must be used within an I18nProvider')
+export function useLocale() {
+  const context = useContext(LocaleContext)
+  if (!context)
+    throw new Error('useLocale must be used within an LocaleProvider')
   return context
 }

@@ -7,7 +7,7 @@ import { useUser } from './context/UserProvider'
 import { LandingPage } from './pages/LandingPage'
 import { Home } from './pages/Home'
 import { BasePage } from './pages/BasePage'
-import { UserProfilePage } from './pages/user_profile_page/UserProfilePage'
+import { UserAccountPage } from './pages/user_account_page/UserAccountPage'
 import { ForgotPasswordPage } from './pages/ForgotPasswordPage'
 import { ResetPasswordPage } from './pages/ResetPasswordPage'
 import { VerifyEmailPage } from './pages/VerifyEmailPage'
@@ -47,10 +47,10 @@ export const routes: RouteDefinition[] = [
     ),
   },
   {
-    path: '/profile',
+    path: '/account',
     component: () => (
       <ProtectedRoute
-        route={() => <BasePage mainComponent={UserProfilePage} />}
+        route={() => <BasePage mainComponent={UserAccountPage} />}
       />
     ),
   },

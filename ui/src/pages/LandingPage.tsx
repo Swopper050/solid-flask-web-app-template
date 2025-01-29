@@ -9,10 +9,10 @@ import { LanguageSelector } from '../components/LanguageSelector'
 import { LoginModal } from '../components/LoginModal'
 import { RegisterModal } from '../components/RegisterModal'
 import { useUser } from '../context/UserProvider'
-import { useI18n } from '../context/I18nProvider'
+import { useLocale } from '../context/LocaleProvider'
 
 export function LandingPage(): JSXElement {
-  const { t } = useI18n()
+  const { t } = useLocale()
   const { user } = useUser()
   const [openLoginModal, setOpenLoginModal] = createSignal(false)
   const [openRegisterModal, setOpenRegisterModal] = createSignal(false)
@@ -63,15 +63,15 @@ export function LandingPage(): JSXElement {
 
       <div class="flex justify-center mt-40">
         <h1 class="text-4xl font-bold">
-          {t('landing_page_this_is')}
+          {t('this_is')}
           <span class="text-transparent bg-clip-text bg-gradient-to-tr from-primary to-secondary">
-            {t('landing_page_your')}
+            {t('your')}
           </span>
-          {t('landing_page_web_application')}
+          {t('web_application')}
         </h1>
       </div>
       <div class="flex justify-center mt-5">
-        <h2>{t('landing_page_build')}</h2>
+        <h2>{t('build')}</h2>
       </div>
 
       <div class="flex justify-center my-40">

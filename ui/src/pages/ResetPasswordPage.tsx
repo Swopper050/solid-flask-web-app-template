@@ -3,7 +3,10 @@ import { A, useSearchParams } from '@solidjs/router'
 import { clsx } from 'clsx'
 
 import { ThemeSwitcher } from '../components/ThemeSwitcher'
+import { LanguageSelector } from '../components/LanguageSelector'
 import { TextInput } from '../components/TextInput'
+
+import { useLocale } from '../context/LocaleProvider'
 
 import {
   getValue,
@@ -23,6 +26,8 @@ type PasswordResetFormData = {
 }
 
 export function ResetPasswordPage(): JSXElement {
+  const { t } = useLocale()
+
   const [searchParams] = useSearchParams()
   const [resetPasswordForm, ResetPassword] = createForm<PasswordResetFormData>()
 
@@ -68,10 +73,11 @@ export function ResetPasswordPage(): JSXElement {
       <div class="navbar fixed bg-base-100 top-0 left-0">
         <div class="flex-1" />
         <ThemeSwitcher />
+        <LanguageSelector />
       </div>
 
       <div class="flex justify-center items-center mt-40">
-        <h1 class="text-4xl text-center font-bold">{'Reset password'}</h1>
+        <h1 class="text-4xl text-center font-bold">{t('reset_password')}</h1>
       </div>
 
       <div class="flex justify-center mt-20">
@@ -80,11 +86,17 @@ export function ResetPasswordPage(): JSXElement {
             <ResetPassword.Field
               name="password"
               validate={[
-                required('Please enter a new password.'),
-                minLength(8, 'Your password must have 8 characters or more.'),
-                pattern(/[A-Z]/, 'Must contain 1 uppercase letter.'),
-                pattern(/[a-z]/, 'Must contain 1 lower case letter.'),
-                pattern(/[0-9]/, 'Must contain 1 digit.'),
+                required(t('please_enter_a_new_password')),
+                minLength(8, t('your_password_must_have_8_characters_or_more')),
+                pattern(
+                  /[A-Z]/,
+                  t('your_password_must_have_1_uppercase_letter')
+                ),
+                pattern(
+                  /[a-z]/,
+                  t('your_password_must_have_1_lowercase_letter')
+                ),
+                pattern(/[0-9]/, t('your_password_must_have_1_digit')),
               ]}
             >
               {(field, props) => (
@@ -93,7 +105,7 @@ export function ResetPasswordPage(): JSXElement {
                   type="password"
                   value={field.value}
                   error={field.error}
-                  placeholder="New password"
+                  placeholder={t('new_password')}
                   icon={<i class="fa-solid fa-key" />}
                 />
               )}
@@ -102,8 +114,8 @@ export function ResetPasswordPage(): JSXElement {
             <ResetPassword.Field
               name="checkPassword"
               validate={[
-                required('Please confirm your new password.'),
-                mustMatch('Passwords do not match'),
+                required(t('please_confirm_your_new_password')),
+                mustMatch(t('passwords_do_not_match')),
               ]}
             >
               {(field, props) => (
@@ -112,7 +124,7 @@ export function ResetPasswordPage(): JSXElement {
                   type="password"
                   value={field.value}
                   error={field.error}
-                  placeholder="Confirm new password"
+                  placeholder={t('confirm_new_password')}
                   icon={<i class="fa-solid fa-key" />}
                 />
               )}
@@ -121,7 +133,7 @@ export function ResetPasswordPage(): JSXElement {
             <Show when={resetPasswordForm.response.status === 'success'}>
               <div class="flex justify-center my-4">
                 <div role="alert" class="alert alert-success w-80">
-                  <span>Successfully reset password</span>
+                  <span>{t('successfully_reset_password')}</span>
                 </div>
               </div>
             </Show>
@@ -137,7 +149,7 @@ export function ResetPasswordPage(): JSXElement {
 
             <div class="flex justify-center mt-10">
               <A class="btn btn-primary btn-outline" href="/home">
-                Back to home
+                {t('back_to_home')}
               </A>
 
               <button
@@ -151,10 +163,10 @@ export function ResetPasswordPage(): JSXElement {
               >
                 <Show
                   when={resetPasswordForm.submitting}
-                  fallback="Reset password"
+                  fallback={t('reset_password')}
                 >
                   <span class="loading loading-spinner" />
-                  Resetting
+                  {t('resetting')}
                 </Show>
               </button>
             </div>
