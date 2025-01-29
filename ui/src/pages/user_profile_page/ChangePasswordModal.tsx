@@ -1,6 +1,6 @@
 import { User, UserAttributes } from '../../models/User'
 import { createEffect, JSXElement, Show } from 'solid-js'
-import { useUser } from '../../context'
+import { useUser } from '../../context/UserProvider'
 
 import { changePassword } from '../../api'
 import {

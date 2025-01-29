@@ -11,6 +11,9 @@ importers:
       '@modular-forms/solid':
         specifier: ^0.25.0
         version: 0.25.0(solid-js@1.9.1)(typescript@5.6.2)
+      '@solid-primitives/i18n':
+        specifier: ^2.2.0
+        version: 2.2.0(solid-js@1.9.1)
       '@solidjs/router':
         specifier: ^0.8.4
         version: 0.8.4(solid-js@1.9.1)
@@ -516,6 +519,11 @@ packages:
 
   '@solid-primitives/event-listener@2.3.3':
     resolution: {integrity: sha512-DAJbl+F0wrFW2xmcV8dKMBhk9QLVLuBSW+TR4JmIfTaObxd13PuL7nqaXnaYKDWOYa6otB00qcCUIGbuIhSUgQ==}
+    peerDependencies:
+      solid-js: ^1.6.12
+
+  '@solid-primitives/i18n@2.2.0':
+    resolution: {integrity: sha512-OY1IvGNefg4espiv3JL7gi38rcOaDdgRsderms6cHboDfHdye6HGI1mLkdrQxonN9TrsOBHeWtP/ptLBgSevfQ==}
     peerDependencies:
       solid-js: ^1.6.12
 
@@ -2180,6 +2188,10 @@ snapshots:
   '@solid-primitives/event-listener@2.3.3(solid-js@1.9.1)':
     dependencies:
       '@solid-primitives/utils': 6.2.3(solid-js@1.9.1)
+      solid-js: 1.9.1
+
+  '@solid-primitives/i18n@2.2.0(solid-js@1.9.1)':
+    dependencies:
       solid-js: 1.9.1
 
   '@solid-primitives/keyboard@1.2.8(solid-js@1.9.1)':

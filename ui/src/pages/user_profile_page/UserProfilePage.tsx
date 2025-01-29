@@ -1,5 +1,5 @@
 import { createSignal, JSXElement, Show } from 'solid-js'
-import { useUser } from '../../context'
+import { useUser } from '../../context/UserProvider'
 import { clsx } from 'clsx'
 
 import { resendVerificationMail } from '../../api'

@@ -7,8 +7,8 @@ import {
   JSXElement,
 } from 'solid-js'
 
-import { whoAmI } from './api'
-import { User } from './models/User'
+import { whoAmI } from '../api'
+import { User } from '../models/User'
 
 interface UserContextAttributes {
   user: Accessor<User> | null

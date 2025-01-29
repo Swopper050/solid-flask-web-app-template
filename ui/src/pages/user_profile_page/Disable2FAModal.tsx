@@ -1,7 +1,7 @@
 import { JSXElement, Show } from 'solid-js'
 import { disable2FA } from '../../api'
 import { clsx } from 'clsx'
-import { useUser } from '../../context'
+import { useUser } from '../../context/UserProvider'
 
 import {
   required,

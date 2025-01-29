@@ -3,7 +3,7 @@ import { JSXElement, Show } from 'solid-js'
 import { Navigate } from '@solidjs/router'
 import type { RouteDefinition } from '@solidjs/router'
 
-import { useUser } from './context'
+import { useUser } from './context/UserProvider'
 import { LandingPage } from './pages/LandingPage'
 import { Home } from './pages/Home'
 import { BasePage } from './pages/BasePage'

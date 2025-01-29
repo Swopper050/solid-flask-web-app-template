@@ -1,0 +1,16 @@
+export const dict = {
+  hello_template: (name: string) => `Hello ${name}`,
+  login: 'Login',
+  register: 'Register',
+  to_the_app: 'To the app',
+  landing_page_this_is: 'This is ',
+  landing_page_your: 'your ',
+  landing_page_web_application: 'web application.',
+  landing_page_build: 'You can built whatever you want.',
+  a_puppy: 'A puppy!',
+  want_to_show_puppies: 'Want to show puppies?',
+  you_can: 'You can!',
+  preikestolen: 'Preikestolen',
+  want_to_show_rocks: 'Want to show rocks?',
+  someone_might_like_it: 'Someone might like it!',
+}

@@ -18,7 +18,7 @@ import {
 import { passwordLogin, totpLogin } from '../api'
 
 import { User } from '../models/User'
-import { useUser } from '../context'
+import { useUser } from '../context/UserProvider'
 import { TextInput } from './TextInput'
 import { Modal, ModalBaseProps } from './Modal'
 

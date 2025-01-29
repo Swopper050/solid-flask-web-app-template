@@ -17,7 +17,7 @@ import {
 
 import { register } from '../api'
 
-import { useUser } from '../context'
+import { useUser } from '../context/UserProvider'
 import { User } from '../models/User'
 
 import { TextInput } from './TextInput'

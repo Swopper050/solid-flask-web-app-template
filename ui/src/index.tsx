@@ -1,10 +1,12 @@
 /* @refresh reload */
 import './index.css'
 
+import { Suspense } from 'solid-js'
 import { render } from 'solid-js/web'
 import { Router } from '@solidjs/router'
 import App from './App'
-import { UserProvider } from './context'
+import { UserProvider } from './context/UserProvider'
+import { I18nProvider } from './context/I18nProvider'
 
 const root = document.getElementById('root')
 
@@ -18,7 +20,11 @@ render(
   () => (
     <Router>
       <UserProvider>
-        <App />
+        <I18nProvider>
+          <Suspense>
+            <App />
+          </Suspense>
+        </I18nProvider>
       </UserProvider>
     </Router>
   ),

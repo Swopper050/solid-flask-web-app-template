@@ -3,7 +3,7 @@ import { A, useSearchParams } from '@solidjs/router'
 
 import { ThemeSwitcher } from '../components/ThemeSwitcher'
 
-import { useUser } from '../context'
+import { useUser } from '../context/UserProvider'
 import { verifyEmail } from '../api'
 
 export function VerifyEmailPage(): JSXElement {

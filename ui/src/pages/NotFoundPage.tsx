@@ -4,7 +4,7 @@ import { A } from '@solidjs/router'
 import puppy from '/puppy.jpg'
 import ProfileMenu from '../components/ProfileMenu'
 import { ThemeSwitcher } from '../components/ThemeSwitcher'
-import { useUser } from '../context'
+import { useUser } from '../context/UserProvider'
 
 export function NotFoundPage(): JSXElement {
   const { user } = useUser()

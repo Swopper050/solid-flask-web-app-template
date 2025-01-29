@@ -5,11 +5,14 @@ import puppy from '/puppy.jpg'
 import preikestolen from '/preikestolen.jpg'
 
 import { ThemeSwitcher } from '../components/ThemeSwitcher'
+import { LanguageSelector } from '../components/LanguageSelector'
 import { LoginModal } from '../components/LoginModal'
 import { RegisterModal } from '../components/RegisterModal'
-import { useUser } from '../context'
+import { useUser } from '../context/UserProvider'
+import { useI18n } from '../context/I18nProvider'
 
 export function LandingPage(): JSXElement {
+  const { t } = useI18n()
   const { user } = useUser()
   const [openLoginModal, setOpenLoginModal] = createSignal(false)
   const [openRegisterModal, setOpenRegisterModal] = createSignal(false)
@@ -25,13 +28,15 @@ export function LandingPage(): JSXElement {
 
         <ThemeSwitcher />
 
+        <LanguageSelector />
+
         <Show
           when={user() === null}
           fallback={
             <div class="flex-none ml-2">
               <A class="btn btn-ghost" href="/home">
                 <i class="fa-solid fa-arrow-right-to-bracket" />
-                To the app
+                {t('to_the_app')}
               </A>
             </div>
           }
@@ -41,7 +46,7 @@ export function LandingPage(): JSXElement {
               class="btn btn-ghost"
               onClick={() => setOpenLoginModal(true)}
             >
-              Login
+              {t('login')}
             </button>
           </div>
 
@@ -50,7 +55,7 @@ export function LandingPage(): JSXElement {
               class="btn btn-ghost"
               onClick={() => setOpenRegisterModal(true)}
             >
-              Register
+              {t('register')}
             </button>
           </div>
         </Show>
@@ -58,15 +63,15 @@ export function LandingPage(): JSXElement {
 
       <div class="flex justify-center mt-40">
         <h1 class="text-4xl font-bold">
-          {'This is '}
+          {t('landing_page_this_is')}
           <span class="text-transparent bg-clip-text bg-gradient-to-tr from-primary to-secondary">
-            {'your '}
+            {t('landing_page_your')}
           </span>
-          {'web application.'}
+          {t('landing_page_web_application')}
         </h1>
       </div>
       <div class="flex justify-center mt-5">
-        <h2>You can build whatever you want.</h2>
+        <h2>{t('landing_page_build')}</h2>
       </div>
 
       <div class="flex justify-center my-40">
@@ -75,10 +80,10 @@ export function LandingPage(): JSXElement {
             <img src={puppy} alt="Puppy" />
           </figure>
           <div class="card-body">
-            <h2 class="card-title">A puppy!</h2>
-            <p>Want to show puppies?</p>
+            <h2 class="card-title">{t('a_puppy')}</h2>
+            <p>{t('want_to_show_puppies')}</p>
             <div class="card-actions justify-end">
-              <button class="btn btn-ghost">You can!</button>
+              <button class="btn btn-ghost">{t('you_can')}</button>
             </div>
           </div>
         </div>
@@ -88,10 +93,12 @@ export function LandingPage(): JSXElement {
             <img src={preikestolen} alt="Preikestolen" />
           </figure>
           <div class="card-body">
-            <h2 class="card-title">Preikestolen</h2>
-            <p>Want to show rocks?</p>
+            <h2 class="card-title">{t('preikestolen')}</h2>
+            <p>{t('want_to_show_rocks')}</p>
             <div class="card-actions justify-end">
-              <button class="btn btn-ghost">Someone might like it!</button>
+              <button class="btn btn-ghost">
+                {t('someone_might_like_it')}
+              </button>
             </div>
           </div>
         </div>

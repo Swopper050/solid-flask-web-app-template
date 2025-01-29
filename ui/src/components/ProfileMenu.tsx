@@ -2,7 +2,7 @@ import { createSignal, JSXElement, Show } from 'solid-js'
 import { A, useNavigate } from '@solidjs/router'
 import { clsx } from 'clsx'
 
-import { useUser } from '../context'
+import { useUser } from '../context/UserProvider'
 
 import { logout } from '../api'
 

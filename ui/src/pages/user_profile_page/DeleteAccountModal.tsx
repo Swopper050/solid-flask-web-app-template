@@ -1,6 +1,6 @@
 import { createSignal, JSXElement, Show } from 'solid-js'
 import { useNavigate } from '@solidjs/router'
-import { useUser } from '../../context'
+import { useUser } from '../../context/UserProvider'
 import { clsx } from 'clsx'
 
 import { deleteAccount } from '../../api'
