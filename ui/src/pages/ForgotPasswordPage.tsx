@@ -2,8 +2,7 @@ import { JSXElement, Show } from 'solid-js'
 import { A } from '@solidjs/router'
 import { clsx } from 'clsx'
 
-import { ThemeSwitcher } from '../components/ThemeSwitcher'
-import { LanguageSelector } from '../components/LanguageSelector'
+import { TopBar } from '../components/TopBar'
 import { TextInput } from '../components/TextInput'
 import { useLocale } from '../context/LocaleProvider'
 
@@ -45,11 +44,7 @@ export function ForgotPasswordPage(): JSXElement {
 
   return (
     <>
-      <div class="navbar fixed bg-base-100 top-0 left-0">
-        <div class="flex-1" />
-        <ThemeSwitcher />
-        <LanguageSelector />
-      </div>
+      <TopBar />
 
       <div class="flex justify-center items-center mt-40">
         <h1 class="text-4xl text-center font-bold">
