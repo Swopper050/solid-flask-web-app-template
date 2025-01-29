@@ -38,7 +38,7 @@ export function Enable2FAModal(props: ModalBaseProps): JSXElement {
   const onEnable2FA: SubmitHandler<TotpFormData> = async (values) => {
     const response = await enable2FA(totpSecret(), values.totpCode)
 
-    if (response.status != 200) {
+    if (response.status !== 200) {
       setResponse(totpForm, {
         status: 'error',
         message: (await response.json()).error_message,

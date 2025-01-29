@@ -46,7 +46,7 @@ export function LoginModal(props: ModalBaseProps): JSXElement {
   const onPasswordLogin: SubmitHandler<LoginFormData> = async (values) => {
     const response = await passwordLogin(values.email, values.password)
 
-    if (response.status != 200) {
+    if (response.status !== 200) {
       setResponse(loginForm, {
         status: 'error',
         message: (await response.json()).error_message,
@@ -72,7 +72,7 @@ export function LoginModal(props: ModalBaseProps): JSXElement {
   const onTotpLogin: SubmitHandler<TotpFormData> = async (values) => {
     const response = await totpLogin(currentEmail(), values.totpCode)
 
-    if (response.status != 200) {
+    if (response.status !== 200) {
       setResponse(totpForm, {
         status: 'error',
         message: (await response.json()).error_message,

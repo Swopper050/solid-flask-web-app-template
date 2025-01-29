@@ -56,7 +56,7 @@ export function RegisterModal(props: ModalBaseProps): JSXElement {
   const onSubmit: SubmitHandler<RegisterFormData> = async (values) => {
     const response = await register(values.email, values.password)
 
-    if (response.status != 200) {
+    if (response.status !== 200) {
       setResponse(registerForm, {
         status: 'error',
         message: (await response.json()).error_message,

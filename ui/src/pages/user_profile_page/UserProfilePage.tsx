@@ -2,7 +2,8 @@ import { createSignal, JSXElement, Show } from 'solid-js'
 import { useUser } from '../../context'
 import { clsx } from 'clsx'
 
-import api from '../../api'
+import { resendVerificationMail } from '../../api'
+
 import { ChangePasswordModal } from './ChangePasswordModal'
 import { Enable2FAModal } from './Enable2FAModal'
 import { Disable2FAModal } from './Disable2FAModal'
@@ -106,9 +107,10 @@ function VerifyEmailButton(): JSXElement {
   const { user } = useUser()
   const [sending, setSending] = createSignal(false)
 
-  const resendVerificationMail = () => {
+  const onResendVerificationMail = async () => {
     setSending(true)
-    api.post('/resend_email_verification').finally(() => setSending(false))
+    await resendVerificationMail()
+    setSending(false)
   }
 
   return (
@@ -130,7 +132,7 @@ function VerifyEmailButton(): JSXElement {
           >
             <button
               class={clsx('btn btn-ghost btn-sm', sending() && 'btn-disabled')}
-              onClick={resendVerificationMail}
+              onClick={onResendVerificationMail}
             >
               <Show
                 when={!sending()}

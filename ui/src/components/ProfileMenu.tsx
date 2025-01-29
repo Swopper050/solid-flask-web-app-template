@@ -4,7 +4,7 @@ import { clsx } from 'clsx'
 
 import { useUser } from '../context'
 
-import api from '../api'
+import { logout } from '../api'
 
 function ProfileMenu(): JSXElement {
   const navigate = useNavigate()
@@ -18,21 +18,19 @@ function ProfileMenu(): JSXElement {
     setTimeout(() => setShowLogoutFailedToast(false), 5000)
   }
 
-  const logout = async () => {
+  const onLogout = async () => {
     setLoggingOut(true)
 
-    api
-      .post('/logout')
-      .then(() => {
-        setUser(null)
-        navigate('/')
-      })
-      .catch(() => {
-        timeLogoutFailedToast()
-      })
-      .finally(() => {
-        setLoggingOut(false)
-      })
+    const response = await logout()
+
+    if (response.status === 200) {
+      setUser(null)
+      setLoggingOut(false)
+      navigate('/')
+    }
+
+    timeLogoutFailedToast()
+    setLoggingOut(false)
   }
 
   return (
@@ -57,7 +55,7 @@ function ProfileMenu(): JSXElement {
               'text-left',
               loggingOut() && 'btn-disabled'
             )}
-            onClick={logout}
+            onClick={onLogout}
           >
             <Show
               when={loggingOut()}

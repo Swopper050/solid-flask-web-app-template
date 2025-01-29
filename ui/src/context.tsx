@@ -7,7 +7,7 @@ import {
   JSXElement,
 } from 'solid-js'
 
-import api from './api'
+import { whoAmI } from './api'
 import { User } from './models/User'
 
 interface UserContextAttributes {
@@ -24,21 +24,15 @@ export const UserProvider = (props: { children: JSXElement }) => {
   const [loading, setLoading] = createSignal(true)
 
   const fetchUser = async () => {
-    api
-      .get('/whoami')
-      .then(async (response) => {
-        if (response.status === 200) {
-          setUser(new User(response.data))
-        } else {
-          setUser(null)
-        }
+    const response = await whoAmI()
 
-        setLoading(false)
-      })
-      .catch(() => {
-        setUser(null)
-        setLoading(false)
-      })
+    if (response.status === 200) {
+      setUser(new User(await response.json()))
+    } else {
+      setUser(null)
+    }
+
+    setLoading(false)
   }
 
   onMount(() => {

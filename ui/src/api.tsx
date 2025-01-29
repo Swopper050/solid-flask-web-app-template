@@ -1,10 +1,3 @@
-import axios from 'axios'
-
-const api = axios.create({ baseURL: '/api', withCredentials: true })
-api.defaults.headers.post['Content-Type'] = 'application/json'
-
-export default api
-
 export async function changePassword(
   currentPassword: string,
   newPassword: string
@@ -47,6 +40,14 @@ export async function totpLogin(email: string, totpCode: string) {
   })
 }
 
+export async function logout() {
+  return post('api/logout', {})
+}
+
+export async function deleteAccount() {
+  return _delete('api/delete_account')
+}
+
 export async function register(email: string, password: string) {
   return post('api/register', {
     email: email,
@@ -71,6 +72,21 @@ export async function disable2FA(totpCode: string) {
   })
 }
 
+export async function verifyEmail(email: string, verificationToken: string) {
+  return post('api/verify_email', {
+    email: email,
+    verification_token: verificationToken,
+  })
+}
+
+export async function resendVerificationMail() {
+  return post('api/resend_email_verification', {})
+}
+
+export async function whoAmI() {
+  return get('api/whoami')
+}
+
 export async function get(url: string) {
   return fetch(url, {
     method: 'GET',
@@ -84,6 +100,13 @@ export async function post(url: string, data: object) {
     body: JSON.stringify({
       ...data,
     }),
+    headers: new Headers({ 'Content-Type': 'application/json' }),
+  })
+}
+
+export async function _delete(url: string) {
+  return fetch(url, {
+    method: 'DELETE',
     headers: new Headers({ 'Content-Type': 'application/json' }),
   })
 }

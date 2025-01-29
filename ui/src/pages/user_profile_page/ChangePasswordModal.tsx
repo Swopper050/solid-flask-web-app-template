@@ -70,7 +70,7 @@ export function ChangePasswordModal(props: ModalBaseProps): JSXElement {
       values.newPassword
     )
 
-    if (response.status != 200) {
+    if (response.status !== 200) {
       setResponse(changePasswordForm, {
         status: 'error',
         message: (await response.json()).error_message,
