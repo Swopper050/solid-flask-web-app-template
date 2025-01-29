@@ -11,7 +11,7 @@ A full stack template for an app and web application with backend. The repositor
    - 🧍 User login management with cookies using [Flask-Login](https://flask-login.readthedocs.io/en/latest/)
    - 💿 Database migrations using [Alembic](https://alembic.sqlalchemy.org/en/latest/)
    - 🧪 Tests with [pytest](https://docs.pytest.org/en/stable/)
-   - 📝 Code formatting with [black](https://github.com/psf/black), [isort](https://pycqa.github.io/isort/) and [flake8](https://flake8.pycqa.org/en/latest/)
+   - 📝 Code formatting with [ruff](https://docs.astral.sh/ruff/)
  - 🚀 CI/CD with pipelines for:
    - 📝 Automatic linters for checking code format
    - 🧪 Running tests
