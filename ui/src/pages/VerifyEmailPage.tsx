@@ -1,8 +1,7 @@
 import { createSignal, JSXElement, Show, onMount } from 'solid-js'
 import { A, useSearchParams } from '@solidjs/router'
 
-import { ThemeSwitcher } from '../components/ThemeSwitcher'
-import { LanguageSelector } from '../components/LanguageSelector'
+import { TopBar } from '../components/TopBar'
 
 import { useUser } from '../context/UserProvider'
 import { useLocale } from '../context/LocaleProvider'
@@ -40,11 +39,7 @@ export function VerifyEmailPage(): JSXElement {
 
   return (
     <>
-      <div class="navbar fixed bg-base-100 top-0 left-0">
-        <div class="flex-1" />
-        <ThemeSwitcher />
-        <LanguageSelector />
-      </div>
+      <TopBar />
 
       <div class="flex justify-center items-center mt-40">
         <h1 class="text-4xl text-center font-bold">{t('verifying_email')}</h1>
