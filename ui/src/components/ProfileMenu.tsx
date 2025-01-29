@@ -3,7 +3,6 @@ import { A, useNavigate } from '@solidjs/router'
 import { clsx } from 'clsx'
 
 import { useUser } from '../context'
-import { DotsIcon } from './icons/Dots'
 
 import api from '../api'
 
@@ -40,7 +39,7 @@ function ProfileMenu(): JSXElement {
     <details class="dropdown dropdown-end">
       <summary class="btn btn-ghost">
         <span class="text">{user().email}</span>
-        <DotsIcon />
+        <i class="fa-solid fa-ellipsis" />
       </summary>
 
       <ul class="menu dropdown-content bg-base-200 rounded-box z-[100]">

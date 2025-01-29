@@ -3,7 +3,6 @@ import { A } from '@solidjs/router'
 import { clsx } from 'clsx'
 
 import { ThemeSwitcher } from '../components/ThemeSwitcher'
-import { EmailIcon } from '../components/icons/Email'
 import { TextInput } from '../components/TextInput'
 
 import {
@@ -69,7 +68,7 @@ export function ForgotPasswordPage(): JSXElement {
                 value={field.value}
                 error={field.error}
                 placeholder="your@email.com"
-                icon={<EmailIcon />}
+                icon={<i class="fa-solid fa-envelope" />}
               />
             )}
           </ForgotPassword.Field>

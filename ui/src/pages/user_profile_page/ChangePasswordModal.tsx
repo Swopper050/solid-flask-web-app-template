@@ -15,7 +15,6 @@ import {
   SubmitHandler,
 } from '@modular-forms/solid'
 
-import { PasswordIcon } from '../../components/icons/Password'
 import { TextInput } from '../../components/TextInput'
 import { Modal, ModalBaseProps } from '../../components/Modal'
 
@@ -108,7 +107,7 @@ export function ChangePasswordModal(props: ModalBaseProps): JSXElement {
               value={field.value}
               error={field.error}
               placeholder="Current password"
-              icon={<PasswordIcon />}
+              icon={<i class="fa-solid fa-key" />}
             />
           )}
         </Field>
@@ -129,7 +128,7 @@ export function ChangePasswordModal(props: ModalBaseProps): JSXElement {
               value={field.value}
               error={field.error}
               placeholder="New password"
-              icon={<PasswordIcon />}
+              icon={<i class="fa-solid fa-key" />}
             />
           )}
         </Field>
@@ -144,7 +143,7 @@ export function ChangePasswordModal(props: ModalBaseProps): JSXElement {
               value={field.value}
               error={field.error}
               placeholder="Confirm new password"
-              icon={<PasswordIcon />}
+              icon={<i class="fa-solid fa-key" />}
             />
           )}
         </Field>
