@@ -1,8 +1,8 @@
-import { createSignal, Show, JSXElement } from 'solid-js';
+import { createSignal, Show, JSXElement } from 'solid-js'
 import { A } from '@solidjs/router'
 
-import { useUser } from '../context/UserProvider';
-import { useLocale } from '../context/LocaleProvider';
+import { useUser } from '../context/UserProvider'
+import { useLocale } from '../context/LocaleProvider'
 
 import { ThemeSwitcher } from '../components/ThemeSwitcher'
 import { LanguageSelector } from '../components/LanguageSelector'
@@ -15,7 +15,6 @@ export function TopBar(): JSXElement {
 
   const [openLoginModal, setOpenLoginModal] = createSignal(false)
   const [openRegisterModal, setOpenRegisterModal] = createSignal(false)
-
 
   return (
     <>
