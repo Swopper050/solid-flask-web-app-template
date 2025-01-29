@@ -17,7 +17,8 @@ import {
 
 import { register } from '../api'
 
-import { useUser } from '../context'
+import { useUser } from '../context/UserProvider'
+import { useLocale } from '../context/LocaleProvider'
 import { User } from '../models/User'
 
 import { TextInput } from './TextInput'
@@ -30,6 +31,7 @@ type RegisterFormData = {
 }
 
 export function RegisterModal(props: ModalBaseProps): JSXElement {
+  const { t } = useLocale()
   const { setUser } = useUser()
 
   const [registerForm, Register] = createForm<RegisterFormData>()
@@ -79,7 +81,7 @@ export function RegisterModal(props: ModalBaseProps): JSXElement {
 
   return (
     <Modal
-      title="Register"
+      title={t('register')}
       isOpen={props.isOpen}
       onClose={() => {
         onClose()
@@ -90,8 +92,8 @@ export function RegisterModal(props: ModalBaseProps): JSXElement {
         <Register.Field
           name="email"
           validate={[
-            required('Please enter an email'),
-            email('Please enter a valid email'),
+            required(t('please_enter_your_email')),
+            email(t('please_enter_a_valid_email')),
           ]}
         >
           {(field, props) => (
@@ -100,7 +102,7 @@ export function RegisterModal(props: ModalBaseProps): JSXElement {
               type="email"
               value={field.value}
               error={field.error}
-              placeholder="your@email.com"
+              placeholder={t('email_placeholder')}
               icon={<i class="fa-solid fa-envelope" />}
             />
           )}
@@ -109,10 +111,10 @@ export function RegisterModal(props: ModalBaseProps): JSXElement {
         <Register.Field
           name="password"
           validate={[
-            minLength(8, 'Your password must have 8 characters or more.'),
-            pattern(/[A-Z]/, 'Must contain 1 uppercase letter.'),
-            pattern(/[a-z]/, 'Must contain 1 lower case letter.'),
-            pattern(/[0-9]/, 'Must contain 1 digit.'),
+            minLength(8, t('your_password_must_have_8_characters_or_more')),
+            pattern(/[A-Z]/, t('your_password_must_have_1_uppercase_letter')),
+            pattern(/[a-z]/, t('your_password_must_have_1_lowercase_letter')),
+            pattern(/[0-9]/, t('your_password_must_have_1_digit')),
           ]}
         >
           {(field, props) => (
@@ -121,7 +123,7 @@ export function RegisterModal(props: ModalBaseProps): JSXElement {
               type="password"
               value={field.value}
               error={field.error}
-              placeholder="Password"
+              placeholder={t('password')}
               icon={<i class="fa-solid fa-key" />}
             />
           )}
@@ -129,7 +131,7 @@ export function RegisterModal(props: ModalBaseProps): JSXElement {
 
         <Register.Field
           name="checkPassword"
-          validate={[mustMatch("Passwords don't match")]}
+          validate={[mustMatch(t('passwords_do_not_match'))]}
         >
           {(field, props) => (
             <TextInput
@@ -137,7 +139,7 @@ export function RegisterModal(props: ModalBaseProps): JSXElement {
               type="password"
               value={field.value}
               error={field.error}
-              placeholder="Confirm password"
+              placeholder={t('confirm_password')}
               icon={<i class="fa-solid fa-key" />}
             />
           )}
@@ -158,9 +160,9 @@ export function RegisterModal(props: ModalBaseProps): JSXElement {
             )}
             type="submit"
           >
-            <Show when={registerForm.submitting} fallback="Register">
+            <Show when={registerForm.submitting} fallback={t('register')}>
+              {t('register')}
               <span class="loading loading-spinner" />
-              Register
             </Show>
           </button>
         </div>

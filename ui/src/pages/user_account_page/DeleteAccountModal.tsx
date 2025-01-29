@@ -1,12 +1,14 @@
 import { createSignal, JSXElement, Show } from 'solid-js'
 import { useNavigate } from '@solidjs/router'
-import { useUser } from '../../context'
+import { useUser } from '../../context/UserProvider'
+import { useLocale } from '../../context/LocaleProvider'
 import { clsx } from 'clsx'
 
 import { deleteAccount } from '../../api'
 import { Modal, ModalBaseProps } from '../../components/Modal'
 
 export function DeleteAccountModal(props: ModalBaseProps): JSXElement {
+  const { t } = useLocale()
   const { setUser } = useUser()
 
   const [deleting, setDeleting] = createSignal(false)
@@ -34,12 +36,12 @@ export function DeleteAccountModal(props: ModalBaseProps): JSXElement {
 
   return (
     <Modal
-      title="Deleting account"
+      title={t('delete_account')}
       isOpen={props.isOpen}
       onClose={props.onClose}
     >
-      <p class="py-4">Are you sure you want to delete your account?</p>
-      <p>This action cannot be undone.</p>
+      <p class="py-4">{t('are_you_sure_you_want_to_delete_your_account')}</p>
+      <p>{t('this_action_cannot_be_undone')}</p>
 
       <Show when={errorMsg() !== null}>
         <div role="alert" class="alert alert-error my-6">
@@ -53,7 +55,7 @@ export function DeleteAccountModal(props: ModalBaseProps): JSXElement {
             class={clsx('btn mr-2', deleting() && 'btn-disabled')}
             onClick={() => props.onClose()}
           >
-            Cancel
+            {t('cancel')}
           </button>
         </form>
 
@@ -64,7 +66,7 @@ export function DeleteAccountModal(props: ModalBaseProps): JSXElement {
           <Show when={deleting()}>
             <span class="loading loading-ball" />
           </Show>
-          Delete
+          {t('delete_account')}
         </button>
       </div>
     </Modal>

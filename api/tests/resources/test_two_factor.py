@@ -107,7 +107,7 @@ class TestDisable2FAAPI:
         assert logged_in_user.two_factor_enabled
 
         response = client.post(
-            "/disable_2fa", json={"totp_code": f"{int(totp.now()) +1 }"}
+            "/disable_2fa", json={"totp_code": f"{int(totp.now()) + 1}"}
         )
 
         assert response.status_code == 401

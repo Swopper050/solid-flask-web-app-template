@@ -1,5 +1,6 @@
 import { createSignal, JSXElement, Show } from 'solid-js'
-import { useUser } from '../../context'
+import { useUser } from '../../context/UserProvider'
+import { useLocale } from '../../context/LocaleProvider'
 import { clsx } from 'clsx'
 
 import { resendVerificationMail } from '../../api'
@@ -9,8 +10,10 @@ import { Enable2FAModal } from './Enable2FAModal'
 import { Disable2FAModal } from './Disable2FAModal'
 import { DeleteAccountModal } from './DeleteAccountModal'
 
-export function UserProfilePage(): JSXElement {
+export function UserAccountPage(): JSXElement {
+  const { t } = useLocale()
   const { user } = useUser()
+
   const [openPasswordModal, setOpenPasswordModal] = createSignal(false)
   const [openDeleteAccountModal, setOpenDeleteAccountModal] =
     createSignal(false)
@@ -23,7 +26,7 @@ export function UserProfilePage(): JSXElement {
         <Show when={user().isAdmin}>
           <p class="text-lg text-success mr-4 mb-6 col-span-4">
             <i class="fa-solid fa-screwdriver-wrench mr-2" />
-            This user is an admin
+            {t('this_user_is_an_admin')}
           </p>
         </Show>
 
@@ -31,17 +34,20 @@ export function UserProfilePage(): JSXElement {
           <table class="table table-fixed">
             <tbody>
               <tr>
-                <td>Email</td>
+                <td>{t('email')}</td>
                 <td>{user().email}</td>
                 <td class="text-end">
                   <VerifyEmailButton />
                 </td>
               </tr>
               <tr>
-                <td>Password</td>
+                <td>{t('password')}</td>
                 <td>*********</td>
                 <td class="text-end">
-                  <p class="tooltip tooltip-left" data-tip="Change password">
+                  <p
+                    class="tooltip tooltip-left"
+                    data-tip={t('change_password')}
+                  >
                     <button
                       class={clsx('btn btn-ghost btn-sm')}
                       onClick={() => setOpenPasswordModal(true)}
@@ -52,10 +58,10 @@ export function UserProfilePage(): JSXElement {
                 </td>
               </tr>
               <tr>
-                <td>2FA enabled</td>
+                <td>{t('enabled_2fa')}</td>
                 <td>
                   <p class="text-lg col-span-2">
-                    {user().twoFactorEnabled ? 'Yes' : 'No'}
+                    {user().twoFactorEnabled ? t('yes') : t('no')}
                   </p>
                 </td>
                 <td class="text-end">
@@ -75,7 +81,7 @@ export function UserProfilePage(): JSXElement {
             onClick={() => setOpenDeleteAccountModal(true)}
           >
             <i class="fa-solid fa-trash" />
-            Delete account
+            {t('delete_account')}
           </button>
         </div>
 
@@ -104,7 +110,9 @@ export function UserProfilePage(): JSXElement {
 }
 
 function VerifyEmailButton(): JSXElement {
+  const { t } = useLocale()
   const { user } = useUser()
+
   const [sending, setSending] = createSignal(false)
 
   const onResendVerificationMail = async () => {
@@ -121,14 +129,14 @@ function VerifyEmailButton(): JSXElement {
           <p class="flex-grow" />
           <p
             class="tooltip tooltip-left"
-            data-tip="Your email is not verified yet"
+            data-tip={t('your_email_is_not_verified_yet')}
           >
             <i class="fa-solid fa-triangle-exclamation text-warning" />
           </p>
 
           <span
             class="tooltip tooltip-left ml-2"
-            data-tip="Resend verification mail"
+            data-tip={t('resend_verification_email')}
           >
             <button
               class={clsx('btn btn-ghost btn-sm', sending() && 'btn-disabled')}
@@ -147,7 +155,7 @@ function VerifyEmailButton(): JSXElement {
     >
       <p
         class="tooltip tooltip-left mr-3"
-        data-tip="Your email has been verified"
+        data-tip={t('your_email_has_been_verified')}
       >
         <i class="fa-solid fa-check text-success" />
       </p>
@@ -159,12 +167,13 @@ function Toggle2FAButton(props: {
   enable2FA: () => void
   disable2FA: () => void
 }): JSXElement {
+  const { t } = useLocale()
   const { user } = useUser()
 
   return (
     <>
       <Show when={user().twoFactorEnabled}>
-        <p class="tooltip tooltip-left" data-tip="Disable 2FA">
+        <p class="tooltip tooltip-left" data-tip={t('disable_2fa')}>
           <button
             class="btn btn-ghost btn-sm"
             onClick={() => props.disable2FA()}
@@ -175,7 +184,7 @@ function Toggle2FAButton(props: {
       </Show>
 
       <Show when={!user().twoFactorEnabled}>
-        <p class="tooltip tooltip-left" data-tip="Enable 2FA">
+        <p class="tooltip tooltip-left" data-tip={t('enable_2fa')}>
           <button
             class="btn btn-ghost btn-sm"
             onClick={() => props.enable2FA()}

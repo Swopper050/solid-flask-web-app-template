@@ -6,6 +6,7 @@ A full stack template for an app and web application with backend. The repositor
    - 🔓 Password recovery with email
    - ✅ User email verification
    - 🌗 Dark theme support
+   - 📜 Support for translations, and easily add your own language
    - 📝 Code formatting with [ESLint](https://eslint.org/) and [Prettier](https://prettier.io/)
  - 🗄️ A backend built in [Python](https://www.python.org/) with [Flask](https://flask.palletsprojects.com/en/3.0.x/) and [SQLAlchemy](https://www.sqlalchemy.org/):
    - 🧍 User login management with cookies using [Flask-Login](https://flask-login.readthedocs.io/en/latest/)

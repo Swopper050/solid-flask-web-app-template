@@ -1,6 +1,8 @@
 import { User, UserAttributes } from '../../models/User'
 import { createEffect, JSXElement, Show } from 'solid-js'
-import { useUser } from '../../context'
+import { useUser } from '../../context/UserProvider'
+import { useLocale } from '../../context/LocaleProvider'
+import { clsx } from 'clsx'
 
 import { changePassword } from '../../api'
 import {
@@ -25,6 +27,8 @@ type ChangePasswordFormData = {
 }
 
 export function ChangePasswordModal(props: ModalBaseProps): JSXElement {
+  const { t } = useLocale()
+
   const [changePasswordForm, { Form, Field }] = createForm<
     ChangePasswordFormData,
     UserAttributes
@@ -94,7 +98,7 @@ export function ChangePasswordModal(props: ModalBaseProps): JSXElement {
 
   return (
     <Modal
-      title="Change password"
+      title={t('change_password')}
       isOpen={props.isOpen}
       onClose={props.onClose}
     >
@@ -106,7 +110,7 @@ export function ChangePasswordModal(props: ModalBaseProps): JSXElement {
               type="password"
               value={field.value}
               error={field.error}
-              placeholder="Current password"
+              placeholder={t('current_password')}
               icon={<i class="fa-solid fa-key" />}
             />
           )}
@@ -114,11 +118,11 @@ export function ChangePasswordModal(props: ModalBaseProps): JSXElement {
         <Field
           name="newPassword"
           validate={[
-            required('Please enter a new password.'),
-            minLength(8, 'Your password must have 8 characters or more.'),
-            pattern(/[A-Z]/, 'Must contain 1 uppercase letter.'),
-            pattern(/[a-z]/, 'Must contain 1 lower case letter.'),
-            pattern(/[0-9]/, 'Must contain 1 digit.'),
+            required(t('please_enter_a_new_password')),
+            minLength(8, t('your_password_must_have_8_characters_or_more')),
+            pattern(/[A-Z]/, t('your_password_must_have_1_uppercase_letter')),
+            pattern(/[a-z]/, t('your_password_must_have_1_lowercase_letter')),
+            pattern(/[0-9]/, t('your_password_must_have_1_digit')),
           ]}
         >
           {(field, props) => (
@@ -127,14 +131,14 @@ export function ChangePasswordModal(props: ModalBaseProps): JSXElement {
               type="password"
               value={field.value}
               error={field.error}
-              placeholder="New password"
+              placeholder={t('new_password')}
               icon={<i class="fa-solid fa-key" />}
             />
           )}
         </Field>
         <Field
           name="confirmNewPassword"
-          validate={[mustMatch("Passwords don't match")]}
+          validate={[mustMatch(t('passwords_do_not_match'))]}
         >
           {(field, props) => (
             <TextInput
@@ -142,7 +146,7 @@ export function ChangePasswordModal(props: ModalBaseProps): JSXElement {
               type="password"
               value={field.value}
               error={field.error}
-              placeholder="Confirm new password"
+              placeholder={t('confirm_new_password')}
               icon={<i class="fa-solid fa-key" />}
             />
           )}
@@ -156,13 +160,19 @@ export function ChangePasswordModal(props: ModalBaseProps): JSXElement {
         </Show>
 
         <div class="modal-action">
-          <button class="btn btn-primary" type="submit">
+          <button
+            class={clsx(
+              'btn btn-primary',
+              changePasswordForm.submitting && 'btn-disabled'
+            )}
+            type="submit"
+          >
             <Show
               when={changePasswordForm.submitting}
-              fallback="Change password"
+              fallback={t('change_password')}
             >
               <span class="loading loading-spinner" />
-              Saving
+              {t('saving')}
             </Show>
           </button>
         </div>

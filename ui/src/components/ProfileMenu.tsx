@@ -2,14 +2,17 @@ import { createSignal, JSXElement, Show } from 'solid-js'
 import { A, useNavigate } from '@solidjs/router'
 import { clsx } from 'clsx'
 
-import { useUser } from '../context'
+import { useUser } from '../context/UserProvider'
+import { useLocale } from '../context/LocaleProvider'
 
 import { logout } from '../api'
 
 function ProfileMenu(): JSXElement {
   const navigate = useNavigate()
 
+  const { t } = useLocale()
   const { user, setUser } = useUser()
+
   const [loggingOut, setLoggingOut] = createSignal(false)
   const [showLogoutFailedToast, setShowLogoutFailedToast] = createSignal(false)
 
@@ -42,9 +45,9 @@ function ProfileMenu(): JSXElement {
 
       <ul class="menu dropdown-content bg-base-200 rounded-box z-[100]">
         <li class="text-left">
-          <A class="btn btn-ghost text-left" href="/profile">
+          <A class="btn btn-ghost text-left" href="/account">
             <i class="fa-regular fa-address-card" />
-            Profile
+            {t('account')}
           </A>
         </li>
         <li class="text-left">
@@ -63,7 +66,7 @@ function ProfileMenu(): JSXElement {
             >
               <span class="loading loading-ball text-neutral loading-sm" />
             </Show>
-            Logout
+            {t('logout')}
           </button>
         </li>
       </ul>
@@ -71,7 +74,7 @@ function ProfileMenu(): JSXElement {
       <Show when={showLogoutFailedToast()}>
         <div class="toast toast-end">
           <div class="alert alert-error">
-            <span>Could not logout. Please try again later</span>
+            <span>{t('could_not_log_out_please_try_again_later')}</span>
           </div>
         </div>
       </Show>
