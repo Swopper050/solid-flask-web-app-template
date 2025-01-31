@@ -16,6 +16,7 @@ export const dict: Translations = {
     'Kon niet uitloggen, probeer het later opnieuw',
   current_password: 'Huidig wachtwoord',
   delete_account: 'Account verwijderen',
+  deleting: 'Verwijderen',
   disable_2fa: '2FA uitschakelen',
   disabling: 'Disabling',
   email: 'E-mail',

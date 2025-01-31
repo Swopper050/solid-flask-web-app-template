@@ -160,9 +160,9 @@ export function RegisterModal(props: ModalBaseProps): JSXElement {
             )}
             type="submit"
           >
-            <Show when={registerForm.submitting} fallback={t('register')}>
-              {t('register')}
-              <span class="loading loading-spinner" />
+            {t('register')}
+            <Show when={registerForm.submitting}>
+              <span class="loading loading-ball" />
             </Show>
           </button>
         </div>

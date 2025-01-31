@@ -139,9 +139,9 @@ export function Enable2FAModal(props: ModalBaseProps): JSXElement {
               )}
               type="submit"
             >
-              <Show when={totpForm.submitting} fallback={t('enable_2fa')}>
-                {t('enabling')}
-                <span class="loading loading-spinner" />
+              {t('enable_2fa')}
+              <Show when={totpForm.submitting}>
+                <span class="loading loading-ball" />
               </Show>
             </button>
           </div>

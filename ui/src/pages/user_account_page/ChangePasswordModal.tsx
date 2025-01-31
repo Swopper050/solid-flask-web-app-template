@@ -167,12 +167,9 @@ export function ChangePasswordModal(props: ModalBaseProps): JSXElement {
             )}
             type="submit"
           >
-            <Show
-              when={changePasswordForm.submitting}
-              fallback={t('change_password')}
-            >
-              <span class="loading loading-spinner" />
-              {t('saving')}
+            {t('change_password')}
+            <Show when={changePasswordForm.submitting}>
+              <span class="loading loading-ball" />
             </Show>
           </button>
         </div>

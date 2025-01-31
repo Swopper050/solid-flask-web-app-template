@@ -108,12 +108,9 @@ export function ForgotPasswordPage(): JSXElement {
               )}
               type="submit"
             >
-              <Show
-                when={forgotPasswordForm.submitting}
-                fallback={t('send_reset_email')}
-              >
+              {t('send_reset_email')}
+              <Show when={forgotPasswordForm.submitting}>
                 <span class="loading loading-ball" />
-                {t('sending')}
               </Show>
             </button>
           </div>
