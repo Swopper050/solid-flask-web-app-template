@@ -63,10 +63,10 @@ export function DeleteAccountModal(props: ModalBaseProps): JSXElement {
           class={clsx('btn btn-error', deleting() && 'btn-disabled')}
           onClick={onDeleteAccount}
         >
+          {t('delete_account')}
           <Show when={deleting()}>
             <span class="loading loading-ball" />
           </Show>
-          {t('delete_account')}
         </button>
       </div>
     </Modal>

@@ -163,9 +163,9 @@ export function LoginModal(props: ModalBaseProps): JSXElement {
               )}
               type="submit"
             >
-              <Show when={loginForm.submitting} fallback={t('login')}>
-                {t('login')}
-                <span class="loading loading-spinner" />
+              {t('login')}
+              <Show when={loginForm.submitting}>
+                <span class="loading loading-ball" />
               </Show>
             </button>
           </div>
@@ -212,9 +212,9 @@ export function LoginModal(props: ModalBaseProps): JSXElement {
               )}
               type="submit"
             >
-              <Show when={totpForm.submitting} fallback={t('login')}>
-                {t('login')}
-                <span class="loading loading-spinner" />
+              {t('login')}
+              <Show when={totpForm.submitting}>
+                <span class="loading loading-ball" />
               </Show>
             </button>
           </div>

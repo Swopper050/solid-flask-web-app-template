@@ -156,12 +156,9 @@ export function ResetPasswordPage(): JSXElement {
                 )}
                 type="submit"
               >
-                <Show
-                  when={resetPasswordForm.submitting}
-                  fallback={t('reset_password')}
-                >
-                  <span class="loading loading-spinner" />
-                  {t('resetting')}
+                {t('reset_password')}
+                <Show when={resetPasswordForm.submitting}>
+                  <span class="loading loading-ball" />
                 </Show>
               </button>
             </div>

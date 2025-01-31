@@ -14,6 +14,7 @@ export const dict = {
     'Could not log out, please try again later',
   current_password: 'Current password',
   delete_account: 'Delete account',
+  deleting: 'Deleting',
   disable_2fa: 'Disable 2FA',
   disabling: 'Disabling',
   email: 'Email',
