@@ -127,17 +127,23 @@ export function ResetPasswordPage(): JSXElement {
             </ResetPassword.Field>
 
             <Show when={resetPasswordForm.response.status === 'success'}>
-              <Alert
-                type="success"
-                message={t('successfully_reset_password')}
-              />
+              <div class="flex justify-center">
+                <Alert
+                  type="success"
+                  message={t('successfully_reset_password')}
+                  extraClasses="w-96"
+                />
+              </div>
             </Show>
 
             <Show when={resetPasswordForm.response.status === 'error'}>
-              <Alert
-                type="error"
-                message={resetPasswordForm.response.message}
-              />
+              <div class="flex justify-center">
+                <Alert
+                  type="error"
+                  message={resetPasswordForm.response.message}
+                  extraClasses="w-96"
+                />
+              </div>
             </Show>
 
             <div class="flex justify-center mt-10">
