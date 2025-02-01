@@ -6,6 +6,7 @@ import { clsx } from 'clsx'
 
 import { deleteAccount } from '../../api'
 import { Modal, ModalBaseProps } from '../../components/Modal'
+import { Alert } from '../../components/Alert'
 
 export function DeleteAccountModal(props: ModalBaseProps): JSXElement {
   const { t } = useLocale()
@@ -44,9 +45,7 @@ export function DeleteAccountModal(props: ModalBaseProps): JSXElement {
       <p>{t('this_action_cannot_be_undone')}</p>
 
       <Show when={errorMsg() !== null}>
-        <div role="alert" class="alert alert-error my-6">
-          <span>{errorMsg()}</span>
-        </div>
+        <Alert type="error" message={errorMsg()} />
       </Show>
 
       <div class="modal-action">

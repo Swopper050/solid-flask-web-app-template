@@ -1,6 +1,7 @@
 import { createSignal, JSXElement, Show, onMount } from 'solid-js'
 import { A, useSearchParams } from '@solidjs/router'
 
+import { Alert } from '../components/Alert'
 import { TopBar } from '../components/TopBar'
 
 import { useUser } from '../context/UserProvider'
@@ -52,19 +53,11 @@ export function VerifyEmailPage(): JSXElement {
       </Show>
 
       <Show when={errorMsg() !== null}>
-        <div class="flex justify-center mt-10">
-          <div role="alert" class="alert alert-error w-80">
-            <span>{errorMsg()}</span>
-          </div>
-        </div>
+        <Alert type="error" message={errorMsg()} />
       </Show>
 
       <Show when={success()}>
-        <div class="flex justify-center mt-10">
-          <div role="alert" class="alert alert-success w-80">
-            <span>{t('successfully_verified_email')}</span>
-          </div>
-        </div>
+        <Alert type="success" message={t('successfully_verified_email')} />
       </Show>
 
       <Show when={!loading()}>

@@ -2,6 +2,7 @@ import { JSXElement, Show } from 'solid-js'
 import { A } from '@solidjs/router'
 import { clsx } from 'clsx'
 
+import { Alert } from '../components/Alert'
 import { TopBar } from '../components/TopBar'
 import { TextInput } from '../components/TextInput'
 import { useLocale } from '../context/LocaleProvider'
@@ -74,24 +75,16 @@ export function ForgotPasswordPage(): JSXElement {
           </ForgotPassword.Field>
 
           <Show when={forgotPasswordForm.response.status === 'success'}>
-            <div class="flex justify-center mt-4">
-              <div role="alert" class="alert alert-success w-80">
-                <span>
-                  {t(
-                    'if_a_user_with_this_email_exists_a_reset_password_mail_has_been_sent'
-                  )}
-                </span>
-              </div>
-            </div>
+            <Alert
+              type="success"
+              message={t(
+                'if_a_user_with_this_email_exists_a_reset_password_mail_has_been_sent'
+              )}
+            />
           </Show>
 
           <Show when={forgotPasswordForm.response.status === 'error'}>
-            <div class="flex justify-center mt-4">
-              <div role="alert" class="alert alert-error w-80">
-                <i class="fa-solid fa-circle-exclamation" />{' '}
-                <span>{forgotPasswordForm.response.message}</span>
-              </div>
-            </div>
+            <Alert type="error" message={forgotPasswordForm.response.message} />
           </Show>
 
           <div class="flex justify-center mt-10">

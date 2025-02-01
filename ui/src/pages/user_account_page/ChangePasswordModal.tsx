@@ -17,6 +17,7 @@ import {
   SubmitHandler,
 } from '@modular-forms/solid'
 
+import { Alert } from '../../components/Alert'
 import { TextInput } from '../../components/TextInput'
 import { Modal, ModalBaseProps } from '../../components/Modal'
 
@@ -153,10 +154,7 @@ export function ChangePasswordModal(props: ModalBaseProps): JSXElement {
         </Field>
 
         <Show when={changePasswordForm.response.status === 'error'}>
-          <div role="alert" class="alert alert-error my-4">
-            <i class="fa-solid fa-circle-exclamation" />{' '}
-            <span>{changePasswordForm.response.message}</span>
-          </div>
+          <Alert type="error" message={changePasswordForm.response.message} />
         </Show>
 
         <div class="modal-action">

@@ -4,6 +4,7 @@ import { clsx } from 'clsx'
 
 import { TopBar } from '../components/TopBar'
 import { TextInput } from '../components/TextInput'
+import { Alert } from '../components/Alert'
 
 import { useLocale } from '../context/LocaleProvider'
 
@@ -126,20 +127,17 @@ export function ResetPasswordPage(): JSXElement {
             </ResetPassword.Field>
 
             <Show when={resetPasswordForm.response.status === 'success'}>
-              <div class="flex justify-center my-4">
-                <div role="alert" class="alert alert-success w-80">
-                  <span>{t('successfully_reset_password')}</span>
-                </div>
-              </div>
+              <Alert
+                type="success"
+                message={t('successfully_reset_password')}
+              />
             </Show>
 
             <Show when={resetPasswordForm.response.status === 'error'}>
-              <div class="flex justify-center my-4">
-                <div role="alert" class="alert alert-error w-80">
-                  <i class="fa-solid fa-circle-exclamation" />{' '}
-                  <span>{resetPasswordForm.response.message}</span>
-                </div>
-              </div>
+              <Alert
+                type="error"
+                message={resetPasswordForm.response.message}
+              />
             </Show>
 
             <div class="flex justify-center mt-10">
