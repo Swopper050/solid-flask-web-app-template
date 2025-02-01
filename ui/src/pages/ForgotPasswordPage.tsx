@@ -88,7 +88,11 @@ export function ForgotPasswordPage(): JSXElement {
 
             <Show when={forgotPasswordForm.response.status === 'error'}>
               <div class="flex justify-center">
-                <Alert type="error" message={forgotPasswordForm.response.message} extraClasses="w-96" />
+                <Alert
+                  type="error"
+                  message={forgotPasswordForm.response.message}
+                  extraClasses="w-96"
+                />
               </div>
             </Show>
 

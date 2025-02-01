@@ -54,13 +54,17 @@ export function VerifyEmailPage(): JSXElement {
 
       <Show when={errorMsg() !== null}>
         <div class="flex justify-center">
-          <Alert type="error" message={errorMsg()} extraClasses="w-96"/>
+          <Alert type="error" message={errorMsg()} extraClasses="w-96" />
         </div>
       </Show>
 
       <Show when={success()}>
         <div class="flex justify-center">
-          <Alert type="success" message={t('successfully_verified_email')} extraClasses="w-96" />
+          <Alert
+            type="success"
+            message={t('successfully_verified_email')}
+            extraClasses="w-96"
+          />
         </div>
       </Show>
 
