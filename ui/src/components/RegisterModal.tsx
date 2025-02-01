@@ -23,6 +23,7 @@ import { User } from '../models/User'
 
 import { TextInput } from './TextInput'
 import { Modal, ModalBaseProps } from './Modal'
+import { Alert } from './Alert'
 
 type RegisterFormData = {
   email: string
@@ -146,10 +147,7 @@ export function RegisterModal(props: ModalBaseProps): JSXElement {
         </Register.Field>
 
         <Show when={registerForm.response.status === 'error'}>
-          <div role="alert" class="mt-4 alert alert-error">
-            <i class="fa-solid fa-circle-exclamation" />{' '}
-            <span>{registerForm.response.message}</span>
-          </div>
+          <Alert type="error" message={registerForm.response.message} />
         </Show>
 
         <div class="modal-action">

@@ -18,6 +18,7 @@ import { passwordLogin, totpLogin } from '../api'
 import { User } from '../models/User'
 import { useUser } from '../context/UserProvider'
 import { useLocale } from '../context/LocaleProvider'
+import { Alert } from './Alert'
 import { TextInput } from './TextInput'
 import { Modal, ModalBaseProps } from './Modal'
 
@@ -141,10 +142,7 @@ export function LoginModal(props: ModalBaseProps): JSXElement {
         </Login.Field>
 
         <Show when={loginForm.response.status === 'error'}>
-          <div role="alert" class="alert alert-error my-4">
-            <i class="fa-solid fa-circle-exclamation" />{' '}
-            <span>{loginForm.response.message}</span>
-          </div>
+          <Alert type="error" message={loginForm.response.message} />
         </Show>
 
         <Show when={!at2FAStep()}>
@@ -198,10 +196,7 @@ export function LoginModal(props: ModalBaseProps): JSXElement {
           </Totp.Field>
 
           <Show when={loginForm.response.status === 'error'}>
-            <div role="alert" class="alert alert-error my-4">
-              <i class="fa-solid fa-circle-exclamation" />{' '}
-              <span>{loginForm.response.message}</span>
-            </div>
+            <Alert type="error" message={loginForm.response.message} />
           </Show>
 
           <div class="modal-action">

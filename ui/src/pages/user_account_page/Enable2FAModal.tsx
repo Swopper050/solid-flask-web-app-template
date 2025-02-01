@@ -14,6 +14,7 @@ import {
   SubmitHandler,
 } from '@modular-forms/solid'
 
+import { Alert } from '../../components/Alert'
 import { Modal, ModalBaseProps } from '../../components/Modal'
 import { TextInput } from '../../components/TextInput'
 
@@ -125,10 +126,7 @@ export function Enable2FAModal(props: ModalBaseProps): JSXElement {
           </Totp.Field>
 
           <Show when={totpForm.response.status === 'error'}>
-            <div role="alert" class="alert alert-error my-4">
-              <i class="fa-solid fa-circle-exclamation" />
-              <span>{totpForm.response.message}</span>
-            </div>
+            <Alert type="error" message={totpForm.response.message} />
           </Show>
 
           <div class="modal-action">

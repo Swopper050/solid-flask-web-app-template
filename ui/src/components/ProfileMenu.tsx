@@ -4,6 +4,7 @@ import { clsx } from 'clsx'
 
 import { useUser } from '../context/UserProvider'
 import { useLocale } from '../context/LocaleProvider'
+import { Alert } from './Alert'
 
 import { logout } from '../api'
 
@@ -73,9 +74,10 @@ function ProfileMenu(): JSXElement {
 
       <Show when={showLogoutFailedToast()}>
         <div class="toast toast-end">
-          <div class="alert alert-error">
-            <span>{t('could_not_log_out_please_try_again_later')}</span>
-          </div>
+          <Alert
+            type="error"
+            message={t('could_not_log_out_please_try_again_later')}
+          />
         </div>
       </Show>
     </details>
