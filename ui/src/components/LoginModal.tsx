@@ -97,6 +97,7 @@ export function LoginModal(props: ModalBaseProps): JSXElement {
     clearResponse(totpForm)
     reset(loginForm)
     reset(totpForm)
+    setAt2FAStep(false)
   }
 
   return (
