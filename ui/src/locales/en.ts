@@ -2,6 +2,7 @@ export const dict = {
   hello_template: (name: string) => `Hello ${name}`,
   a_puppy: 'A puppy!',
   account: 'Account',
+  admin_panel: 'Admin panel',
   are_you_sure_you_want_to_delete_your_account:
     'Are you sure you want to delete your account?',
   back_to_home: 'Back to home',

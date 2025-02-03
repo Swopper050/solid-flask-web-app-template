@@ -1,9 +1,10 @@
-import { JSXElement, Show } from 'solid-js'
+import { JSXElement, Switch, Match } from 'solid-js'
 
 import { Navigate } from '@solidjs/router'
 import type { RouteDefinition } from '@solidjs/router'
 
 import { useUser } from './context/UserProvider'
+import { AdminPanelPage } from './pages/admin_panel_page/AdminPanelPage'
 import { LandingPage } from './pages/LandingPage'
 import { Home } from './pages/Home'
 import { BasePage } from './pages/BasePage'
@@ -13,23 +14,27 @@ import { ResetPasswordPage } from './pages/ResetPasswordPage'
 import { VerifyEmailPage } from './pages/VerifyEmailPage'
 import { NotFoundPage } from './pages/NotFoundPage'
 
-function ProtectedRoute(props: { route: () => JSXElement }): JSXElement {
+function ProtectedRoute(props: {
+  route: () => JSXElement
+  adminOnly?: boolean
+}): JSXElement {
   const { user, loading } = useUser()
 
   return (
-    <Show
-      when={!loading() && user() === null}
-      fallback={
-        <Show when={loading()} fallback={props.route()}>
-          <div class="flex flex-col justify-center items-center h-screen w-screen">
-            <div class="loading loading-ball text-neutral loading-lg mb-3" />
-            <div class="text-lg text-neutral font-bold">Loading...</div>
-          </div>
-        </Show>
-      }
-    >
-      <Navigate href="/" />
-    </Show>
+    <Switch fallback={props.route()}>
+      <Match when={!loading() && user() === null}>
+        <Navigate href="/" />
+      </Match>
+      <Match when={!loading() && props.adminOnly && !user().isAdmin}>
+        <Navigate href="/" />
+      </Match>
+      <Match when={loading()}>
+        <div class="flex flex-col justify-center items-center h-screen w-screen">
+          <div class="loading loading-ball text-neutral loading-lg mb-3" />
+          <div class="text-lg text-neutral font-bold">Loading...</div>
+        </div>
+      </Match>
+    </Switch>
   )
 }
 
@@ -51,6 +56,15 @@ export const routes: RouteDefinition[] = [
     component: () => (
       <ProtectedRoute
         route={() => <BasePage mainComponent={UserAccountPage} />}
+      />
+    ),
+  },
+  {
+    path: '/admin-panel',
+    component: () => (
+      <ProtectedRoute
+        adminOnly={true}
+        route={() => <BasePage mainComponent={AdminPanelPage} />}
       />
     ),
   },

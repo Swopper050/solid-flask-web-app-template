@@ -4,6 +4,7 @@ export const dict: Translations = {
   hello_template: (name: string) => `Hallo ${name}`,
   a_puppy: 'Een puppy!',
   account: 'Account',
+  admin_panel: 'Admin paneel',
   are_you_sure_you_want_to_delete_your_account:
     'Weet je zeker dat je je account wilt verwijderen?',
   back_to_home: 'Terug naar home',
