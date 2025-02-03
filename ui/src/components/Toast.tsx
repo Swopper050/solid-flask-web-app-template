@@ -1,4 +1,11 @@
-import { createSignal, JSXElement, Show, onMount, onCleanup } from 'solid-js'
+import {
+  createSignal,
+  JSXElement,
+  Show,
+  onMount,
+  onCleanup,
+  untrack,
+} from 'solid-js'
 
 import { Alert } from './Alert'
 
@@ -6,6 +13,7 @@ interface ToastProps {
   type: 'info' | 'error' | 'success' | 'warning'
   message: string
   duration?: number
+  onClear?: () => void
 }
 
 export function Toast(props: ToastProps): JSXElement {
@@ -13,7 +21,12 @@ export function Toast(props: ToastProps): JSXElement {
   let timerId: number
 
   onMount(() => {
-    timerId = window.setTimeout(() => setVisible(false), props.duration ?? 5000)
+    timerId = window.setTimeout(() => {
+      untrack(() => {
+        setVisible(false)
+        props.onClear?.()
+      })
+    }, props.duration ?? 5000)
   })
 
   onCleanup(() => {

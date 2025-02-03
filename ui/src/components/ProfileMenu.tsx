@@ -72,6 +72,7 @@ function ProfileMenu(): JSXElement {
           message={t('could_not_log_out_please_try_again_later')}
           type="error"
           duration={5000}
+          onClear={() => setShowLogoutFailed(false)}
         />
       </Show>
     </details>
