@@ -4,7 +4,7 @@ import { clsx } from 'clsx'
 
 import { useUser } from '../context/UserProvider'
 import { useLocale } from '../context/LocaleProvider'
-import { Alert } from './Alert'
+import { Toast } from './Toast'
 
 import { logout } from '../api'
 
@@ -15,12 +15,7 @@ function ProfileMenu(): JSXElement {
   const { user, setUser } = useUser()
 
   const [loggingOut, setLoggingOut] = createSignal(false)
-  const [showLogoutFailedToast, setShowLogoutFailedToast] = createSignal(false)
-
-  const timeLogoutFailedToast = () => {
-    setShowLogoutFailedToast(true)
-    setTimeout(() => setShowLogoutFailedToast(false), 5000)
-  }
+  const [showLogoutFailed, setShowLogoutFailed] = createSignal(false)
 
   const onLogout = async () => {
     setLoggingOut(true)
@@ -33,7 +28,7 @@ function ProfileMenu(): JSXElement {
       navigate('/')
     }
 
-    timeLogoutFailedToast()
+    setShowLogoutFailed(true)
     setLoggingOut(false)
   }
 
@@ -72,13 +67,13 @@ function ProfileMenu(): JSXElement {
         </li>
       </ul>
 
-      <Show when={showLogoutFailedToast()}>
-        <div class="toast toast-end">
-          <Alert
-            type="error"
-            message={t('could_not_log_out_please_try_again_later')}
-          />
-        </div>
+      <Show when={showLogoutFailed()}>
+        <Toast
+          message={t('could_not_log_out_please_try_again_later')}
+          type="error"
+          duration={5000}
+          onClear={() => setShowLogoutFailed(false)}
+        />
       </Show>
     </details>
   )
