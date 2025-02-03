@@ -25,7 +25,7 @@ jobs:
     - name: Setup npm
       uses: actions/setup-node@v4
       with:
-        node-version: 22.4.0
+        node-version: 23
 
     - name: Install dependencies
       run: cd ui && make deps
