@@ -35,6 +35,7 @@ export const dict = {
   my_solid_app: 'My solid app',
   new_password: 'New password',
   no: 'No',
+  of: 'of',
   password: 'Password',
   passwords_do_not_match: 'Passwords do not match',
   please_confirm_your_new_password: 'Please confirm your new password',

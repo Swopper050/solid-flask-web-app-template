@@ -37,6 +37,7 @@ export const dict: Translations = {
   my_solid_app: 'My solid app',
   new_password: 'Nieuw wachtwoord',
   no: 'Nee',
+  of: 'van',
   password: 'Wachtwoord',
   passwords_do_not_match: 'Wachtwoorden komen niet overeen',
   please_confirm_your_new_password: 'Bevestig je nieuwe wachtwoord',

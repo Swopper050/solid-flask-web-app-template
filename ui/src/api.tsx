@@ -1,3 +1,6 @@
+import { PaginationResult } from './models/Base'
+import { UserAttributes } from './models/User'
+
 export async function changePassword(
   currentPassword: string,
   newPassword: string
@@ -12,6 +15,11 @@ export async function forgotPassword(email: string) {
   return post('api/forgot_password', {
     email: email,
   })
+}
+
+export async function getUsers(page: number, perPage: number): Promise<PaginationResult<UserAttributes>> {
+  const response = await get(`api/users?page=${page}&per_page=${perPage}`)
+  return response.json()
 }
 
 export async function resetPassword(
