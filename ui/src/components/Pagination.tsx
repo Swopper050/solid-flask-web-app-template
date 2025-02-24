@@ -28,18 +28,20 @@ export function Pagination(props: PaginationProps): JSXElement {
       <div class="flex gap-2">
         <p class="font-bold">{props.page}</p>
         <p>{t('of')}</p>
-        <Show
-          when={props.totalPages !== undefined}
-          fallback={<p class="loading loading-xs" />}
-        >
-          <p>{props.totalPages}</p>
-        </Show>
+        <p class="w-2">
+          <Show
+            when={props.totalPages !== undefined}
+            fallback={<span class="loading loading-ball loading-xs" />}
+          >
+            {props.totalPages}
+          </Show>
+        </p>
       </div>
 
       <button
         class="btn btn-small btn-ghost"
         onClick={() => onPageChange(props.page + 1)}
-        disabled={props.page >= props.totalPages}
+        disabled={props.totalPages === undefined || props.page >= props.totalPages}
       >
         <i class="fa-solid fa-arrow-right-long" />
       </button>

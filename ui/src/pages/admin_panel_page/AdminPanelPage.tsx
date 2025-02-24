@@ -2,9 +2,13 @@ import { JSXElement, Switch, Match, createSignal } from 'solid-js'
 import { clsx } from 'clsx'
 import { UsersAdmin } from './UsersAdmin'
 
+import { useLocale } from '../../context/LocaleProvider'
+
 type AdminTab = 'organisations' | 'users'
 
 export function AdminPanelPage(): JSXElement {
+  const { t } = useLocale()
+
   const [tab, setTab] = createSignal<AdminTab>('users')
 
   return (
@@ -17,7 +21,7 @@ export function AdminPanelPage(): JSXElement {
           )}
           onClick={() => setTab('users')}
         >
-          Users
+          {t('users')}
         </a>
       </div>
 
