@@ -39,6 +39,9 @@ def db(app):
     _db.session.close()
     _db.drop_all()
 
+    # Release connection pool resources
+    _db.engine.dispose()
+
 
 @pytest.fixture
 def admin(db):
@@ -71,4 +74,10 @@ def user(db):
 @pytest.fixture
 def logged_in_user(client, user):
     client.post("/login", json={"email": user.email, "password": "password123"})
+    return user
+
+
+@pytest.fixture
+def logged_in_admin(client, admin):
+    client.post("/login", json={"email": admin.email, "password": "password321"})
     return user

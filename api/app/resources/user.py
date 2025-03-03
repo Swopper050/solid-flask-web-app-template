@@ -71,7 +71,7 @@ class UserAPI(Resource):
 class DeleteAccount(Resource):
     @login_required
     def delete(self):
-        user = User.query.get(current_user.id)
+        user = db.session.get(User, current_user.id)
 
         logout_user()
 
