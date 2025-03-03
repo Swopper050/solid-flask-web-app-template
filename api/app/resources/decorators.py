@@ -1,6 +1,7 @@
 from functools import wraps
 
 from flask import request
+from flask_login import current_user
 
 
 def insert_pagination_parameters(func):
@@ -13,5 +14,16 @@ def insert_pagination_parameters(func):
             return func(*args, page=int(page), per_page=int(per_page))
         else:
             return func(*args, **kwargs, page=None, per_page=None)
+
+    return wrapper
+
+
+def admin_required(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        if not current_user.is_admin:
+            return {"message": "You must be an admin to access this resource"}, 403
+
+        return func(*args, **kwargs)
 
     return wrapper

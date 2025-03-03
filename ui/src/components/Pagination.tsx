@@ -41,7 +41,9 @@ export function Pagination(props: PaginationProps): JSXElement {
       <button
         class="btn btn-small btn-ghost"
         onClick={() => onPageChange(props.page + 1)}
-        disabled={props.totalPages === undefined || props.page >= props.totalPages}
+        disabled={
+          props.totalPages === undefined || props.page >= props.totalPages
+        }
       >
         <i class="fa-solid fa-arrow-right-long" />
       </button>

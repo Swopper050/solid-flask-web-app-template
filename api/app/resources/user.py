@@ -1,10 +1,19 @@
+from flask import request
 from flask_login import current_user, login_required, logout_user
 from flask_restx import Resource
+from marshmallow import Schema, fields
 
 from app.db.user import User, UserSchema
 from app.extensions import api, db
-from app.resources.decorators import insert_pagination_parameters
+from app.mail_utils import send_email_verification_email
+from app.resources.decorators import admin_required, insert_pagination_parameters
 from app.resources.utils import pagination_query
+
+
+class CreateUserSchema(Schema):
+    email = fields.String(required=True)
+    password = fields.String(required=True)
+    is_admin = fields.Boolean(required=True)
 
 
 @api.route("/users")
@@ -19,6 +28,43 @@ class UsersAPI(Resource):
             meta = {}
 
         return {"items": UserSchema(many=True).dump(users), "meta": meta}
+
+    @admin_required
+    def post(self):
+        user_data: dict = CreateUserSchema().load(request.get_json())
+        if User.query.filter_by(email=user_data.get("email")).first() is not None:
+            return {"error_message": "An account with this email already exists"}, 409
+
+        new_user = User(email=user_data.get("email"), is_admin=user_data.get("is_admin"))
+        new_user.set_password(user_data.get("password"))
+
+        db.session.add(new_user)
+        db.session.commit()
+
+        verification_token = new_user.set_email_verification_token()
+
+        send_email_verification_email(
+            receiver=new_user.email, verification_token=verification_token
+        )
+
+        db.session.add(new_user)
+        db.session.commit()
+
+        return UserSchema().dump(new_user)
+
+
+@api.route("/user/<int:id>")
+class UserAPI(Resource):
+    @admin_required
+    def delete(self, id):
+        user = db.session.get(User, id)
+        if not user:
+            return {"error_message": f"User with id {id} not found"}, 404
+
+        db.session.delete(user)
+        db.session.commit()
+
+        return {}, 200
 
 
 @api.route("/delete_account")

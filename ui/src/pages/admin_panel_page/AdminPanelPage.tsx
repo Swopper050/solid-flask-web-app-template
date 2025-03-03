@@ -13,7 +13,7 @@ export function AdminPanelPage(): JSXElement {
 
   return (
     <>
-      <div class="navbar bg-base-100">
+      <div class="navbar bg-base-100 border-b border-primary">
         <a
           class={clsx(
             'btn font-bold text-lg mx-2',

@@ -70,7 +70,8 @@ export const dict: Translations = {
   this_is: 'Dit is ',
   this_is_the_home_page: 'Dit is de home pagina',
   this_user_has_been_verified: 'Deze gebruiker is geverifieerd',
-  this_user_has_not_been_verified_yet: 'Deze gebruiker is nog niet geverifieerd',
+  this_user_has_not_been_verified_yet:
+    'Deze gebruiker is nog niet geverifieerd',
   this_user_is_an_admin: 'Deze gebruiker is een admin',
   to_the_app: 'Naar de applicatie',
   users: 'Gebruikers',

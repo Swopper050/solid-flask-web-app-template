@@ -17,7 +17,10 @@ export async function forgotPassword(email: string) {
   })
 }
 
-export async function getUsers(page: number, perPage: number): Promise<PaginationResult<UserAttributes>> {
+export async function getUsers(
+  page: number,
+  perPage: number
+): Promise<PaginationResult<UserAttributes>> {
   const response = await get(`api/users?page=${page}&per_page=${perPage}`)
   return response.json()
 }
@@ -93,6 +96,22 @@ export async function resendVerificationMail() {
 
 export async function whoAmI() {
   return get('api/whoami')
+}
+
+export async function createUser(
+  email: string,
+  password: string,
+  isAdmin: boolean
+) {
+  return post(`api/users`, {
+    email: email,
+    password: password,
+    is_admin: isAdmin,
+  })
+}
+
+export async function deleteUser(userId: number) {
+  return _delete(`api/user/${userId}`)
 }
 
 export async function get(url: string) {
