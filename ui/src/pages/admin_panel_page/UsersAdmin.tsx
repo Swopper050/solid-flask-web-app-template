@@ -1,4 +1,5 @@
 import { createSignal, createResource, JSXElement, Show, For } from 'solid-js'
+import { clsx } from 'clsx'
 
 import { Alert } from '../../components/Alert'
 import { Pagination } from '../../components/Pagination'
@@ -29,7 +30,7 @@ export function UsersAdmin(): JSXElement {
         />
       </div>
 
-      <div class="overflow-x-auto m-4 w-full">
+      <div class="overflow-x-auto m-4">
         <table class="table w-full">
           <thead>
             <tr>
@@ -81,7 +82,27 @@ export function UsersAdmin(): JSXElement {
                           </span>
                         </Show>
                       </td>
-                      <td class="text-right">TODO delete</td>
+                      <td class="text-right">
+                        <button
+                          class={clsx(
+                            'btn btn-ghost btn-sm mx-1',
+                            user.is_admin && 'btn-disabled'
+                          )}
+                          onClick={() =>
+                            document
+                              .getElementById(`confirm_delete_user_${props.user.id}`)
+                              .showModal()
+                          }
+                        >
+                          <i
+                            class={clsx(
+                              'fa-solid fa-trash',
+                              !props.user.isAdmin && 'text-error'
+                            )}
+                          />
+                        </button>
+                        TODO delete
+                      </td>
                     </tr>
                   )
                 }}
