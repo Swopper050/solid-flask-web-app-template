@@ -4,7 +4,7 @@ import { Navigate } from '@solidjs/router'
 import type { RouteDefinition } from '@solidjs/router'
 
 import { useUser } from './context/UserProvider'
-import { AdminPanelPage } from './pages/admin_panel_page/AdminPanelPage'
+import { AdminPage } from './pages/admin_page/AdminPage'
 import { LandingPage } from './pages/LandingPage'
 import { Home } from './pages/Home'
 import { BasePage } from './pages/BasePage'
@@ -64,7 +64,7 @@ export const routes: RouteDefinition[] = [
     component: () => (
       <ProtectedRoute
         adminOnly={true}
-        route={() => <BasePage mainComponent={AdminPanelPage} />}
+        route={() => <BasePage mainComponent={AdminPage} />}
       />
     ),
   },

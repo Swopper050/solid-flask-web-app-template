@@ -28,7 +28,7 @@ export function UsersAdmin(): JSXElement {
   const { t } = useLocale()
 
   const [page, setPage] = createSignal(1)
-  const [perPage] = createSignal(25)
+  const [perPage] = createSignal(10)
 
   const [users, { refetch }] = createResource(() => getUsers(page(), perPage()))
 
@@ -282,11 +282,7 @@ function CreateUserModal(props: CreateUserModalProps): JSXElement {
   }
 
   return (
-    <Modal
-      title={t('create_new_user')}
-      isOpen={props.isOpen}
-      onClose={props.onClose}
-    >
+    <Modal title={t('create_new_user')} isOpen={props.isOpen} onClose={onClose}>
       <Create.Form onSubmit={handleCreate}>
         <Create.Field
           name="email"

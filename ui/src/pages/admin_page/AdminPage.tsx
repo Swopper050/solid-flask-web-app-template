@@ -6,7 +6,7 @@ import { useLocale } from '../../context/LocaleProvider'
 
 type AdminTab = 'organisations' | 'users'
 
-export function AdminPanelPage(): JSXElement {
+export function AdminPage(): JSXElement {
   const { t } = useLocale()
 
   const [tab, setTab] = createSignal<AdminTab>('users')
@@ -25,7 +25,7 @@ export function AdminPanelPage(): JSXElement {
         </a>
       </div>
 
-      <div class="mt-6">
+      <div class="flex-grow overflow-hidden">
         <Switch>
           <Match when={tab() === 'users'}>
             <UsersAdmin />
