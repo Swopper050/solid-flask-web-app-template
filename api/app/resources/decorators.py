@@ -22,7 +22,7 @@ def admin_required(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
         if not current_user.is_admin:
-            return {"message": "You must be an admin to access this resource"}, 403
+            return {"error_message": "You must be an admin to access this resource"}, 403
 
         return func(*args, **kwargs)
 

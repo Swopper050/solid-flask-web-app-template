@@ -1,7 +1,6 @@
 import { Translations } from '../context/LocaleProvider'
 
 export const dict: Translations = {
-  hello_template: (name: string) => `Hallo ${name}`,
   a_puppy: 'Een puppy!',
   account: 'Account',
   admin_panel: 'Admin paneel',
@@ -18,14 +17,11 @@ export const dict: Translations = {
   create_new_user: 'Nieuwe gebruiker aanmaken',
   current_password: 'Huidig wachtwoord',
   delete_account: 'Account verwijderen',
-  deleting: 'Verwijderen',
   disable_2fa: '2FA uitschakelen',
-  disabling: 'Disabling',
   email: 'E-mail',
   email_placeholder: 'je@email.nl',
   enable_2fa: '2FA inschakelen',
   enabled_2fa: '2FA ingeschakeld',
-  enabling: 'Inschakelen',
   enter_the_6_digit_code_generated_by_your_authenticator_app:
     'Voer de 6-cijferige code in die is gegenereerd door je authenticator-app',
   error_loading_users: 'Fout bij het laden van gebruikers',
@@ -55,10 +51,7 @@ export const dict: Translations = {
   register: 'Registreer',
   resend_verification_email: 'Verificatie e-mail opnieuw verzenden',
   reset_password: 'Wachtwoord opnieuw instellen',
-  resetting: 'Opnieuw aan het instellen',
-  saving: 'Opslaan',
   send_reset_email: 'Stuur e-mail voor wachtwoord reset',
-  sending: 'Verzenden',
   someone_might_like_it: 'Iemand vindt het misschien leuk!',
   step_1_scan_qr_code_with_your_authenticator_app:
     'Stap 1: Scan de QR-code met je authenticator-app',
