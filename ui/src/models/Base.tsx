@@ -44,3 +44,15 @@ export class BaseModel<TModelAttributes extends BaseModelAttributes> {
     return clone
   }
 }
+
+export interface PaginationMetaAttributes {
+  page: number
+  per_page: number
+  total_items: number
+  total_pages: number
+}
+
+export interface PaginationResult<TAttributes extends BaseModelAttributes> {
+  items: TAttributes[]
+  meta: PaginationMetaAttributes
+}

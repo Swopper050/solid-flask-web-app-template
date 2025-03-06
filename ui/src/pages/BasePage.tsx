@@ -1,7 +1,7 @@
 import { JSXElement } from 'solid-js'
 import { A } from '@solidjs/router'
 
-import ProfileMenu from '../components/ProfileMenu'
+import { ProfileMenu } from '../components/ProfileMenu'
 import { ThemeSwitcher } from '../components/ThemeSwitcher'
 import { LanguageSelector } from '../components/LanguageSelector'
 

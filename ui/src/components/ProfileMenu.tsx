@@ -8,7 +8,7 @@ import { Toast } from './Toast'
 
 import { logout } from '../api'
 
-function ProfileMenu(): JSXElement {
+export function ProfileMenu(): JSXElement {
   const navigate = useNavigate()
 
   const { t } = useLocale()
@@ -39,19 +39,29 @@ function ProfileMenu(): JSXElement {
         <i class="fa-solid fa-ellipsis" />
       </summary>
 
-      <ul class="menu dropdown-content bg-base-200 rounded-box z-[100]">
-        <li class="text-left">
-          <A class="btn btn-ghost text-left" href="/account">
+      <ul class="menu dropdown-content bg-base-200 w-40 rounded-box z-[100]">
+        <li>
+          <A class="btn btn-ghost justify-start" href="/account">
             <i class="fa-regular fa-address-card" />
             {t('account')}
           </A>
         </li>
-        <li class="text-left">
+
+        <Show when={user().isAdmin}>
+          <li>
+            <A class="btn btn-ghost justify-start" href="/admin-panel">
+              <i class="fa-solid fa-screwdriver-wrench text-success" />
+              <p class="text-success">{t('admin_panel')}</p>
+            </A>
+          </li>
+        </Show>
+
+        <li>
           <button
             class={clsx(
               'btn',
               'btn-ghost',
-              'text-left',
+              'justify-start',
               loggingOut() && 'btn-disabled'
             )}
             onClick={onLogout}
@@ -78,5 +88,3 @@ function ProfileMenu(): JSXElement {
     </details>
   )
 }
-
-export default ProfileMenu

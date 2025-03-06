@@ -1,9 +1,9 @@
 import { Translations } from '../context/LocaleProvider'
 
 export const dict: Translations = {
-  hello_template: (name: string) => `Hallo ${name}`,
   a_puppy: 'Een puppy!',
   account: 'Account',
+  admin_panel: 'Admin paneel',
   are_you_sure_you_want_to_delete_your_account:
     'Weet je zeker dat je je account wilt verwijderen?',
   back_to_home: 'Terug naar home',
@@ -14,28 +14,29 @@ export const dict: Translations = {
   confirm_password: 'Bevestig wachtwoord',
   could_not_log_out_please_try_again_later:
     'Kon niet uitloggen, probeer het later opnieuw',
+  create_new_user: 'Nieuwe gebruiker aanmaken',
   current_password: 'Huidig wachtwoord',
   delete_account: 'Account verwijderen',
-  deleting: 'Verwijderen',
   disable_2fa: '2FA uitschakelen',
-  disabling: 'Disabling',
   email: 'E-mail',
   email_placeholder: 'je@email.nl',
   enable_2fa: '2FA inschakelen',
   enabled_2fa: '2FA ingeschakeld',
-  enabling: 'Inschakelen',
   enter_the_6_digit_code_generated_by_your_authenticator_app:
     'Voer de 6-cijferige code in die is gegenereerd door je authenticator-app',
+  error_loading_users: 'Fout bij het laden van gebruikers',
   forgot_password: 'Wachtwoord vergeten?',
   here_is_a_picture_of_a: 'Hier is een foto van een ',
   home: 'Home',
   if_a_user_with_this_email_exists_a_reset_password_mail_has_been_sent:
     'Als een gebruiker met dit e-mailadres bestaat, is er een e-mail voor het opnieuw instellen van het wachtwoord verzonden',
+  id: 'ID',
   login: 'Login',
   logout: 'Logout',
   my_solid_app: 'My solid app',
   new_password: 'Nieuw wachtwoord',
   no: 'Nee',
+  of: 'van',
   password: 'Wachtwoord',
   passwords_do_not_match: 'Wachtwoorden komen niet overeen',
   please_confirm_your_new_password: 'Bevestig je nieuwe wachtwoord',
@@ -50,10 +51,7 @@ export const dict: Translations = {
   register: 'Registreer',
   resend_verification_email: 'Verificatie e-mail opnieuw verzenden',
   reset_password: 'Wachtwoord opnieuw instellen',
-  resetting: 'Opnieuw aan het instellen',
-  saving: 'Opslaan',
   send_reset_email: 'Stuur e-mail voor wachtwoord reset',
-  sending: 'Verzenden',
   someone_might_like_it: 'Iemand vindt het misschien leuk!',
   step_1_scan_qr_code_with_your_authenticator_app:
     'Stap 1: Scan de QR-code met je authenticator-app',
@@ -64,8 +62,13 @@ export const dict: Translations = {
   this_action_cannot_be_undone: 'Deze actie kan niet ongedaan worden gemaakt',
   this_is: 'Dit is ',
   this_is_the_home_page: 'Dit is de home pagina',
+  this_user_has_been_verified: 'Deze gebruiker is geverifieerd',
+  this_user_has_not_been_verified_yet:
+    'Deze gebruiker is nog niet geverifieerd',
   this_user_is_an_admin: 'Deze gebruiker is een admin',
   to_the_app: 'Naar de applicatie',
+  users: 'Gebruikers',
+  verified: 'Geverifieerd',
   verifying_email: 'E-mail verifiëren',
   want_to_show_puppies: "Wil je puppy's laten zien?",
   want_to_show_rocks: 'Wil je stenen laten zien?',

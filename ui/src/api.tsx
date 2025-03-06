@@ -1,3 +1,6 @@
+import { PaginationResult } from './models/Base'
+import { UserAttributes } from './models/User'
+
 export async function changePassword(
   currentPassword: string,
   newPassword: string
@@ -12,6 +15,14 @@ export async function forgotPassword(email: string) {
   return post('api/forgot_password', {
     email: email,
   })
+}
+
+export async function getUsers(
+  page: number,
+  perPage: number
+): Promise<PaginationResult<UserAttributes>> {
+  const response = await get(`api/users?page=${page}&per_page=${perPage}`)
+  return response.json()
 }
 
 export async function resetPassword(
@@ -85,6 +96,22 @@ export async function resendVerificationMail() {
 
 export async function whoAmI() {
   return get('api/whoami')
+}
+
+export async function createUser(
+  email: string,
+  password: string,
+  isAdmin: boolean
+) {
+  return post(`api/users`, {
+    email: email,
+    password: password,
+    is_admin: isAdmin,
+  })
+}
+
+export async function deleteUser(userId: number) {
+  return _delete(`api/user/${userId}`)
 }
 
 export async function get(url: string) {
