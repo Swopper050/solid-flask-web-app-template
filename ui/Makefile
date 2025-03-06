@@ -27,6 +27,6 @@ server: ## Start the development server
 docker_latest: ## Build a docker container and tag it with the current git version tag and 'latest'
 	docker build -t $(DOCKERHUB_NAMESPACE)/my-solid-app-ui:$(VERSION) -t $(DOCKERHUB_NAMESPACE)/my-solid-app-ui:latest .
 
-docker_push: ## Push the odcker containers with the current git version tag and 'latest'
+docker_push_latest: ## Push the odcker containers with the current git version tag and 'latest'
 	docker push $(DOCKERHUB_NAMESPACE)/my-solid-app-ui:$(VERSION)
 	docker push $(DOCKERHUB_NAMESPACE)/my-solid-app-ui:latest

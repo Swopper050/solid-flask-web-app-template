@@ -81,7 +81,7 @@ db_upgrade: ## Upgrade database
 docker_latest: ## Build a docker container and tag it with the current git version tag and 'latest'
 	docker build -t $(DOCKERHUB_NAMESPACE)/my-solid-app-api:$(VERSION) -t $(DOCKERHUB_NAMESPACE)/my-solid-app-api:latest .
 
-docker_push: ## Push the docker containers with the current git version tag and 'latest'
+docker_push_latest: ## Push the docker containers with the current git version tag and 'latest'
 	docker push $(DOCKERHUB_NAMESPACE)/my-solid-app-api:$(VERSION)
 	docker push $(DOCKERHUB_NAMESPACE)/my-solid-app-api:latest
 
