@@ -11,7 +11,6 @@ on:
 jobs:
   docker-api-stable-build-push:
     runs-on: ubuntu-latest
-    if: github.ref_type == 'tag' && startsWith(github.ref, 'refs/tags/v') && github.base_ref == 'refs/heads/main'
     steps:
       - name: Setup
         uses: actions/checkout@v4
@@ -30,7 +29,6 @@ jobs:
 
   docker-ui-stable-build-push:
     runs-on: ubuntu-latest
-    if: github.ref_type == 'tag' && startsWith(github.ref, 'refs/tags/v') && github.base_ref == 'refs/heads/main'
     steps:
       - name: Setup
         uses: actions/checkout@v4
@@ -49,7 +47,7 @@ jobs:
 
   deploy-prod:
     runs-on: ubuntu-latest
-    if: github.ref_type == 'tag' && startsWith(github.ref, 'refs/tags/v') && github.base_ref == 'refs/heads/main'
+    if: github.ref_type == 'tag' && startsWith(github.ref, 'refs/tags/v')
     needs: [docker-ui-stable-build-push, docker-api-stable-build-push]
     steps:
       - name: Setup
