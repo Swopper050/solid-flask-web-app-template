@@ -70,10 +70,10 @@ sudo ufw enable
 ```bash
 sudo apt install certbot
 ```
-2. Add certificates for your domain:
+2. Add certificates for your domain (staging and production, make sure the subdomains are created and pointing to your VPS first):
 ```bash
-sudo certbot certonly --standalone --preferred-challenges http -d www.mysolidapp.nl
-sudo certbot certonly --standalone --preferred-challenges http -d mysolidapp.nl
+sudo certbot certonly --standalone --preferred-challenges http -d my-solid-app.nl -d www.my-solid-app.nl
+sudo certbot certonly --standalone --preferred-challenges http -d staging.my-solid-app.nl -d www.staging.my-solid-app.nl
 ```
 
 
