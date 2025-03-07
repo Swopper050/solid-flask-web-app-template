@@ -24,9 +24,15 @@ formatlint: format lint ## First format code, then run linters
 server: ## Start the development server
 	pnpm run dev
 
-docker_latest: ## Build a docker container and tag it with the current git version tag and 'latest'
-	docker build -t $(DOCKERHUB_NAMESPACE)/my-solid-app-ui:$(VERSION) -t $(DOCKERHUB_NAMESPACE)/my-solid-app-ui:latest .
+docker_latest: ## Build a docker container and tag it with 'latest'
+	docker build -t $(DOCKERHUB_NAMESPACE)/my-solid-app-ui:latest .
 
-docker_push: ## Push the odcker containers with the current git version tag and 'latest'
-	docker push $(DOCKERHUB_NAMESPACE)/my-solid-app-ui:$(VERSION)
+docker_stable: ## Build a docker container and tag it with the current git version tag and 'stable'
+	docker build -t $(DOCKERHUB_NAMESPACE)/my-solid-app-ui:$(VERSION) -t $(DOCKERHUB_NAMESPACE)/my-solid-app-ui:stable .
+
+docker_push_latest: ## Push the odcker container with the tag 'latest'
 	docker push $(DOCKERHUB_NAMESPACE)/my-solid-app-ui:latest
+
+docker_push_stable: ## Push the odcker containers with the current git version tag and 'stable'
+	docker push $(DOCKERHUB_NAMESPACE)/my-solid-app-ui:$(VERSION)
+	docker push $(DOCKERHUB_NAMESPACE)/my-solid-app-ui:stable

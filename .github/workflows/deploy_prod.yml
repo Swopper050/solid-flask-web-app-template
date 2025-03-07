@@ -1,92 +1,14 @@
 name: 
 
 on:
-  pull_request:
-    branches:
-      - develop
   push:
     branches:
-      - develop
       - main
-    tags: 
-      - 'v[0-9].[0-9]+.[0-9]+'
 
 jobs:
-  lint-ui:
+  docker-api-stable-build-push:
     runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-
-    - name: Install pnpm
-      uses: pnpm/action-setup@v4
-      with:
-        version: 9
-
-    - name: Setup npm
-      uses: actions/setup-node@v4
-      with:
-        node-version: 23
-
-    - name: Install dependencies
-      run: cd ui && make deps
-
-    - name: Lint
-      run: cd ui && make lint
-
-  lint-api:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-
-    - name: Setup python
-      uses: actions/setup-python@v5
-      with:
-        python-version: 3.12
-
-    - name: Install dependencies
-      run: cd api && make deps
-
-    - name: Lint
-      run: cd api && make lint
-
-  tests-api:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-
-    - name: Setup python
-      uses: actions/setup-python@v5
-      with:
-        python-version: 3.12
-
-    - name: Install dependencies
-      run: cd api && make deps
-
-    - name: Tests
-      run: cd api && make test
-
-  docker-api-build-test:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Setup
-        uses: actions/checkout@v4
-
-      - name: Build docker image
-        run: cd api && make docker_latest
-
-  docker-ui-build-test:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Setup
-        uses: actions/checkout@v4
-
-      - name: Build docker image
-        run: cd ui && make docker_latest
-
-  docker-api-build-push:
-    runs-on: ubuntu-latest
-    if: github.ref_type == 'tag' && startsWith(github.ref, 'refs/tags/v')
-    needs: [lint-ui, docker-ui-build-test, lint-api, tests-api, docker-api-build-test]
+    if: github.ref_type == 'tag' && startsWith(github.ref, 'refs/tags/v') && github.base_ref == 'refs/heads/main'
     steps:
       - name: Setup
         uses: actions/checkout@v4
@@ -98,15 +20,14 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build docker image
-        run: cd api && make DOCKERHUB_NAMESPACE=${{ secrets.DOCKERHUB_NAMESPACE }} docker_latest
+        run: cd api && make DOCKERHUB_NAMESPACE=${{ secrets.DOCKERHUB_NAMESPACE }} docker_stable
 
       - name: Push docker image
-        run: cd api && make DOCKERHUB_NAMESPACE=${{ secrets.DOCKERHUB_NAMESPACE }} docker_push
+        run: cd api && make DOCKERHUB_NAMESPACE=${{ secrets.DOCKERHUB_NAMESPACE }} docker_push_stable
 
-  docker-ui-build-push:
+  docker-ui-stable-build-push:
     runs-on: ubuntu-latest
-    if: github.ref_type == 'tag' && startsWith(github.ref, 'refs/tags/v')
-    needs: [lint-ui, docker-ui-build-test, lint-api, tests-api, docker-api-build-test]
+    if: github.ref_type == 'tag' && startsWith(github.ref, 'refs/tags/v') && github.base_ref == 'refs/heads/main'
     steps:
       - name: Setup
         uses: actions/checkout@v4
@@ -118,15 +39,15 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build docker image
-        run: cd ui && make DOCKERHUB_NAMESPACE=${{ secrets.DOCKERHUB_USERNAME }} docker_latest
+        run: cd ui && make DOCKERHUB_NAMESPACE=${{ secrets.DOCKERHUB_USERNAME }} docker_stable
 
       - name: Push docker image
-        run: cd ui && make DOCKERHUB_NAMESPACE=${{ secrets.DOCKERHUB_NAMESPACE }} docker_push
+        run: cd ui && make DOCKERHUB_NAMESPACE=${{ secrets.DOCKERHUB_NAMESPACE }} docker_push_stable
 
-  deploy:
+  deploy-prod:
     runs-on: ubuntu-latest
-    if: github.ref_type == 'tag' && startsWith(github.ref, 'refs/tags/v')
-    needs: [docker-ui-build-push, docker-api-build-push]
+    if: github.ref_type == 'tag' && startsWith(github.ref, 'refs/tags/v') && github.base_ref == 'refs/heads/main'
+    needs: [docker-ui-stable-build-push, docker-api-stable-build-push]
     steps:
       - name: Setup
         uses: actions/checkout@v4
@@ -167,6 +88,6 @@ jobs:
 
             docker compose -f docker-compose.prod.yml down
             docker compose -f docker-compose.prod.yml pull
-            docker compose -f docker-compose.prod.yml up -d
+            docker compose -f docker-compose.prod.yml up -d --remove-orphans
             sleep 10
             docker compose -f docker-compose.prod.yml run api make db_upgrade
