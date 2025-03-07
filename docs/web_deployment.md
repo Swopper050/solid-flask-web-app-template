@@ -53,7 +53,7 @@ touch .ssh/authorized_keys
 # Add your public ssh key to the authorized keys
 ```
 
-3. [Install docker with docker compose](https://docs.docker.com/engine/install/ubuntu/). Make sure you can run docker without sudo, it is enabled as service and you are logged in (`docker login`).
+3. [Install docker with docker compose](https://docs.docker.com/engine/install/ubuntu/). Make sure you can run docker without sudo (both your production and staging user), it is enabled as service and you are logged in (`docker login`).
 
 4. Setup firewall (sometimes you might need to also allow mail ports!):
 ```bash
