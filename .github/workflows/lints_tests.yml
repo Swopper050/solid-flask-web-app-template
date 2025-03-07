@@ -1,0 +1,82 @@
+name:
+
+on:
+  pull_request:
+    branches:
+      - develop
+  push:
+    branches:
+      - develop
+      - main
+
+jobs:
+  lint-ui:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        version: 9
+
+    - name: Setup npm
+      uses: actions/setup-node@v4
+      with:
+        node-version: 23
+
+    - name: Install dependencies
+      run: cd ui && make deps
+
+    - name: Lint
+      run: cd ui && make lint
+
+  lint-api:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup python
+      uses: actions/setup-python@v5
+      with:
+        python-version: 3.13
+
+    - name: Install dependencies
+      run: cd api && make deps
+
+    - name: Lint
+      run: cd api && make lint
+
+  tests-api:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup python
+      uses: actions/setup-python@v5
+      with:
+        python-version: 3.13
+
+    - name: Install dependencies
+      run: cd api && make deps
+
+    - name: Tests
+      run: cd api && make test
+
+  docker-api-build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup
+        uses: actions/checkout@v4
+
+      - name: Build docker image
+        run: cd api && make docker_latest
+
+  docker-ui-build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup
+        uses: actions/checkout@v4
+
+      - name: Build docker image
+        run: cd ui && make docker_latest
