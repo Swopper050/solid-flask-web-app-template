@@ -1,15 +1,15 @@
 services:
   ui:
-    image: $DOCKERHUB_NAMESPACE/my-solid-app-ui:stable
-    container_name: my-solid-app-ui
+    image: $DOCKERHUB_NAMESPACE/my-solid-app-ui:latest
+    container_name: my-solid-app-ui-staging
     volumes:
       - '/etc/letsencrypt/:/etc/letsencrypt/'
-      - '/home/${MY_SOLID_APP_VPS_USER}/nginx.staging.conf:/etc/nginx/conf.d/default.conf:ro'
+      - '/home/${MY_SOLID_APP_STAGING_VPS_USER}/nginx.staging.conf:/etc/nginx/conf.d/default.conf:ro'
     ports:
       - '80:80'
       - '443:443'
     networks:
-      - my-solid-app-network
+      - my-solid-app-network-staging
     depends_on:
       - api
     logging:
@@ -19,15 +19,15 @@ services:
         max-file: '10'
 
   api:
-    image: $DOCKERHUB_NAMESPACE/my-solid-app-api:stable
-    container_name: my-solid-app-api
+    image: $DOCKERHUB_NAMESPACE/my-solid-app-api:latest
+    container_name: my-solid-app-api-staging
     environment:
       MY_SOLID_APP_DB_NAME: $MY_SOLID_APP_DB_NAME
       MY_SOLID_APP_DB_USER: $MY_SOLID_APP_DB_USER
       MY_SOLID_APP_DB_PASSWORD: $MY_SOLID_APP_DB_PASSWORD
       MY_SOLID_APP_DB_HOST: 'db'
       MY_SOLID_APP_DB_PORT: '3306'
-      MY_SOLID_APP_FRONTEND_URL: https://my-solid-app.nl
+      MY_SOLID_APP_FRONTEND_URL: https://staging.my-solid-app.nl
       MY_SOLID_APP_PASSWORD_RESET_TOKEN_EXPIRE_HOURS: 1
       MY_SOLID_APP_SECRET_KEY: $MY_SOLID_APP_SECRET_KEY
       MY_SOLID_APP_MAIL_SERVER: $MY_SOLID_APP_MAIL_SERVER
@@ -38,7 +38,7 @@ services:
       MY_SOLID_APP_MAIL_DEFAULT_SENDER: $MY_SOLID_APP_MAIL_DEFAULT_SENDER
       MY_SOLID_APP_FERNET_SECRET_KEY: $MY_SOLID_APP_FERNET_SECRET_KEY
     networks:
-      - my-solid-app-network
+      - my-solid-app-network-staging
     depends_on:
       - db
     logging:
@@ -49,7 +49,7 @@ services:
 
   db:
     image: mariadb:latest
-    container_name: my-solid-app-mariadb
+    container_name: my-solid-app-mariadb-staging
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: $MYSQL_ROOT_PASSWORD
@@ -59,7 +59,7 @@ services:
     volumes:
       - db_data:/var/lib/mysql
     networks:
-      - my-solid-app-network
+      - my-solid-app-network-staging
     logging:
       driver: 'json-file'
       options:
@@ -68,9 +68,9 @@ services:
 
 
 networks:
-  my-solid-app-network:
+  my-solid-app-network-staging:
     driver: bridge
 
 
 volumes:
-  db_data_prod:
+  db_data_staging:

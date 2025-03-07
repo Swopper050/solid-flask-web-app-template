@@ -53,39 +53,39 @@ jobs:
       - name: SCP new docker compose file 
         uses: appleboy/scp-action@v0.1.7
         with:
-          host: ${{ secrets.MY_SOLID_APP_VPS_HOST }}
-          username: ${{ secrets.MY_SOLID_APP_VPS_USER }}
-          port: ${{ secrets.MY_SOLID_APP_VPS_PORT }}
-          key: ${{ secrets.MY_SOLID_APP_VPS_SSH_KEY }}
-          source: 'docker-compose.prod.yml'
+          host: ${{ secrets.MY_SOLID_APP_STAGING_VPS_HOST }}
+          username: ${{ secrets.MY_SOLID_APP_STAGING_VPS_USER }}
+          port: ${{ secrets.MY_SOLID_APP_STAGING_VPS_PORT }}
+          key: ${{ secrets.MY_SOLID_APP_STAGING_VPS_SSH_KEY }}
+          source: 'docker-compose.staging.yml, nginx.staging.conf'
           target: '~/'
 
       - name: Deploy new docker containers 
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.MY_SOLID_APP_VPS_HOST }}
-          username: ${{ secrets.MY_SOLID_APP_VPS_USER }}
-          port: ${{ secrets.MY_SOLID_APP_VPS_PORT }}
-          key: ${{ secrets.MY_SOLID_APP_VPS_SSH_KEY }}
+          host: ${{ secrets.MY_SOLID_APP_STAGING_VPS_HOST }}
+          username: ${{ secrets.MY_SOLID_APP_STAGING_VPS_USER }}
+          port: ${{ secrets.MY_SOLID_APP_STAGING_VPS_PORT }}
+          key: ${{ secrets.MY_SOLID_APP_STAGING_VPS_SSH_KEY }}
           script: |
             export DOCKERHUB_NAMESPACE=${{ secrets.DOCKERHUB_NAMESPACE }}
-            export MY_SOLID_APP_DB_NAME=${{ secrets.MY_SOLID_APP_DB_NAME }}
-            export MY_SOLID_APP_DB_USER=${{ secrets.MY_SOLID_APP_DB_USER }}
-            export MY_SOLID_APP_DB_PASSWORD=${{ secrets.MY_SOLID_APP_DB_PASSWORD }}
-            export MY_SOLID_APP_SECRET_KEY=${{ secrets.MY_SOLID_APP_SECRET_KEY }}
-            export MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}
-            export MYSQL_DATABASE=${{ secrets.MY_SOLID_APP_DB_NAME }}
-            export MYSQL_USER=${{ secrets.MY_SOLID_APP_DB_USER }}
-            export MYSQL_PASSWORD=${{ secrets.MY_SOLID_APP_DB_PASSWORD }}
-            export MY_SOLID_APP_MAIL_SERVER=${{ secrets.MY_SOLID_APP_MAIL_SERVER }}
-            export MY_SOLID_APP_MAIL_PORT=${{ secrets.MY_SOLID_APP_MAIL_PORT }}
-            export MY_SOLID_APP_MAIL_USERNAME=${{ secrets.MY_SOLID_APP_MAIL_USERNAME }}
-            export MY_SOLID_APP_MAIL_PASSWORD=${{ secrets.MY_SOLID_APP_MAIL_PASSWORD }}
-            export MY_SOLID_APP_MAIL_DEFAULT_SENDER=${{ secrets.MY_SOLID_APP_MAIL_DEFAULT_SENDER }}
-            export MY_SOLID_APP_FERNET_SECRET_KEY=${{ secrets.MY_SOLID_APP_FERNET_SECRET_KEY }}
+            export MY_SOLID_APP_DB_NAME=${{ secrets.MY_SOLID_APP_STAGING_DB_NAME }}
+            export MY_SOLID_APP_DB_USER=${{ secrets.MY_SOLID_APP_STAGING_DB_USER }}
+            export MY_SOLID_APP_DB_PASSWORD=${{ secrets.MY_SOLID_APP_STAGING_DB_PASSWORD }}
+            export MY_SOLID_APP_SECRET_KEY=${{ secrets.MY_SOLID_APP_STAGING_SECRET_KEY }}
+            export MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD_STAGING }}
+            export MYSQL_DATABASE=${{ secrets.MY_SOLID_APP_STAGING_DB_NAME }}
+            export MYSQL_USER=${{ secrets.MY_SOLID_APP_STAGING_DB_USER }}
+            export MYSQL_PASSWORD=${{ secrets.MY_SOLID_APP_STAGING_DB_PASSWORD }}
+            export MY_SOLID_APP_MAIL_SERVER=${{ secrets.MY_SOLID_APP_STAGING_MAIL_SERVER }}
+            export MY_SOLID_APP_MAIL_PORT=${{ secrets.MY_SOLID_APP_STAGING_MAIL_PORT }}
+            export MY_SOLID_APP_MAIL_USERNAME=${{ secrets.MY_SOLID_APP_STAGING_MAIL_USERNAME }}
+            export MY_SOLID_APP_MAIL_PASSWORD=${{ secrets.MY_SOLID_APP_STAGING_MAIL_PASSWORD }}
+            export MY_SOLID_APP_MAIL_DEFAULT_SENDER=${{ secrets.MY_SOLID_APP_STAGING_MAIL_DEFAULT_SENDER }}
+            export MY_SOLID_APP_FERNET_SECRET_KEY=${{ secrets.MY_SOLID_APP_STAGING_FERNET_SECRET_KEY }}
 
-            docker compose -f docker-compose.prod.yml down
-            docker compose -f docker-compose.prod.yml pull
-            docker compose -f docker-compose.prod.yml up -d
+            docker compose -f docker-compose.staging.yml down
+            docker compose -f docker-compose.staging.yml pull
+            docker compose -f docker-compose.staging.yml up -d --remove-orphans
             sleep 10
-            docker compose -f docker-compose.prod.yml run api make db_upgrade
+            docker compose -f docker-compose.staging.yml run api make db_upgrade
