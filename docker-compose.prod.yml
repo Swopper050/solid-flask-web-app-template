@@ -4,7 +4,7 @@ services:
     container_name: my-solid-app-ui
     volumes:
       - '/etc/letsencrypt/:/etc/letsencrypt/'
-      - '/home/${MY_SOLID_APP_SERVER_USER}/nginx.staging.conf:/etc/nginx/conf.d/default.conf:ro'
+      - '/home/${MY_SOLID_APP_SERVER_USER}/nginx.prod.conf:/etc/nginx/conf.d/default.conf:ro'
     ports:
       - '80:80'
       - '443:443'

@@ -60,6 +60,8 @@ touch .ssh/authorized_keys
 sudo ufw allow OpenSSH
 sudo ufw allow http
 sudo ufw allow https
+sudo ufw allow 8080
+sudo ufw allow 8443
 sudo ufw enable
 ```
 

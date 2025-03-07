@@ -6,8 +6,8 @@ services:
       - '/etc/letsencrypt/:/etc/letsencrypt/'
       - '/home/${MY_SOLID_APP_SERVER_USER}/nginx.staging.conf:/etc/nginx/conf.d/default.conf:ro'
     ports:
-      - '80:80'
-      - '443:443'
+      - '8080:80'
+      - '8443:443'
     networks:
       - my-solid-app-network-staging
     depends_on:
@@ -27,7 +27,7 @@ services:
       MY_SOLID_APP_DB_PASSWORD: $MY_SOLID_APP_DB_PASSWORD
       MY_SOLID_APP_DB_HOST: 'db'
       MY_SOLID_APP_DB_PORT: '3306'
-      MY_SOLID_APP_FRONTEND_URL: https://staging.my-solid-app.nl
+      MY_SOLID_APP_FRONTEND_URL: https://staging.my-solid-app.nl:8443
       MY_SOLID_APP_PASSWORD_RESET_TOKEN_EXPIRE_HOURS: 1
       MY_SOLID_APP_SECRET_KEY: $MY_SOLID_APP_SECRET_KEY
       MY_SOLID_APP_MAIL_SERVER: $MY_SOLID_APP_MAIL_SERVER
