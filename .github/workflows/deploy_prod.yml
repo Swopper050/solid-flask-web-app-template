@@ -59,7 +59,7 @@ jobs:
           username: ${{ secrets.MY_SOLID_APP_VPS_USER }}
           port: ${{ secrets.MY_SOLID_APP_VPS_PORT }}
           key: ${{ secrets.MY_SOLID_APP_VPS_SSH_KEY }}
-          source: 'docker-compose.prod.yml'
+          source: 'docker-compose.prod.yml, nginx.prod.conf'
           target: '~/'
 
       - name: Deploy new docker containers 
