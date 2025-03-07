@@ -70,6 +70,7 @@ jobs:
           port: ${{ secrets.MY_SOLID_APP_VPS_PORT }}
           key: ${{ secrets.MY_SOLID_APP_VPS_SSH_KEY }}
           script: |
+            export MY_SOLID_APP_SERVER_USER=${{ secrets.MY_SOLID_APP_VPS_USER }}
             export DOCKERHUB_NAMESPACE=${{ secrets.DOCKERHUB_NAMESPACE }}
             export MY_SOLID_APP_DB_NAME=${{ secrets.MY_SOLID_APP_DB_NAME }}
             export MY_SOLID_APP_DB_USER=${{ secrets.MY_SOLID_APP_DB_USER }}

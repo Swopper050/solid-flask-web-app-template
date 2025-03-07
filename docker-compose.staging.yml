@@ -4,7 +4,7 @@ services:
     container_name: my-solid-app-ui-staging
     volumes:
       - '/etc/letsencrypt/:/etc/letsencrypt/'
-      - '/home/${MY_SOLID_APP_STAGING_VPS_USER}/nginx.staging.conf:/etc/nginx/conf.d/default.conf:ro'
+      - '/home/${MY_SOLID_APP_SERVER_USER}/nginx.staging.conf:/etc/nginx/conf.d/default.conf:ro'
     ports:
       - '80:80'
       - '443:443'
@@ -57,7 +57,7 @@ services:
       MYSQL_USER: $MY_SOLID_APP_DB_USER
       MYSQL_PASSWORD: $MY_SOLID_APP_DB_PASSWORD
     volumes:
-      - db_data:/var/lib/mysql
+      - db_data_staging:/var/lib/mysql
     networks:
       - my-solid-app-network-staging
     logging:
