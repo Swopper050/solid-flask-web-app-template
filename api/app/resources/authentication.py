@@ -9,6 +9,7 @@ from marshmallow import Schema, fields
 
 from app.config import MY_SOLID_APP_PASSWORD_RESET_TOKEN_EXPIRE_HOURS
 from app.db.user import User, UserSchema
+from app.errors import APIError
 from app.extensions import api, db, login_manager
 from app.mail_utils import send_email_verification_email, send_forgot_password_email
 
@@ -62,9 +63,7 @@ class Login(Resource):
 
         user = User.query.filter_by(email=data.get("email")).first()
         if user is None or not user.is_correct_password(data.get("password")):
-            return {
-                "error_message": "Could not login with the given email and password"
-            }, 401
+            raise APIError(1, "Could not login with the given email and code", 401)
 
         if user.two_factor_enabled:
             session.pop("partially_authenticated_user", None)
@@ -94,9 +93,7 @@ class Login2FA(Resource):
             or user_id is None
             or user.id != user_id
         ):
-            return {
-                "error_message": "Could not login with the given email and code"
-            }, 401
+            raise APIError(1, "Could not login with the given email and code", 401)
 
         totp = pyotp.TOTP(user.totp_secret)
         if not totp.verify(totp_code):
