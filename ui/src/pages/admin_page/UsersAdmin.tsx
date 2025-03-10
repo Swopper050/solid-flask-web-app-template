@@ -8,7 +8,7 @@ import { createUser, getUsers, deleteUser } from '../../api'
 
 import { BooleanInput } from '../../components/BooleanInput'
 import { TextInput } from '../../components/TextInput'
-import { Modal, ModalBaseProps } from '../../components/Modal'
+import { createModalState, Modal, ModalBaseProps } from '../../components/Modal'
 
 import { useLocale } from '../../context/LocaleProvider'
 
@@ -24,6 +24,7 @@ import {
   SubmitHandler,
 } from '@modular-forms/solid'
 
+
 export function UsersAdmin(): JSXElement {
   const { t } = useLocale()
 
@@ -35,8 +36,11 @@ export function UsersAdmin(): JSXElement {
   const [selectedUser, setSelectedUser] = createSignal<UserAttributes | null>(
     null
   )
-  const [showDeleteUserModal, setShowDeleteUserModal] = createSignal(false)
-  const [showCreateUserModal, setShowCreateUserModal] = createSignal(false)
+
+  const [modalState, openModal, closeModal] = createModalState(
+    'deleteUser',
+    'createUser'
+  )
 
   const onPageChange = (newPage: number) => {
     setPage(newPage)
@@ -45,7 +49,7 @@ export function UsersAdmin(): JSXElement {
 
   const handleDelete = (user: UserAttributes | null) => {
     setSelectedUser(user)
-    setShowDeleteUserModal(true)
+    openModal('deleteUser')
   }
 
   return (
@@ -70,7 +74,7 @@ export function UsersAdmin(): JSXElement {
               <th class="text-right w-3/12">
                 <button
                   class="btn btn-primary btn-sm"
-                  onClick={() => setShowCreateUserModal(true)}
+                  onClick={() => openModal('createUser')}
                 >
                   <i class="fa-solid fa-plus" />
                   {t('create_new_user')}
@@ -153,15 +157,15 @@ export function UsersAdmin(): JSXElement {
       </div>
 
       <CreateUserModal
-        isOpen={showCreateUserModal()}
-        onClose={() => setShowCreateUserModal(false)}
+        isOpen={modalState().createUser}
+        onClose={() => closeModal('createUser')}
         onCreate={refetch}
       />
 
       {selectedUser() !== null && (
         <DeleteUserModal
-          isOpen={showDeleteUserModal()}
-          onClose={() => setShowDeleteUserModal(false)}
+          isOpen={modalState().deleteUser}
+          onClose={() => closeModal('deleteUser')}
           user={selectedUser()}
           onDelete={() => {
             refetch()

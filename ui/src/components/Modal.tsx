@@ -1,5 +1,27 @@
 import clsx from 'clsx'
-import { JSXElement } from 'solid-js'
+import { createSignal, JSXElement } from 'solid-js'
+
+/**
+ * Creates a modal state that can be used to open and close modals
+ * the keys passed in are used as identifiers for identifying differnent modals.
+ */
+export function createModalState<T extends string>(...keys: T[]) {
+  const initialState = Object.fromEntries(
+    keys.map((key) => [key, false])
+  ) as Record<T, boolean>
+
+  const [modalState, setModalState] = createSignal(initialState)
+
+  const openModal = (modal: T) => {
+    setModalState((prev) => ({ ...prev, [modal]: true }))
+  }
+
+  const closeModal = (modal: T) => {
+    setModalState((prev) => ({ ...prev, [modal]: false }))
+  }
+
+  return [modalState, openModal, closeModal] as const
+}
 
 export interface ModalBaseProps {
   isOpen: boolean
