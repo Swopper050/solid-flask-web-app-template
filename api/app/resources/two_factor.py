@@ -8,6 +8,7 @@ from flask_login import current_user, login_required
 from flask_restx import Resource
 from marshmallow import Schema, fields
 
+from app.errors import APIError, APIErrorEnum
 from app.extensions import api, db
 
 
@@ -16,7 +17,11 @@ class Generate2FASecret(Resource):
     @login_required
     def get(self):
         if current_user.two_factor_enabled:
-            return {"error_message": "2FA is already enabled"}, 400
+            raise APIError(
+                APIErrorEnum.already_2fa_enabled,
+                "2FA is already enabled",
+                400,
+            )
 
         totp = pyotp.TOTP(pyotp.random_base32())
 
@@ -42,7 +47,11 @@ class Enable2FA(Resource):
     @login_required
     def post(self):
         if current_user.two_factor_enabled:
-            return {"error_message": "2FA is already enabled"}, 400
+            raise APIError(
+                APIErrorEnum.already_2fa_enabled,
+                "2FA is already enabled",
+                400,
+            )
 
         data: dict = Enable2FASchema().load(request.get_json())
         totp_secret: str = data.get("totp_secret")
@@ -50,7 +59,11 @@ class Enable2FA(Resource):
 
         totp = pyotp.TOTP(totp_secret)
         if not totp.verify(totp_code):
-            return {"error_message": "Incorrect 2FA code"}, 400
+            raise APIError(
+                APIErrorEnum.incorrect_totp_code,
+                "Incorrect 2FA code",
+                400,
+            )
 
         current_user.totp_secret = totp_secret
         current_user.two_factor_enabled = True
@@ -69,14 +82,22 @@ class Disable2FA(Resource):
     @login_required
     def post(self):
         if not current_user.two_factor_enabled:
-            return {"error_message": "2FA is already disabled"}, 400
+            raise APIError(
+                APIErrorEnum.already_2fa_disabled,
+                "2FA is already disabled",
+                400,
+            )
 
         data: dict = Disable2FASchema().load(request.get_json())
         totp_code: str = data.get("totp_code")
 
         totp = pyotp.TOTP(current_user.totp_secret)
         if not totp.verify(totp_code):
-            return {"error_message": "Incorrect 2FA code"}, 401
+            raise APIError(
+                APIErrorEnum.incorrect_totp_code,
+                "Incorrect 2FA code",
+                400,
+            )
 
         current_user.totp_secret = None
         current_user.two_factor_enabled = False

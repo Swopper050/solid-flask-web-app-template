@@ -1,5 +1,19 @@
 import { PaginationResult } from './models/Base'
 import { UserAttributes } from './models/User'
+import { TranslationKeys } from './context/LocaleProvider'
+
+interface ErrorData {
+  error: number
+  message: string
+}
+
+export async function getErrorMessage(
+  response: Response
+): Promise<keyof TranslationKeys> {
+  const errorData: ErrorData = await response.json()
+  console.log(errorData.error)
+  return errorMessages[errorData.error] || 'an_unknown_error_occurred'
+}
 
 export async function changePassword(
   currentPassword: string,
@@ -136,4 +150,20 @@ export async function _delete(url: string) {
     method: 'DELETE',
     headers: new Headers({ 'Content-Type': 'application/json' }),
   })
+}
+
+const errorMessages: Record<number, keyof TranslationKeys> = {
+  0: 'an_account_with_this_email_already_exists',
+  1: 'could_not_login_with_the_given_email_and_password',
+  2: 'incorrect_2fa_code_try_again',
+  3: 'wrong_password',
+  4: 'new_password_does_not_match_conditions',
+  5: 'could_not_reset_password_with_the_given_token',
+  6: 'this_token_has_expired',
+  7: 'could_not_verify_email_with_the_given_token',
+  8: 'this_requires_you_to_be_an_admin',
+  9: 'twofa_is_already_enabled',
+  10: 'incorrect_2fa_code_try_again',
+  11: 'twofa_is_already_disabled',
+  12: 'user_not_found',
 }

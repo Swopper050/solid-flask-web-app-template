@@ -9,7 +9,7 @@ from marshmallow import Schema, fields
 
 from app.config import MY_SOLID_APP_PASSWORD_RESET_TOKEN_EXPIRE_HOURS
 from app.db.user import User, UserSchema
-from app.errors import APIError
+from app.errors import APIError, APIErrorEnum
 from app.extensions import api, db, login_manager
 from app.mail_utils import send_email_verification_email, send_forgot_password_email
 
@@ -30,7 +30,11 @@ class Register(Resource):
         data: dict = RegisterSchema().load(request.get_json())
 
         if User.query.filter_by(email=data.get("email")).first() is not None:
-            return {"error_message": "An account with this email already exists"}, 409
+            raise APIError(
+                APIErrorEnum.email_already_exists,
+                "An account with this email already exists",
+                409,
+            )
 
         new_user = User(email=data.get("email"))
         new_user.set_password(data.get("password"))
@@ -63,7 +67,11 @@ class Login(Resource):
 
         user = User.query.filter_by(email=data.get("email")).first()
         if user is None or not user.is_correct_password(data.get("password")):
-            raise APIError(1, "Could not login with the given email and code", 401)
+            raise APIError(
+                APIErrorEnum.wrong_email_password,
+                "Could not login with the given email and password",
+                401,
+            )
 
         if user.two_factor_enabled:
             session.pop("partially_authenticated_user", None)
@@ -93,13 +101,19 @@ class Login2FA(Resource):
             or user_id is None
             or user.id != user_id
         ):
-            raise APIError(1, "Could not login with the given email and code", 401)
+            raise APIError(
+                APIErrorEnum.wrong_email_totp_code,
+                "Could not login with the given email and code",
+                401,
+            )
 
         totp = pyotp.TOTP(user.totp_secret)
         if not totp.verify(totp_code):
-            return {
-                "error_message": "Could not login with the given email and code"
-            }, 401
+            raise APIError(
+                APIErrorEnum.wrong_email_totp_code,
+                "Could not login with the given email and code",
+                401,
+            )
 
         session.pop("partially_authenticated_user", None)
 
@@ -128,11 +142,19 @@ class ChangePassword(Resource):
         data: dict = ChangePasswordSchema().load(request.get_json())
 
         if not current_user.is_correct_password(data.get("current_password")):
-            return {"error_message": "The current password is incorrect"}, 409
+            raise APIError(
+                APIErrorEnum.wrong_password,
+                "The current password is incorrect",
+                409,
+            )
 
         new_password = data.get("new_password")
         if new_password is None or not password_matches_conditions(new_password):
-            return {"error_message": "New password does not match conditions"}, 409
+            raise APIError(
+                APIErrorEnum.password_does_not_match_conditions,
+                "New password does not match conditions",
+                409,
+            )
 
         current_user.set_password(new_password)
 
@@ -178,18 +200,28 @@ class ResetPassword(Resource):
         reset_token = data.get("reset_token")
         user = User.query.filter_by(email=data.get("email")).first()
         if user is None or not user.check_password_reset_token(reset_token):
-            return {
-                "error_message": "Could not reset password with the given token"
-            }, 400
+            raise APIError(
+                APIErrorEnum.could_not_reset_password_with_token,
+                "Could not reset password with the given token",
+                400,
+            )
 
         if (int(time.time()) - user.password_reset_time) > (
             MY_SOLID_APP_PASSWORD_RESET_TOKEN_EXPIRE_HOURS * 3600
         ):
-            return {"error_message": "This token has expired"}, 410
+            raise APIError(
+                APIErrorEnum.token_expired,
+                "This token has expired",
+                410,
+            )
 
         new_password = data.get("new_password")
         if new_password is None or not password_matches_conditions(new_password):
-            return {"error_message": "New password does not match conditions"}, 409
+            raise APIError(
+                APIErrorEnum.password_does_not_match_conditions,
+                "New password does not match conditions",
+                409,
+            )
 
         user.set_password(new_password)
         user.clear_password_reset_token()
@@ -213,7 +245,11 @@ class EmailVerification(Resource):
         verification_token = data.get("verification_token")
         user = User.query.filter_by(email=data.get("email")).first()
         if user is None or not user.check_email_verification_token(verification_token):
-            return {"error_message": "Could not verify email with the given token"}, 400
+            raise APIError(
+                APIErrorEnum.could_not_verify_email_with_token,
+                "Could not verify email with the given token",
+                400,
+            )
 
         user.is_verified = True
         user.clear_email_verification_token()

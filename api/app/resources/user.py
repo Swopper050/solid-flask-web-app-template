@@ -4,6 +4,7 @@ from flask_restx import Resource
 from marshmallow import Schema, fields
 
 from app.db.user import User, UserSchema
+from app.errors import APIError, APIErrorEnum
 from app.extensions import api, db
 from app.mail_utils import send_email_verification_email
 from app.resources.decorators import admin_required, insert_pagination_parameters
@@ -33,7 +34,11 @@ class UsersAPI(Resource):
     def post(self):
         user_data: dict = CreateUserSchema().load(request.get_json())
         if User.query.filter_by(email=user_data.get("email")).first() is not None:
-            return {"error_message": "An account with this email already exists"}, 409
+            raise APIError(
+                APIErrorEnum.email_already_exists,
+                "An account with this email already exists",
+                409,
+            )
 
         new_user = User(email=user_data.get("email"), is_admin=user_data.get("is_admin"))
         new_user.set_password(user_data.get("password"))
@@ -59,7 +64,9 @@ class UserAPI(Resource):
     def delete(self, id):
         user = db.session.get(User, id)
         if not user:
-            return {"error_message": f"User with id {id} not found"}, 404
+            raise APIError(
+                APIErrorEnum.user_not_found, f"User with id {id} not found", 404
+            )
 
         db.session.delete(user)
         db.session.commit()

@@ -4,6 +4,9 @@ export const dict: Translations = {
   a_puppy: 'Een puppy!',
   account: 'Account',
   admin_panel: 'Admin paneel',
+  an_account_with_this_email_already_exists:
+    'Een account met dit e-mailadres bestaat al',
+  an_unknown_error_occurred: 'Er is een onbekende fout opgetreden',
   are_you_sure_you_want_to_delete_your_account:
     'Weet je zeker dat je je account wilt verwijderen?',
   back_to_home: 'Terug naar home',
@@ -14,9 +17,16 @@ export const dict: Translations = {
   confirm_password: 'Bevestig wachtwoord',
   could_not_log_out_please_try_again_later:
     'Kon niet uitloggen, probeer het later opnieuw',
+  could_not_login_with_the_given_email_and_password:
+    'Kon niet inloggen met dit e-mailadres en wachtwoord',
   create_new_user: 'Nieuwe gebruiker aanmaken',
+  create_user: 'Gebruiker aanmaken',
   current_password: 'Huidig wachtwoord',
+  delete: 'Verwijderen',
   delete_account: 'Account verwijderen',
+  delete_user: 'Gebruiker verwijderen',
+  delete_user_confirmation:
+    'Weet je zeker dat je deze gebruiker wilt verwijderen?',
   disable_2fa: '2FA uitschakelen',
   email: 'E-mail',
   email_placeholder: 'je@email.nl',
@@ -28,11 +38,12 @@ export const dict: Translations = {
   forgot_password: 'Wachtwoord vergeten?',
   here_is_a_picture_of_a: 'Hier is een foto van een ',
   home: 'Home',
+  id: 'ID',
   if_a_user_with_this_email_exists_a_reset_password_mail_has_been_sent:
     'Als een gebruiker met dit e-mailadres bestaat, is er een e-mail voor het opnieuw instellen van het wachtwoord verzonden',
-  id: 'ID',
   login: 'Login',
   logout: 'Logout',
+  make_this_user_an_admin: 'Maak deze gebruiker een admin',
   my_solid_app: 'My solid app',
   new_password: 'Nieuw wachtwoord',
   no: 'Nee',
@@ -44,6 +55,7 @@ export const dict: Translations = {
   please_enter_a_new_password: 'Voer een nieuw wachtwoord in',
   please_enter_a_valid_email: 'Voer een geldig e-mailadres in',
   please_enter_a_valid_6_digit_code: 'Voer een geldige 6-cijferige code in',
+  please_enter_a_password: 'Voer een wachtwoord in',
   please_enter_your_email: 'Voer je e-mailadres in',
   preikestolen: 'Preikestolen',
   puppy: 'puppy',
