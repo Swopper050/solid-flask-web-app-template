@@ -129,7 +129,7 @@ export function UsersAdmin(): JSXElement {
                       user.id,
                       <UserEmail user={user} />,
                       <IsVerified user={user} />,
-                      <DeleteUserButton user={user}/>,
+                      <DeleteUserButton user={user} />,
                     ]}
                   />
                 </>

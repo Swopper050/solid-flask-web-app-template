@@ -98,7 +98,6 @@ export function UserAccountPage(): JSXElement {
   )
 }
 
-
 function VerifyEmailButton(): JSXElement {
   const { t } = useLocale()
   const { user } = useUser()
