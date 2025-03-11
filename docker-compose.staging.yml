@@ -77,6 +77,8 @@ services:
     entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew --force-renewal --webroot -w /var/www/certbot; sleep 30s & wait $${!}; done;'"
     networks:
       - my-solid-app-network-staging
+    depends_on:
+      - ui
     logging:
       driver: 'json-file'
       options:
