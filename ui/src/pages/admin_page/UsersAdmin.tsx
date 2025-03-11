@@ -218,7 +218,10 @@ function DeleteUserModal(props: DeleteUserModalProps): JSXElement {
               'btn btn-outline',
               deleteForm.submitting && 'btn-disabled'
             )}
-            onClick={() => props.onClose()}
+            onClick={(e) => {
+              e.preventDefault()
+              props.onClose()
+            }}
           >
             {t('cancel')}
           </button>
