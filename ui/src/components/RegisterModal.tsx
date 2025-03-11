@@ -15,7 +15,7 @@ import {
   SubmitHandler,
 } from '@modular-forms/solid'
 
-import { register } from '../api'
+import { getErrorMessage, register } from '../api'
 
 import { useUser } from '../context/UserProvider'
 import { useLocale } from '../context/LocaleProvider'
@@ -62,7 +62,7 @@ export function RegisterModal(props: ModalBaseProps): JSXElement {
     if (response.status !== 200) {
       setResponse(registerForm, {
         status: 'error',
-        message: (await response.json()).error_message,
+        message: t(await getErrorMessage(response)),
       })
       return
     }

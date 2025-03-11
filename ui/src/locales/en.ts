@@ -2,6 +2,9 @@ export const dict = {
   a_puppy: 'A puppy!',
   account: 'Account',
   admin_panel: 'Admin panel',
+  an_account_with_this_email_already_exists:
+    'An account with this email already exists',
+  an_unknown_error_occurred: 'An unknown error occurred',
   are_you_sure_you_want_to_delete_your_account:
     'Are you sure you want to delete your account?',
   back_to_home: 'Back to home',
@@ -12,6 +15,12 @@ export const dict = {
   confirm_password: 'Confirm password',
   could_not_log_out_please_try_again_later:
     'Could not log out, please try again later',
+  could_not_login_with_the_given_email_and_password:
+    'Could not login with the given email and password',
+  could_not_reset_password_with_the_given_token:
+    'Could not reset password with the given token',
+  could_not_verify_email_with_the_given_token:
+    'Could not verify email with the given token',
   create_new_user: 'Create new user',
   create_user: 'Create user',
   current_password: 'Current password',
@@ -33,11 +42,14 @@ export const dict = {
   id: 'ID',
   if_a_user_with_this_email_exists_a_reset_password_mail_has_been_sent:
     'If a user with this email exists, a reset password mail has been sent',
+  incorrect_2fa_code_try_again: 'Incorrect 2FA code, please try again',
   login: 'Login',
   logout: 'Logout',
   make_this_user_an_admin: 'Make this user an admin',
   my_solid_app: 'My solid app',
   new_password: 'New password',
+  new_password_does_not_match_conditions:
+    'New password does not match conditions',
   no: 'No',
   of: 'of',
   password: 'Password',
@@ -66,10 +78,15 @@ export const dict = {
   this_action_cannot_be_undone: 'This action cannot be undone',
   this_is: 'This is ',
   this_is_the_home_page: 'This is the home page',
+  this_requires_you_to_be_an_admin: 'This requires you to be an admin',
+  this_token_has_expired: 'This token has expired',
   this_user_has_been_verified: 'This user has been verified',
   this_user_has_not_been_verified_yet: 'This user has not been verified yet',
   this_user_is_an_admin: 'This user is an admin',
   to_the_app: 'To the app',
+  twofa_is_already_disabled: '2FA is already disabled',
+  twofa_is_already_enabled: '2FA is already enabled',
+  user_not_found: 'User not found',
   users: 'Users',
   verified: 'Verified',
   verifying_email: 'Verifying email',
@@ -78,6 +95,7 @@ export const dict = {
   web_application: 'web application.',
   woops_i_forgot_my_password: 'Woops, I forgot my password',
   woops_this_page_does_not_exist: 'Woops, this page does not exist',
+  wrong_password: 'Wrong password',
   yes: 'Yes',
   you_can: 'You can!',
   your: 'your ',

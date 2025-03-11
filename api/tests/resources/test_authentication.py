@@ -8,6 +8,7 @@ from flask import session
 from flask_login import current_user
 
 from app.db.user import User, UserSchema
+from app.errors import APIErrorEnum
 from app.extensions import mail
 
 
@@ -48,9 +49,8 @@ class TestRegisterAPI:
         )
 
         assert response.status_code == 409
-        assert response.json == {
-            "error_message": "An account with this email already exists"
-        }
+        assert response.json["error"] == APIErrorEnum.email_already_exists.value
+        assert response.json["message"] == "An account with this email already exists"
         assert User.query.count() == 1
 
 
@@ -69,9 +69,11 @@ class TestLoginAPI:
         )
 
         assert response.status_code == 401
-        assert response.json == {
-            "error_message": "Could not login with the given email and password"
-        }
+        assert response.json["error"] == APIErrorEnum.wrong_email_password.value
+        assert (
+            response.json["message"]
+            == "Could not login with the given email and password"
+        )
 
     def test_login_wrong_password(self, client, user):
         response = client.post(
@@ -79,9 +81,11 @@ class TestLoginAPI:
         )
 
         assert response.status_code == 401
-        assert response.json == {
-            "error_message": "Could not login with the given email and password"
-        }
+        assert response.json["error"] == APIErrorEnum.wrong_email_password.value
+        assert (
+            response.json["message"]
+            == "Could not login with the given email and password"
+        )
 
     def test_login_with_2fa_enabled(self, db, client, user):
         user.two_factor_enabled = True
@@ -151,9 +155,11 @@ class TestLogin2FAAPI:
                 json={"email": "dijkstra@test.com", "totp_code": totp.now()},
             )
             assert response.status_code == 401
-            assert response.json == {
-                "error_message": "Could not login with the given email and code"
-            }
+            assert response.json["error"] == APIErrorEnum.wrong_email_totp_code.value
+            assert (
+                response.json["message"]
+                == "Could not login with the given email and code"
+            )
 
     def test_login_2fa_not_enabled(self, client, user, totp):
         with client:
@@ -162,9 +168,11 @@ class TestLogin2FAAPI:
                 json={"email": user.email, "totp_code": totp.now()},
             )
             assert response.status_code == 401
-            assert response.json == {
-                "error_message": "Could not login with the given email and code"
-            }
+            assert response.json["error"] == APIErrorEnum.wrong_email_totp_code.value
+            assert (
+                response.json["message"]
+                == "Could not login with the given email and code"
+            )
 
     def test_login_2fa_session_not_set(self, client, user_with_2fa, totp):
         with client:
@@ -175,9 +183,11 @@ class TestLogin2FAAPI:
                 json={"email": user_with_2fa.email, "totp_code": totp.now()},
             )
             assert response.status_code == 401
-            assert response.json == {
-                "error_message": "Could not login with the given email and code"
-            }
+            assert response.json["error"] == APIErrorEnum.wrong_email_totp_code.value
+            assert (
+                response.json["message"]
+                == "Could not login with the given email and code"
+            )
 
     def test_login_2fa_session_for_different_user(
         self, client, user_with_2fa, admin, totp
@@ -195,9 +205,11 @@ class TestLogin2FAAPI:
                 json={"email": admin.email, "totp_code": totp.now()},
             )
             assert response.status_code == 401
-            assert response.json == {
-                "error_message": "Could not login with the given email and code"
-            }
+            assert response.json["error"] == APIErrorEnum.wrong_email_totp_code.value
+            assert (
+                response.json["message"]
+                == "Could not login with the given email and code"
+            )
 
     def test_login_2fa_wrong_code(self, client, user_with_2fa, totp):
         with client:
@@ -214,9 +226,11 @@ class TestLogin2FAAPI:
                 },
             )
             assert response.status_code == 401
-            assert response.json == {
-                "error_message": "Could not login with the given email and code"
-            }
+            assert response.json["error"] == APIErrorEnum.wrong_email_totp_code.value
+            assert (
+                response.json["message"]
+                == "Could not login with the given email and code"
+            )
 
 
 class TestLogoutAPI:
@@ -274,9 +288,11 @@ class TestChangePasswordAPI:
         )
 
         assert response.status_code == 409
-        assert response.json == {
-            "error_message": "New password does not match conditions"
-        }
+        assert (
+            response.json["error"]
+            == APIErrorEnum.password_does_not_match_conditions.value
+        )
+        assert response.json["message"] == "New password does not match conditions"
 
     def test_change_password_not_logged_in(self, client, user):
         assert user.is_correct_password("password123")
@@ -304,7 +320,8 @@ class TestChangePasswordAPI:
         )
 
         assert response.status_code == 409
-        assert response.json == {"error_message": "The current password is incorrect"}
+        assert response.json["error"] == APIErrorEnum.wrong_password.value
+        assert response.json["message"] == "The current password is incorrect"
         assert user.is_correct_password("password123")
 
 
@@ -411,9 +428,13 @@ class TestResetPasswordAPI:
         )
 
         assert response.status_code == 400
-        assert response.json == {
-            "error_message": "Could not reset password with the given token"
-        }
+        assert (
+            response.json["error"]
+            == APIErrorEnum.could_not_reset_password_with_token.value
+        )
+        assert (
+            response.json["message"] == "Could not reset password with the given token"
+        )
 
         # Make sure the user reset tokens are not cleared yet.
         assert user.password_reset_token is not None
@@ -431,9 +452,13 @@ class TestResetPasswordAPI:
         )
 
         assert response.status_code == 400
-        assert response.json == {
-            "error_message": "Could not reset password with the given token"
-        }
+        assert (
+            response.json["error"]
+            == APIErrorEnum.could_not_reset_password_with_token.value
+        )
+        assert (
+            response.json["message"] == "Could not reset password with the given token"
+        )
 
     @patch("app.db.user.time")
     @patch("app.resources.authentication.time")
@@ -464,7 +489,8 @@ class TestResetPasswordAPI:
         )
 
         assert response.status_code == 410
-        assert response.json == {"error_message": "This token has expired"}
+        assert response.json["error"] == APIErrorEnum.token_expired.value
+        assert response.json["message"] == "This token has expired"
 
         # Make sure the user reset tokens are not cleared yet.
         assert user.password_reset_token is not None
@@ -499,9 +525,11 @@ class TestResetPasswordAPI:
         )
 
         assert response.status_code == 409
-        assert response.json == {
-            "error_message": "New password does not match conditions"
-        }
+        assert (
+            response.json["error"]
+            == APIErrorEnum.password_does_not_match_conditions.value
+        )
+        assert response.json["message"] == "New password does not match conditions"
 
         # Make sure the user reset tokens are not cleared yet.
         assert user.password_reset_token is not None
@@ -543,9 +571,11 @@ class TestEmailVerificationAPI:
         )
 
         assert response.status_code == 400
-        assert response.json == {
-            "error_message": "Could not verify email with the given token"
-        }
+        assert (
+            response.json["error"]
+            == APIErrorEnum.could_not_verify_email_with_token.value
+        )
+        assert response.json["message"] == "Could not verify email with the given token"
 
         # Make sure the user tokens are not cleared yet and user is not verified.
         assert user.email_verification_token is not None
@@ -561,9 +591,11 @@ class TestEmailVerificationAPI:
         )
 
         assert response.status_code == 400
-        assert response.json == {
-            "error_message": "Could not verify email with the given token"
-        }
+        assert (
+            response.json["error"]
+            == APIErrorEnum.could_not_verify_email_with_token.value
+        )
+        assert response.json["message"] == "Could not verify email with the given token"
 
 
 class TestResendVerifyEmailAPI:

@@ -6,7 +6,7 @@ import { TopBar } from '../components/TopBar'
 
 import { useUser } from '../context/UserProvider'
 import { useLocale } from '../context/LocaleProvider'
-import { verifyEmail } from '../api'
+import { getErrorMessage, verifyEmail } from '../api'
 
 export function VerifyEmailPage(): JSXElement {
   const { t } = useLocale()
@@ -29,7 +29,7 @@ export function VerifyEmailPage(): JSXElement {
     )
 
     if (response.status !== 200) {
-      setErrorMsg((await response.json()).error_message)
+      setErrorMsg(t(await getErrorMessage(response)))
     } else {
       await fetchUser()
       setSuccess(true)

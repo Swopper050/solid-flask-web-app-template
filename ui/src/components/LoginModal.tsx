@@ -13,7 +13,7 @@ import {
   SubmitHandler,
 } from '@modular-forms/solid'
 
-import { passwordLogin, totpLogin } from '../api'
+import { getErrorMessage, passwordLogin, totpLogin } from '../api'
 
 import { User } from '../models/User'
 import { useUser } from '../context/UserProvider'
@@ -51,7 +51,7 @@ export function LoginModal(props: ModalBaseProps): JSXElement {
     if (response.status !== 200) {
       setResponse(loginForm, {
         status: 'error',
-        message: (await response.json()).error_message,
+        message: t(await getErrorMessage(response)),
       })
       return
     }

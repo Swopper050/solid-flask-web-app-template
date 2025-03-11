@@ -4,7 +4,7 @@ import { useUser } from '../../context/UserProvider'
 import { useLocale } from '../../context/LocaleProvider'
 import { clsx } from 'clsx'
 
-import { deleteAccount } from '../../api'
+import { deleteAccount, getErrorMessage } from '../../api'
 import { Modal, ModalBaseProps } from '../../components/Modal'
 import { Alert } from '../../components/Alert'
 
@@ -23,9 +23,7 @@ export function DeleteAccountModal(props: ModalBaseProps): JSXElement {
 
     const response = await deleteAccount()
     if (response.status !== 200) {
-      setErrorMsg(
-        (await response.json()).error_message ?? 'Could not delete account'
-      )
+      setErrorMsg(t(await getErrorMessage(response)))
       setDeleting(false)
       return
     }
