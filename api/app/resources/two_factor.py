@@ -62,7 +62,7 @@ class Enable2FA(Resource):
             raise APIError(
                 APIErrorEnum.incorrect_totp_code,
                 "Incorrect 2FA code",
-                400,
+                401,
             )
 
         current_user.totp_secret = totp_secret
@@ -96,7 +96,7 @@ class Disable2FA(Resource):
             raise APIError(
                 APIErrorEnum.incorrect_totp_code,
                 "Incorrect 2FA code",
-                400,
+                401,
             )
 
         current_user.totp_secret = None

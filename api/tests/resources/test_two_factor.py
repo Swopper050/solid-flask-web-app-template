@@ -61,7 +61,7 @@ class TestEnable2FAAPI:
             json={"totp_code": f"{int(totp.now()) + 1}", "totp_secret": totp.secret},
         )
 
-        assert response.status_code == 400
+        assert response.status_code == 401
         assert response.json["error"] == 10
         assert response.json["message"] == "Incorrect 2FA code"
 
@@ -114,7 +114,7 @@ class TestDisable2FAAPI:
             "/disable_2fa", json={"totp_code": f"{int(totp.now()) + 1}"}
         )
 
-        assert response.status_code == 400
+        assert response.status_code == 401
         assert response.json["error"] == 10
         assert response.json["message"] == "Incorrect 2FA code"
         assert logged_in_user.two_factor_enabled
