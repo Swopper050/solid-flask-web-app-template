@@ -1,7 +1,6 @@
 import { Translations } from '../context/LocaleProvider'
 
 export const dict: Translations = {
-  a_puppy: 'Een puppy!',
   account: 'Account',
   admin_panel: 'Admin paneel',
   an_account_with_this_email_already_exists:
