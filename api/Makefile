@@ -91,7 +91,7 @@ docker_push_stable: ## Push the docker containers with the current git version t
 	docker push $(DOCKERHUB_NAMESPACE)/my-solid-app-api:$(VERSION)
 	docker push $(DOCKERHUB_NAMESPACE)/my-solid-app-api:stable
 
-docker_run: ## Run the api as a docker container
+docker_run_latest: ## Run the api as a docker container
 	docker run \
 		--name my-solid-app-api \
 		--network host \
