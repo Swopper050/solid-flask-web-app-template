@@ -25,6 +25,7 @@ import {
 } from '@modular-forms/solid'
 import { Table, TableRow } from '../../components/Table'
 import { Tooltip } from '../../components/Tooltip'
+import { Button } from '../../components/Button'
 
 export function UsersAdmin(): JSXElement {
   const { t } = useLocale()
@@ -348,18 +349,13 @@ function CreateUserModal(props: CreateUserModalProps): JSXElement {
         </Show>
 
         <div class="modal-action">
-          <button
-            class={clsx(
-              'mt-4 btn btn-primary',
-              createUserForm.submitting && 'btn-disabled'
-            )}
+          <Button
             type="submit"
+            class="mt-4"
+            isLoading={createUserForm.submitting}
           >
             {t('create_user')}
-            <Show when={createUserForm.submitting}>
-              <span class="loading loading-ball" />
-            </Show>
-          </button>
+          </Button>
         </div>
       </Create.Form>
     </Modal>

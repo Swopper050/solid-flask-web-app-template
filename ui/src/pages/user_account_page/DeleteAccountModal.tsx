@@ -2,20 +2,20 @@ import { createSignal, JSXElement, Show } from 'solid-js'
 import { useNavigate } from '@solidjs/router'
 import { useUser } from '../../context/UserProvider'
 import { useLocale } from '../../context/LocaleProvider'
-import { clsx } from 'clsx'
 
 import { deleteAccount, getErrorMessage } from '../../api'
 import { Modal, ModalBaseProps } from '../../components/Modal'
 import { Alert } from '../../components/Alert'
+import { Button } from '../../components/Button'
 
 export function DeleteAccountModal(props: ModalBaseProps): JSXElement {
   const { t } = useLocale()
   const { setUser } = useUser()
 
+  const navigate = useNavigate()
+
   const [deleting, setDeleting] = createSignal(false)
   const [errorMsg, setErrorMsg] = createSignal<string | null>(null)
-
-  const navigate = useNavigate()
 
   const onDeleteAccount = async () => {
     setDeleting(true)
@@ -47,24 +47,21 @@ export function DeleteAccountModal(props: ModalBaseProps): JSXElement {
       </Show>
 
       <div class="modal-action">
-        <form method="dialog">
-          <button
-            class={clsx('btn mr-2', deleting() && 'btn-disabled')}
-            onClick={() => props.onClose()}
-          >
-            {t('cancel')}
-          </button>
-        </form>
+        <Button
+          onClick={() => props.onClose()}
+          variant="secondary"
+          isLoading={deleting()}
+        >
+          {t('cancel')}
+        </Button>
 
-        <button
-          class={clsx('btn btn-error', deleting() && 'btn-disabled')}
-          onClick={onDeleteAccount}
+        <Button
+          onClick={() => onDeleteAccount()}
+          variant="error"
+          isLoading={deleting()}
         >
           {t('delete_account')}
-          <Show when={deleting()}>
-            <span class="loading loading-ball" />
-          </Show>
-        </button>
+        </Button>
       </div>
     </Modal>
   )
