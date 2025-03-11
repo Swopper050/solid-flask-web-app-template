@@ -1,6 +1,7 @@
 from flask_login import current_user
 
 from app.db.user import User
+from app.errors import APIErrorEnum
 
 
 class TestUsersAPI:
@@ -97,7 +98,7 @@ class TestUsersAPI:
         )
 
         assert response.status_code == 409
-        assert response.get_json()["error"] == 0
+        assert response.get_json()["error"] == APIErrorEnum.email_already_exists.value
         assert "already exists" in response.get_json()["message"]
 
     def test_create_user_not_admin(self, client, db, logged_in_user):
@@ -131,7 +132,7 @@ class TestUserAPI:
         response = client.delete(f"/user/{nonexistent_id}")
 
         assert response.status_code == 404
-        assert response.get_json()["error"] == 12
+        assert response.get_json()["error"] == APIErrorEnum.user_not_found.value
         assert f"{nonexistent_id}" in response.get_json()["message"]
 
     def test_delete_user_not_admin(self, client, db, user, logged_in_user):
