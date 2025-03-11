@@ -2,6 +2,7 @@
 
 import re
 import sys
+import argparse
 from pathlib import Path
 import typing
 
@@ -41,7 +42,7 @@ def get_file_content(file_path):
         return f.read()
 
 
-def add_missing_keys(default_keys, target_file_path):
+def add_missing_keys(default_keys, target_file_path, ci_mode=False, quiet_mode=False):
     """Add missing keys to a target locale file in alphabetical order among existing keys."""
     target_content = get_file_content(target_file_path)
     target_keys = extract_translation_keys(target_file_path)
@@ -50,8 +51,17 @@ def add_missing_keys(default_keys, target_file_path):
     missing_keys = [key for key in default_keys if key not in target_keys]
 
     if not missing_keys:
-        print(f"{GREEN}No missing keys in {target_file_path.name}{RESET}")
-        return 0
+        if not quiet_mode:
+            print(f"{GREEN}No missing keys in {target_file_path.name}{RESET}")
+        return 0, missing_keys
+
+    if ci_mode:
+        # In CI mode, don't modify the file, just report missing keys
+        if not quiet_mode:
+            print(f"{RED}Found {len(missing_keys)} missing keys in {target_file_path.name}:{RESET}")
+            for key in sorted(missing_keys):
+                print(f"- {key}")
+        return len(missing_keys), missing_keys
 
     if "}" in target_content:
         content_lines = target_content.splitlines()
@@ -69,7 +79,7 @@ def add_missing_keys(default_keys, target_file_path):
             print(
                 f"{RED}Could not find the translation object in {target_file_path.name}{RESET}"
             )
-            return 0
+            return 0, missing_keys
 
         # Get the indentation from an existing line
         indentation = ""
@@ -150,32 +160,44 @@ def add_missing_keys(default_keys, target_file_path):
         with open(target_file_path, "w", encoding="utf-8") as f:
             f.write(updated_content)
 
-        print(
-            f"{YELLOW}Added {len(missing_keys)} missing keys to {target_file_path.name} in alphabetical order:{RESET}"
-        )
-        for key in sorted(missing_keys):
-            print(f"- {key}")
+        if not quiet_mode:
+            print(
+                f"{YELLOW}Added {len(missing_keys)} missing keys to {target_file_path.name} in alphabetical order:{RESET}"
+            )
+            for key in sorted(missing_keys):
+                print(f"- {key}")
 
-        return len(missing_keys)
+        return len(missing_keys), missing_keys
 
     print(
         f"{RED}Could not find where to insert missing keys in {target_file_path.name}{RESET}"
     )
-    return 0
+    return 0, missing_keys
 
 
 def main():
     """Add missing translation keys to non-default locale files."""
+    parser = argparse.ArgumentParser(description="Add missing translation keys to locale files")
+    parser.add_argument("--ci", action="store_true", help="Run in CI mode (reports missing translations but doesn't add them)")
+    parser.add_argument("--quiet", action="store_true", help="Reduce output verbosity")
+    args = parser.parse_args()
+    
+    ci_mode = args.ci
+    quiet_mode = args.quiet
+    
     default_file_path = Path(f"{LOCALES_PATH}/{DEFAULT_LOCALE}")
     if not default_file_path.exists():
         print(f"{RED}Error: Default locale file {DEFAULT_LOCALE} not found!{RESET}")
         sys.exit(1)
 
-    print(f"Using {DEFAULT_LOCALE} as the default locale...")
+    if not quiet_mode:
+        print(f"Using {DEFAULT_LOCALE} as the default locale...")
     default_keys = extract_translation_keys(default_file_path)
-    print(f"Found {len(default_keys)} translation keys in {DEFAULT_LOCALE}")
+    if not quiet_mode:
+        print(f"Found {len(default_keys)} translation keys in {DEFAULT_LOCALE}")
 
     total_added = 0
+    all_missing_keys = []
 
     for locale in NON_DEFAULT_LOCALES:
         target_file_path = Path(f"{LOCALES_PATH}/{locale}")
@@ -183,20 +205,27 @@ def main():
             print(f"{RED}Error: Target locale file {locale} not found!{RESET}")
             continue
 
-        print(f"\nChecking {locale} for missing keys...")
-        total_added += add_missing_keys(default_keys, target_file_path)
+        if not quiet_mode:
+            print(f"\nChecking {locale} for missing keys...")
+        added, missing = add_missing_keys(default_keys, target_file_path, ci_mode, quiet_mode)
+        total_added += added
+        all_missing_keys.extend(missing)
 
-    if total_added > 0:
-        print(
-            f"\n{GREEN}Added a total of {total_added} missing keys across all locale files.{RESET}"
-        )
-        print(
-            f"{YELLOW}NOTE: All added keys have empty string values. Please translate them!{RESET}"
-        )
-    else:
-        print(
-            f"\n{GREEN}All locale files already have all keys from {DEFAULT_LOCALE}.{RESET}"
-        )
+    if not ci_mode:
+        if total_added > 0:
+            print(
+                f"\n{GREEN}Added a total of {total_added} missing keys across all locale files.{RESET}"
+            )
+            print(
+                f"{YELLOW}NOTE: All added keys have empty string values. Please translate them!{RESET}"
+            )
+        else:
+            print(
+                f"\n{GREEN}All locale files already have all keys from {DEFAULT_LOCALE}.{RESET}"
+            )
+    elif all_missing_keys:
+        print(f"\n{RED}Error: Found missing translations in CI mode!{RESET}")
+        sys.exit(1)
 
 
 if __name__ == "__main__":
