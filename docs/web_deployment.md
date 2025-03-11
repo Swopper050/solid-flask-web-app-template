@@ -79,10 +79,12 @@ sudo mkdir -p /var/www/certbot-staging
 ```bash
 mkdir -p ~/certificates
 ```
-4. Add certificates for your domain (staging and production, make sure the subdomains are created and pointing to your VPS first):
+4. Add initial certificates for your domain (staging and production, make sure the subdomains are created and pointing to your VPS first):
 ```bash
-sudo certbot certonly --config-dir ~/certificates --work-dir ~/certificates --logs-dir ~/certificates --webroot -w /var/www/certbot --preferred-challenges http -d my-solid-app.nl -d www.my-solid-app.nl
-sudo certbot certonly --config-dir ~/certificates --work-dir ~/certificates --logs-dir ~/certificates --webroot -w /var/www/certbot --preferred-challenges http -d staging.my-solid-app.nl -d www.staging.my-solid-app.nl
+# Logged in as production user
+sudo certbot certonly --config-dir ~/certificates --work-dir ~/certificates --logs-dir ~/certificates --standalone --preferred-challenges http -d my-solid-app.nl -d www.my-solid-app.nl
+# Logged in as staging user
+sudo certbot certonly --config-dir ~/certificates --work-dir ~/certificates --logs-dir ~/certificates --standalone --preferred-challenges http -d staging.my-solid-app.nl -d www.staging.my-solid-app.nl
 ```
 
 The certificates will be automatically renewed by the certbot containers included in the docker-compose files. The certificates are stored in the user's home directory under 'certificates/' to separate production and staging certificates.
