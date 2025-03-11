@@ -1,4 +1,4 @@
-name:
+name: Lints and Tests
 
 on:
   pull_request:
@@ -30,6 +30,19 @@ jobs:
 
     - name: Lint
       run: cd ui && make lint
+      
+  check-translations:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.10"
+        
+    - name: Check translations
+      run: cd ui && make check_translations
 
   lint-api:
     runs-on: ubuntu-latest

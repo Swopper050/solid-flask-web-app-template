@@ -2,8 +2,8 @@
 
 import re
 import subprocess
-import json
 import sys
+import argparse
 from pathlib import Path
 
 # Configuration
@@ -80,7 +80,22 @@ def is_key_used(key, src_path):
 
 def main():
     """Find unused translation keys in the locale file."""
-    print(f"Checking for unused translation keys in {LOCALE_TO_CHECK}...")
+    parser = argparse.ArgumentParser(
+        description="Find unused translation keys in locale files"
+    )
+    parser.add_argument(
+        "--ci",
+        action="store_true",
+        help="Run in CI mode (fails on unused translations)",
+    )
+    parser.add_argument("--quiet", action="store_true", help="Reduce output verbosity")
+    args = parser.parse_args()
+
+    ci_mode = args.ci
+    quiet_mode = args.quiet
+
+    if not quiet_mode:
+        print(f"Checking for unused translation keys in {LOCALE_TO_CHECK}...")
 
     locale_file_path = Path(f"{LOCALES_PATH}/{LOCALE_TO_CHECK}")
     if not locale_file_path.exists():
@@ -88,20 +103,24 @@ def main():
         sys.exit(1)
 
     keys = extract_translation_keys(locale_file_path)
-    print(f"Found {len(keys)} translation keys in {LOCALE_TO_CHECK}")
+    if not quiet_mode:
+        print(f"Found {len(keys)} translation keys in {LOCALE_TO_CHECK}")
 
     unused_keys = []
     used_keys = []
 
     # Process each key
     for key in keys:
-        print(f"Checking key: {key}... ", end="")
+        if not quiet_mode:
+            print(f"Checking key: {key}... ", end="")
 
         if not is_key_used(key, UI_SRC_PATH):
-            print(f"{RED}UNUSED{RESET}")
+            if not quiet_mode:
+                print(f"{RED}UNUSED{RESET}")
             unused_keys.append(key)
         else:
-            print(f"{GREEN}USED{RESET}")
+            if not quiet_mode:
+                print(f"{GREEN}USED{RESET}")
             used_keys.append(key)
 
     # Print summary
@@ -109,7 +128,9 @@ def main():
     if not unused_keys:
         print(f"{GREEN}No unused translation keys found!{RESET}")
     else:
-        print(f"{YELLOW}Found {len(unused_keys)} unused translation keys:{RESET}")
+        print(
+            f"{RED if ci_mode else YELLOW}Found {len(unused_keys)} unused translation keys:{RESET}"
+        )
         for key in unused_keys:
             print(f"- {key}")
 
@@ -117,17 +138,12 @@ def main():
     print(f"Used keys: {len(used_keys)}")
     print(f"Unused keys: {len(unused_keys)}")
 
-    # Optionally export the results to a JSON file
-    results = {
-        "total_keys": len(keys),
-        "used_keys": used_keys,
-        "unused_keys": unused_keys,
-    }
-
-    with open("unused_translations.json", "w", encoding="utf-8") as f:
-        json.dump(results, f, indent=2)
-
-    print("\nResults exported to ./unused_translations.json")
+    # In CI mode, exit with error if unused keys are found
+    if ci_mode and unused_keys:
+        print(
+            f"{RED}Error: Found {len(unused_keys)} unused translation keys in CI mode!{RESET}"
+        )
+        sys.exit(1)
 
 
 if __name__ == "__main__":
