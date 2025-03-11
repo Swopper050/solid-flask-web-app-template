@@ -9,16 +9,19 @@ import { ChangePasswordModal } from './ChangePasswordModal'
 import { Enable2FAModal } from './Enable2FAModal'
 import { Disable2FAModal } from './Disable2FAModal'
 import { DeleteAccountModal } from './DeleteAccountModal'
+import { createModalState } from '../../components/Modal'
+import { Table, TableRow } from '../../components/Table'
 
 export function UserAccountPage(): JSXElement {
   const { t } = useLocale()
   const { user } = useUser()
 
-  const [openPasswordModal, setOpenPasswordModal] = createSignal(false)
-  const [openDeleteAccountModal, setOpenDeleteAccountModal] =
-    createSignal(false)
-  const [openEnable2FAModal, setOpenEnable2FAModal] = createSignal(false)
-  const [openDisable2FAModal, setOpenDisable2FAModal] = createSignal(false)
+  const [modalState, openModal, closeModal] = createModalState(
+    'password',
+    'enable2FA',
+    'disable2FA',
+    'deleteAcount'
+  )
 
   return (
     <>
@@ -30,55 +33,41 @@ export function UserAccountPage(): JSXElement {
           </p>
         </Show>
 
-        <div>
-          <table class="table table-fixed">
-            <tbody>
-              <tr>
-                <td>{t('email')}</td>
-                <td>{user().email}</td>
-                <td class="text-end">
-                  <VerifyEmailButton />
-                </td>
-              </tr>
-              <tr>
-                <td>{t('password')}</td>
-                <td>*********</td>
-                <td class="text-end">
-                  <p
-                    class="tooltip tooltip-left"
-                    data-tip={t('change_password')}
-                  >
-                    <button
-                      class={clsx('btn btn-ghost btn-sm')}
-                      onClick={() => setOpenPasswordModal(true)}
-                    >
-                      <i class="fa-solid fa-edit text-primary" />
-                    </button>
-                  </p>
-                </td>
-              </tr>
-              <tr>
-                <td>{t('enabled_2fa')}</td>
-                <td>
-                  <p class="text-lg col-span-2">
-                    {user().twoFactorEnabled ? t('yes') : t('no')}
-                  </p>
-                </td>
-                <td class="text-end">
-                  <Toggle2FAButton
-                    enable2FA={() => setOpenEnable2FAModal(true)}
-                    disable2FA={() => setOpenDisable2FAModal(true)}
-                  />
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <Table>
+          <TableRow cells={[t('email'), user().email, <VerifyEmailButton />]} />
+          <TableRow
+            cells={[
+              t('password'),
+              '*******',
+              <p class="tooltip tooltip-left" data-tip={t('change_password')}>
+                <button
+                  class={clsx('btn btn-ghost btn-sm')}
+                  onClick={() => openModal('password')}
+                >
+                  <i class="fa-solid fa-edit text-primary" />
+                </button>
+              </p>,
+            ]}
+          />
+
+          <TableRow
+            cells={[
+              t('enabled_2fa'),
+              <p class="text-lg col-span-2">
+                {user().twoFactorEnabled ? t('yes') : t('no')}
+              </p>,
+              <Toggle2FAButton
+                enable2FA={() => openModal('enable2FA')}
+                disable2FA={() => openModal('disable2FA')}
+              />,
+            ]}
+          />
+        </Table>
 
         <div class="mt-4">
           <button
             class="btn btn-error"
-            onClick={() => setOpenDeleteAccountModal(true)}
+            onClick={() => openModal('deleteAcount')}
           >
             <i class="fa-solid fa-trash" />
             {t('delete_account')}
@@ -86,23 +75,23 @@ export function UserAccountPage(): JSXElement {
         </div>
 
         <ChangePasswordModal
-          isOpen={openPasswordModal()}
-          onClose={() => setOpenPasswordModal(false)}
+          isOpen={modalState().password}
+          onClose={() => closeModal('password')}
         />
 
         <DeleteAccountModal
-          isOpen={openDeleteAccountModal()}
-          onClose={() => setOpenDeleteAccountModal(false)}
+          isOpen={modalState().deleteAcount}
+          onClose={() => closeModal('deleteAcount')}
         />
 
         <Enable2FAModal
-          isOpen={openEnable2FAModal()}
-          onClose={() => setOpenEnable2FAModal(false)}
+          isOpen={modalState().enable2FA}
+          onClose={() => closeModal('enable2FA')}
         />
 
         <Disable2FAModal
-          isOpen={openDisable2FAModal()}
-          onClose={() => setOpenDisable2FAModal(false)}
+          isOpen={modalState().disable2FA}
+          onClose={() => closeModal('disable2FA')}
         />
       </div>
     </>
