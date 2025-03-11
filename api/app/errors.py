@@ -27,7 +27,3 @@ class APIError(Exception):
 
     def to_response(self):
         return jsonify({"error": self.code.value, "message": self.message}), self.status
-
-
-def handle_api_error(error: APIError):
-    return error.to_response()
