@@ -90,10 +90,9 @@ jobs:
 
             docker compose -f docker-compose.staging.yml down
             
-            sudo certbot certonly --config-dir ~/certificates --work-dir ~/certificates --logs-dir ~/certificates \
+            certbot certonly --config-dir ~/certificates --work-dir ~/certificates --logs-dir ~/certificates \
               --standalone --preferred-challenges http \
               -d staging.my-solid-app.nl -d www.staging.my-solid-app.nl
-            sudo chown -R $(whoami):$(whoami) ~/certificates
             
             docker compose -f docker-compose.staging.yml pull
             docker compose -f docker-compose.staging.yml up -d --remove-orphans
