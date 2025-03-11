@@ -89,6 +89,12 @@ jobs:
             export MY_SOLID_APP_FERNET_SECRET_KEY=${{ secrets.MY_SOLID_APP_STAGING_FERNET_SECRET_KEY }}
 
             docker compose -f docker-compose.staging.yml down
+            
+            sudo certbot certonly --config-dir ~/certificates --work-dir ~/certificates --logs-dir ~/certificates \
+              --standalone --preferred-challenges http \
+              -d staging.my-solid-app.nl -d www.staging.my-solid-app.nl
+            sudo chown -R $(whoami):$(whoami) ~/certificates
+            
             docker compose -f docker-compose.staging.yml pull
             docker compose -f docker-compose.staging.yml up -d --remove-orphans
             sleep 10

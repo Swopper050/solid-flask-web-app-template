@@ -67,23 +67,6 @@ services:
         max-size: '5m'
         max-file: '5'
 
-  certbot:
-    image: certbot/certbot:latest
-    container_name: my-solid-app-certbot-staging
-    volumes:
-      - '/home/${MY_SOLID_APP_SERVER_USER}/certificates/:/etc/letsencrypt/'
-      - '/home/${MY_SOLID_APP_SERVER_USER}/certbot/lib-staging:/var/lib/letsencrypt/'
-      - '/home/${MY_SOLID_APP_SERVER_USER}/certbot/www:/var/www/certbot'
-    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew --force-renewal --webroot -w /var/www/certbot; sleep 30s & wait $${!}; done;'"
-    networks:
-      - my-solid-app-network-staging
-    depends_on:
-      - ui
-    logging:
-      driver: 'json-file'
-      options:
-        max-size: '1m'
-        max-file: '3'
 
 networks:
   my-solid-app-network-staging:

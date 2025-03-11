@@ -66,22 +66,26 @@ sudo ufw enable
 ```
 
 ### SSL certificates
+
+#### Initial Setup
 1. Install certbot:
 ```bash
 sudo apt install certbot
 ```
-2. Create directories for certbot webroot:
+
+2. Create necessary directories:
 ```bash
-sudo mkdir -p /var/www/certbot
-sudo mkdir -p /var/www/certbot-staging
+# Production user
+mkdir -p ~/certificates ~/certbot/www ~/certbot/lib
+
+# Staging user
+mkdir -p ~/certificates ~/certbot/www ~/certbot/www-staging ~/certbot/lib-staging
 ```
-3. Create directory for certificates in the user's home directory:
+
+3. Generate initial certificates using standalone mode:
+
+For production (as production user):
 ```bash
-mkdir -p ~/certificates
-```
-4. Add initial certificates for your staging and production domain. Make sure the subdomains are created and pointing to your VPS first). Also make sure you do this before deploying the applications.
-```bash
-# Logged in as production user
 docker run --rm \
   -v /home/mysolidapp/certificates/:/etc/letsencrypt \
   -v /home/mysolidapp/certbot/www:/var/www/certbot \
@@ -90,8 +94,8 @@ docker run --rm \
   --agree-tos --email your@email.nl
 ```
 
+For staging (as staging user):
 ```bash
-# Logged in as staging user
 docker run --rm \
   -v /home/mysolidapp-staging/certificates/:/etc/letsencrypt \
   -v /home/mysolidapp-staging/certbot/www:/var/www/certbot \
@@ -100,7 +104,16 @@ docker run --rm \
   --agree-tos --email your@email.nl
 ```
 
-The certificates will be automatically renewed by the certbot containers included in the docker-compose files. The certificates are stored in the user's home directory under 'certificates/' to separate production and staging certificates.
+4. Fix permissions:
+```bash
+sudo chown -R $(whoami):$(whoami) ~/certificates
+```
+
+#### Certificate Renewal
+- **Production**: Certificates are automatically renewed by the certbot container included in the docker-compose.prod.yml file.
+- **Staging**: Certificates are automatically renewed during each deployment through the CI/CD pipeline. The certbot container has been removed from docker-compose.staging.yml.
+
+The certificates are stored in the user's home directory under 'certificates/' to separate production and staging certificates.
 
 
 ### Allow Github Actions to push and pull docker images
