@@ -4,7 +4,7 @@ import { useUser } from '../../context/UserProvider'
 import { useLocale } from '../../context/LocaleProvider'
 import { clsx } from 'clsx'
 
-import { changePassword } from '../../api'
+import { changePassword, getErrorMessage } from '../../api'
 import {
   clearResponse,
   createForm,
@@ -78,7 +78,7 @@ export function ChangePasswordModal(props: ModalBaseProps): JSXElement {
     if (response.status !== 200) {
       setResponse(changePasswordForm, {
         status: 'error',
-        message: (await response.json()).error_message,
+        message: t(await getErrorMessage(response)),
       })
 
       return

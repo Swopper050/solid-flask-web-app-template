@@ -18,7 +18,7 @@ import {
   SubmitHandler,
 } from '@modular-forms/solid'
 
-import { resetPassword } from '../api'
+import { getErrorMessage, resetPassword } from '../api'
 
 type PasswordResetFormData = {
   password: string
@@ -43,7 +43,7 @@ export function ResetPasswordPage(): JSXElement {
     if (response.status !== 200) {
       setResponse(resetPasswordForm, {
         status: 'error',
-        message: (await response.json()).error_message,
+        message: t(await getErrorMessage(response)),
       })
       return
     }

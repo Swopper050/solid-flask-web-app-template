@@ -1,5 +1,5 @@
 import { JSXElement, Show } from 'solid-js'
-import { disable2FA } from '../../api'
+import { disable2FA, getErrorMessage } from '../../api'
 import { clsx } from 'clsx'
 import { useUser } from '../../context/UserProvider'
 import { useLocale } from '../../context/LocaleProvider'
@@ -34,7 +34,7 @@ export function Disable2FAModal(props: ModalBaseProps): JSXElement {
     if (response.status !== 200) {
       setResponse(totpForm, {
         status: 'error',
-        message: (await response.json()).error_message,
+        message: t(await getErrorMessage(response)),
       })
       return
     }

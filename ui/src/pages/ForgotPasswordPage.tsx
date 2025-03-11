@@ -15,7 +15,7 @@ import {
   SubmitHandler,
 } from '@modular-forms/solid'
 
-import { forgotPassword } from '../api'
+import { forgotPassword, getErrorMessage } from '../api'
 
 type ForgotPasswordFormData = {
   email: string
@@ -35,7 +35,7 @@ export function ForgotPasswordPage(): JSXElement {
     if (response.status !== 200) {
       setResponse(forgotPasswordForm, {
         status: 'error',
-        message: (await response.json()).error_message,
+        message: t(await getErrorMessage(response)),
       })
       return
     }

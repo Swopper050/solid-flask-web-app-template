@@ -24,6 +24,12 @@ formatlint: format lint ## First format code, then run linters
 server: ## Start the development server
 	pnpm run dev
 
+find_unused_translations: ## Finds translation keys in the 'en' locale that are not used in the application
+	python scripts/find_unused_translations.py
+
+add_missing_translations: ## Adds missing translation keys to all locales, based on the default 'en' locale
+	python scripts/add_missing_translations.py
+
 docker_latest: ## Build a docker container and tag it with 'latest'
 	docker build -t $(DOCKERHUB_NAMESPACE)/my-solid-app-ui:latest .
 
