@@ -79,7 +79,7 @@ sudo mkdir -p /var/www/certbot-staging
 ```bash
 mkdir -p ~/certificates
 ```
-4. Add initial certificates for your domain (staging and production, make sure the subdomains are created and pointing to your VPS first):
+4. Add initial certificates for your staging and production domain. Make sure the subdomains are created and pointing to your VPS first). Also make sure you do this before deploying the applications.
 ```bash
 # Logged in as production user
 docker run --rm \
