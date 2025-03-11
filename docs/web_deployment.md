@@ -82,9 +82,22 @@ mkdir -p ~/certificates
 4. Add initial certificates for your domain (staging and production, make sure the subdomains are created and pointing to your VPS first):
 ```bash
 # Logged in as production user
-sudo certbot certonly --config-dir ~/certificates --work-dir ~/certificates --logs-dir ~/certificates --standalone --preferred-challenges http -d my-solid-app.nl -d www.my-solid-app.nl
+docker run --rm \
+  -v /home/mysolidapp/certificates/:/etc/letsencrypt \
+  -v /home/mysolidapp/certbot/www:/var/www/certbot \
+  certbot/certbot certonly --standalone --preferred-challenges http \
+  -d my-solid-app.nl -d www.my-solid-app.nl \
+  --agree-tos --email your@email.nl
+```
+
+```bash
 # Logged in as staging user
-sudo certbot certonly --config-dir ~/certificates --work-dir ~/certificates --logs-dir ~/certificates --standalone --preferred-challenges http -d staging.my-solid-app.nl -d www.staging.my-solid-app.nl
+docker run --rm \
+  -v /home/mysolidapp-staging/certificates/:/etc/letsencrypt \
+  -v /home/mysolidapp-staging/certbot/www:/var/www/certbot \
+  certbot/certbot certonly --standalone --preferred-challenges http \
+  -d staging.my-solid-app.nl -d www.staging.my-solid-app.nl \
+  --agree-tos --email your@email.nl
 ```
 
 The certificates will be automatically renewed by the certbot containers included in the docker-compose files. The certificates are stored in the user's home directory under 'certificates/' to separate production and staging certificates.
