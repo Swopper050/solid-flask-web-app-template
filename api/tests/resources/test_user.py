@@ -97,7 +97,8 @@ class TestUsersAPI:
         )
 
         assert response.status_code == 409
-        assert "already exists" in response.get_json()["error_message"]
+        assert response.get_json()["error"] == 0
+        assert "already exists" in response.get_json()["message"]
 
     def test_create_user_not_admin(self, client, db, logged_in_user):
         # User is logged in but not admin
@@ -130,8 +131,8 @@ class TestUserAPI:
         response = client.delete(f"/user/{nonexistent_id}")
 
         assert response.status_code == 404
-        assert "error_message" in response.get_json()
-        assert f"{nonexistent_id}" in response.get_json()["error_message"]
+        assert response.get_json()["error"] == 12
+        assert f"{nonexistent_id}" in response.get_json()["message"]
 
     def test_delete_user_not_admin(self, client, db, user, logged_in_user):
         # User is logged in but not admin

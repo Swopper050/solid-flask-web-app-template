@@ -23,7 +23,8 @@ class TestGenerate2FASecretAPI:
 
         response = client.get("/generate_2fa_secret")
         assert response.status_code == 400
-        assert response.json == {"error_message": "2FA is already enabled"}
+        assert response.json["error"] == 9
+        assert response.json["message"] == "2FA is already enabled"
 
 
 class TestEnable2FAAPI:
@@ -50,7 +51,8 @@ class TestEnable2FAAPI:
             "/enable_2fa", json={"totp_code": totp.now(), "totp_secret": totp.secret}
         )
         assert response.status_code == 400
-        assert response.json == {"error_message": "2FA is already enabled"}
+        assert response.json["error"] == 9
+        assert response.json["message"] == "2FA is already enabled"
 
     def test_enable_2fa_incorrect_code(self, client, logged_in_user):
         totp = pyotp.TOTP(pyotp.random_base32())
@@ -60,7 +62,8 @@ class TestEnable2FAAPI:
         )
 
         assert response.status_code == 400
-        assert response.json == {"error_message": "Incorrect 2FA code"}
+        assert response.json["error"] == 10
+        assert response.json["message"] == "Incorrect 2FA code"
 
     def test_enable_2fa_not_logged_in(self, db, client, user):
         totp = pyotp.TOTP(pyotp.random_base32())
@@ -94,7 +97,8 @@ class TestDisable2FAAPI:
         response = client.post("/disable_2fa", json={"totp_code": "123456"})
 
         assert response.status_code == 400
-        assert response.json == {"error_message": "2FA is already disabled"}
+        assert response.json["error"] == 11
+        assert response.json["message"] == "2FA is already disabled"
 
     def test_disable_2fa_incorrect_code(self, db, client, logged_in_user):
         totp = pyotp.TOTP(pyotp.random_base32())
@@ -110,8 +114,9 @@ class TestDisable2FAAPI:
             "/disable_2fa", json={"totp_code": f"{int(totp.now()) + 1}"}
         )
 
-        assert response.status_code == 401
-        assert response.json == {"error_message": "Incorrect 2FA code"}
+        assert response.status_code == 400
+        assert response.json["error"] == 10
+        assert response.json["message"] == "Incorrect 2FA code"
         assert logged_in_user.two_factor_enabled
 
     def test_disable_2fa_not_logged_in(self, client, user):
