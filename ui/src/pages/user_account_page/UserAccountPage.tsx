@@ -10,7 +10,7 @@ import { Enable2FAModal } from './Enable2FAModal'
 import { Disable2FAModal } from './Disable2FAModal'
 import { DeleteAccountModal } from './DeleteAccountModal'
 import { createModalState } from '../../components/Modal'
-
+import { Table, TableRow } from '../../components/Table'
 
 export function UserAccountPage(): JSXElement {
   const { t } = useLocale()
@@ -34,15 +34,11 @@ export function UserAccountPage(): JSXElement {
         </Show>
 
         <Table>
+          <TableRow cells={[t('email'), user().email, <VerifyEmailButton />]} />
           <TableRow
-            label={t('email')}
-            value={user().email}
-            button={<VerifyEmailButton />}
-          />
-          <TableRow
-            label={t('password')}
-            value={'*******'}
-            button={
+            cells={[
+              t('password'),
+              '*******',
               <p class="tooltip tooltip-left" data-tip={t('change_password')}>
                 <button
                   class={clsx('btn btn-ghost btn-sm')}
@@ -50,22 +46,21 @@ export function UserAccountPage(): JSXElement {
                 >
                   <i class="fa-solid fa-edit text-primary" />
                 </button>
-              </p>
-            }
+              </p>,
+            ]}
           />
+
           <TableRow
-            label={t('enabled_2fa')}
-            value={
+            cells={[
+              t('enabled_2fa'),
               <p class="text-lg col-span-2">
                 {user().twoFactorEnabled ? t('yes') : t('no')}
-              </p>
-            }
-            button={
+              </p>,
               <Toggle2FAButton
                 enable2FA={() => openModal('enable2FA')}
                 disable2FA={() => openModal('disable2FA')}
-              />
-            }
+              />,
+            ]}
           />
         </Table>
 
@@ -103,29 +98,6 @@ export function UserAccountPage(): JSXElement {
   )
 }
 
-function TableRow(props: {
-  label: string
-  value: JSXElement | string
-  button?: JSXElement
-}): JSXElement {
-  return (
-    <tr>
-      <td>{props.label}</td>
-      <td>{props.value}</td>
-      <td class="text-end">{props.button}</td>
-    </tr>
-  )
-}
-
-function Table(props: { children: JSXElement[] }): JSXElement {
-  return (
-    <div>
-      <table class="table table-fixed">
-        <tbody>{props.children}</tbody>
-      </table>
-    </div>
-  )
-}
 
 function VerifyEmailButton(): JSXElement {
   const { t } = useLocale()
