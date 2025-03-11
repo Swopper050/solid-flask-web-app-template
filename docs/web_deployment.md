@@ -86,22 +86,16 @@ mkdir -p ~/certificates ~/certbot/www ~/certbot/www-staging ~/certbot/lib-stagin
 
 For production (as production user):
 ```bash
-docker run --rm \
-  -v /home/mysolidapp/certificates/:/etc/letsencrypt \
-  -v /home/mysolidapp/certbot/www:/var/www/certbot \
-  certbot/certbot certonly --standalone --preferred-challenges http \
-  -d my-solid-app.nl -d www.my-solid-app.nl \
-  --agree-tos --email your@email.nl
+certbot certonly --config-dir ~/certificates --work-dir ~/certificates --logs-dir ~/certificates \
+  --standalone --preferred-challenges http \
+  -d my-solid-app.nl -d www.my-solid-app.nl
 ```
 
 For staging (as staging user):
 ```bash
-docker run --rm \
-  -v /home/mysolidapp-staging/certificates/:/etc/letsencrypt \
-  -v /home/mysolidapp-staging/certbot/www:/var/www/certbot \
-  certbot/certbot certonly --standalone --preferred-challenges http \
-  -d staging.my-solid-app.nl -d www.staging.my-solid-app.nl \
-  --agree-tos --email your@email.nl
+certbot certonly --config-dir ~/certificates --work-dir ~/certificates --logs-dir ~/certificates \
+  --standalone --preferred-challenges http \
+  -d staging.my-solid-app.nl -d www.staging.my-solid-app.nl
 ```
 
 4. Fix permissions:
@@ -111,9 +105,9 @@ sudo chown -R $(whoami):$(whoami) ~/certificates
 
 #### Certificate Renewal
 - **Production**: Certificates are automatically renewed by the certbot container included in the docker-compose.prod.yml file.
-- **Staging**: Certificates are automatically renewed during each deployment through the CI/CD pipeline. The certbot container has been removed from docker-compose.staging.yml.
+- **Staging**: Certificates are **not** automatically renewed when running on 1 VPS. This is because port 80 is already in use by the production application.
 
-The certificates are stored in the user's home directory under 'certificates/' to separate production and staging certificates.
+The certificates are stored in the user's home directory under 'certificates/'.
 
 
 ### Allow Github Actions to push and pull docker images
