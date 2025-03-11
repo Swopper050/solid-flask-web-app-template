@@ -8,7 +8,7 @@ import { createUser, getUsers, deleteUser } from '../../api'
 
 import { BooleanInput } from '../../components/BooleanInput'
 import { TextInput } from '../../components/TextInput'
-import { Modal, ModalBaseProps } from '../../components/Modal'
+import { createModalState, Modal, ModalBaseProps } from '../../components/Modal'
 
 import { useLocale } from '../../context/LocaleProvider'
 
@@ -23,6 +23,8 @@ import {
   setResponse,
   SubmitHandler,
 } from '@modular-forms/solid'
+import { Table, TableRow } from '../../components/Table'
+import { Tooltip } from '../../components/Tooltip'
 
 export function UsersAdmin(): JSXElement {
   const { t } = useLocale()
@@ -35,8 +37,11 @@ export function UsersAdmin(): JSXElement {
   const [selectedUser, setSelectedUser] = createSignal<UserAttributes | null>(
     null
   )
-  const [showDeleteUserModal, setShowDeleteUserModal] = createSignal(false)
-  const [showCreateUserModal, setShowCreateUserModal] = createSignal(false)
+
+  const [modalState, openModal, closeModal] = createModalState(
+    'deleteUser',
+    'createUser'
+  )
 
   const onPageChange = (newPage: number) => {
     setPage(newPage)
@@ -45,7 +50,48 @@ export function UsersAdmin(): JSXElement {
 
   const handleDelete = (user: UserAttributes | null) => {
     setSelectedUser(user)
-    setShowDeleteUserModal(true)
+    openModal('deleteUser')
+  }
+
+  const UserEmail = (props: { user: UserAttributes }): JSXElement => {
+    return (
+      <>
+        {props.user.email}
+        <Show when={props.user.is_admin}>
+          <Tooltip text={t('this_user_is_an_admin')}>
+            <i class="fa-solid fa-screwdriver-wrench text-success ml-2" />
+          </Tooltip>
+        </Show>
+      </>
+    )
+  }
+
+  const IsVerified = (props: { user: UserAttributes }): JSXElement => {
+    return (
+      <Show
+        when={props.user.is_verified}
+        fallback={
+          <Tooltip text={t('this_user_has_not_been_verified_yet')}>
+            <i class="fa-solid fa-triangle-exclamation text-warning" />
+          </Tooltip>
+        }
+      >
+        <Tooltip text={t('this_user_has_been_verified')}>
+          <i class="fa-solid fa-check text-success" />
+        </Tooltip>
+      </Show>
+    )
+  }
+
+  const DeleteUserButton = (props: { user: UserAttributes }): JSXElement => {
+    return (
+      <button
+        class="btn btn-ghost btn-sm mx-1"
+        onClick={() => handleDelete(props.user)}
+      >
+        <i class="fa-solid fa-trash text-error" />
+      </button>
+    )
   }
 
   return (
@@ -59,109 +105,66 @@ export function UsersAdmin(): JSXElement {
           refetch={onPageChange}
         />
       </div>
-
-      <div class="overflow-x-auto m-4">
-        <table class="table w-full">
-          <thead>
-            <tr>
-              <th class="w-1/12">{t('id')}</th>
-              <th class="w-2/12">{t('email')}</th>
-              <th class="w-5/12">{t('verified')}</th>
-              <th class="text-right w-3/12">
-                <button
-                  class="btn btn-primary btn-sm"
-                  onClick={() => setShowCreateUserModal(true)}
-                >
-                  <i class="fa-solid fa-plus" />
-                  {t('create_new_user')}
-                </button>
-              </th>
-            </tr>
-          </thead>
-
-          <tbody>
-            <Show when={!users.loading && !users.error}>
-              <For each={users().items}>
-                {(user) => {
-                  return (
-                    <tr>
-                      <td>{user.id}</td>
-                      <td>
-                        {user.email}
-                        <Show when={user.is_admin}>
-                          <span
-                            class="tooltip tooltip-right"
-                            data-tip={t('this_user_is_an_admin')}
-                          >
-                            <i class="fa-solid fa-screwdriver-wrench text-success ml-2" />
-                          </span>
-                        </Show>
-                      </td>
-                      <td>
-                        <Show
-                          when={user.is_verified}
-                          fallback={
-                            <span
-                              class="tooltip tooltip-right"
-                              data-tip={t(
-                                'this_user_has_not_been_verified_yet'
-                              )}
-                            >
-                              <i class="fa-solid fa-triangle-exclamation text-warning" />
-                            </span>
-                          }
-                        >
-                          <span
-                            class="tooltip tooltip-right"
-                            data-tip={t('this_user_has_been_verified')}
-                          >
-                            <i class="fa-solid fa-check text-success" />
-                          </span>
-                        </Show>
-                      </td>
-                      <td class="text-right">
-                        <button
-                          class="btn btn-ghost btn-sm mx-1"
-                          onClick={() => handleDelete(user)}
-                        >
-                          <i class="fa-solid fa-trash text-error" />
-                        </button>
-                      </td>
-                    </tr>
-                  )
-                }}
-              </For>
-            </Show>
-          </tbody>
-        </table>
-
-        <Show when={users.loading}>
-          <div class="flex justify-center mt-8 w-full">
-            <span class="loading loading-ball loading-xl" />
-          </div>
+      <Table
+        headers={[
+          t('id'),
+          t('email'),
+          t('verified'),
+          <button
+            class="btn btn-primary btn-sm"
+            onClick={() => openModal('createUser')}
+          >
+            <i class="fa-solid fa-plus" />
+            {t('create_new_user')}
+          </button>,
+        ]}
+      >
+        <Show when={!users.loading && !users.error}>
+          <For each={users().items}>
+            {(user) => {
+              return (
+                <>
+                  <TableRow
+                    cells={[
+                      user.id,
+                      <UserEmail user={user} />,
+                      <IsVerified user={user} />,
+                      <DeleteUserButton user={user} />,
+                    ]}
+                  />
+                </>
+              )
+            }}
+          </For>
         </Show>
+      </Table>
 
-        <Show when={users.error}>
-          <div class="flex justify-center items-center mt-8 w-full">
-            <Alert
-              type="error"
-              message={t('error_loading_users')}
-              extraClasses="w-80"
-            />
-          </div>
-        </Show>
-      </div>
+      <Show when={users.loading}>
+        <div class="flex justify-center mt-8 w-full">
+          <span class="loading loading-ball loading-xl" />
+        </div>
+      </Show>
+
+      <Show when={users.error}>
+        <div class="flex justify-center items-center mt-8 w-full">
+          <Alert
+            type="error"
+            message={t('error_loading_users')}
+            extraClasses="w-80"
+          />
+        </div>
+      </Show>
 
       <CreateUserModal
-        isOpen={showCreateUserModal()}
-        onClose={() => setShowCreateUserModal(false)}
+        isOpen={modalState().createUser}
+        onClose={() => closeModal('createUser')}
         onCreate={refetch}
       />
 
       {selectedUser() !== null && (
         <DeleteUserModal
-          isOpen={showDeleteUserModal()}
-          onClose={() => setShowDeleteUserModal(false)}
+          isOpen={modalState().deleteUser}
+          onClose={() => closeModal('deleteUser')}
           user={selectedUser()}
           onDelete={() => {
             refetch()
