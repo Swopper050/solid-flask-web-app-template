@@ -1,5 +1,6 @@
 export const dict = {
   a_puppy: 'A puppy!',
+  niet_gebruikt: 'not_used',
   account: 'Account',
   admin_panel: 'Admin panel',
   an_account_with_this_email_already_exists:
