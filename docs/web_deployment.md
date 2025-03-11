@@ -70,11 +70,22 @@ sudo ufw enable
 ```bash
 sudo apt install certbot
 ```
-2. Add certificates for your domain (staging and production, make sure the subdomains are created and pointing to your VPS first):
+2. Create directories for certbot webroot:
 ```bash
-sudo certbot certonly --standalone --preferred-challenges http -d my-solid-app.nl -d www.my-solid-app.nl
-sudo certbot certonly --standalone --preferred-challenges http -d staging.my-solid-app.nl -d www.staging.my-solid-app.nl
+sudo mkdir -p /var/www/certbot
+sudo mkdir -p /var/www/certbot-staging
 ```
+3. Create directory for certificates in the user's home directory:
+```bash
+mkdir -p ~/certificates
+```
+4. Add certificates for your domain (staging and production, make sure the subdomains are created and pointing to your VPS first):
+```bash
+sudo certbot certonly --config-dir ~/certificates --work-dir ~/certificates --logs-dir ~/certificates --webroot -w /var/www/certbot --preferred-challenges http -d my-solid-app.nl -d www.my-solid-app.nl
+sudo certbot certonly --config-dir ~/certificates --work-dir ~/certificates --logs-dir ~/certificates --webroot -w /var/www/certbot --preferred-challenges http -d staging.my-solid-app.nl -d www.staging.my-solid-app.nl
+```
+
+The certificates will be automatically renewed by the certbot containers included in the docker-compose files. The certificates are stored in the user's home directory under 'certificates/' to separate production and staging certificates.
 
 
 ### Allow Github Actions to push and pull docker images
