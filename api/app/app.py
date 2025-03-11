@@ -15,7 +15,7 @@ def create_app(config_object: DevConfig | ProdConfig | TestConfig = ProdConfig()
     migrate.init_app(app, db)
     mail.init_app(app)
 
-    @app.errorhandler(APIError)
+    @api.errorhandler(APIError)
     def handle_api_error(error):
         return error.to_response()
 

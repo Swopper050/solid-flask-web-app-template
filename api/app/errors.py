@@ -1,7 +1,5 @@
 from enum import IntEnum
 
-from flask import jsonify
-
 
 class APIErrorEnum(IntEnum):
     email_already_exists = 0
@@ -26,4 +24,4 @@ class APIError(Exception):
         self.status = status
 
     def to_response(self):
-        return jsonify({"error": self.code.value, "message": self.message}), self.status
+        return {"error": self.code.value, "message": self.message}, self.status
