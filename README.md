@@ -77,4 +77,4 @@ Now you can visit the local web application at http://localhost:5173
 ## Deployment
 This project currently supports deployment onto a single VPS, i.e. frontend, backend and database all running on that VPS, for both staging and production. For more information on how to do this, see the [deployment docs](docs/web_deployment.md).
 
-You can visit the running staging and production version of this application at [](https://my-solid-app.nl) and [](https://staging.my-solid-app.nl:8443).
+You can visit the running staging and production version of this application at [https://my-solid-app.nl](https://my-solid-app.nl) and [https://staging.my-solid-app.nl:8443](https://staging.my-solid-app.nl:8443).
