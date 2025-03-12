@@ -7,6 +7,7 @@ A full stack template for an app and web application with backend. The repositor
    - ✅ User email verification
    - 🌗 Dark theme support
    - 📜 Support for translations, and easily add your own language
+   - 🧱 Lots of out-of-the-box components to use
    - 📝 Code formatting with [ESLint](https://eslint.org/) and [Prettier](https://prettier.io/)
  - 🗄️ A backend built in [Python](https://www.python.org/) with [Flask](https://flask.palletsprojects.com/en/3.0.x/) and [SQLAlchemy](https://www.sqlalchemy.org/):
    - 🧍 User login management with cookies using [Flask-Login](https://flask-login.readthedocs.io/en/latest/)
@@ -37,10 +38,20 @@ In order to run the project locally you need to:
   * [Install Python 3.12](https://www.python.org/downloads/)
   * [Install docker](https://docs.docker.com/engine/install/) together with [docker compose](https://docs.docker.com/compose/)
 
+In order to replace all instances and variants of 'My solid app', 'MySolidApp', 'my-solid-app', 'my_solid_app', 'mysolidapp' and 'MY_SOLID_APP', run the following commands:
+```bash
+find . -type f -name "*" -not -path "ui/node_modules/*" -not -path "api/.env/*" -exec sed -i 's/My\ solid\ app/Your\ app/g' {} \;
+find . -type f -name "*" -not -path "ui/node_modules/*" -not -path "api/.env/*" -exec sed -i 's/MySolidApp/YourApp/g' {} \;
+find . -type f -name "*" -not -path "ui/node_modules/*" -not -path "api/.env/*" -exec sed -i 's/my-solid-app/your-app/g' {} \;
+find . -type f -name "*" -not -path "ui/node_modules/*" -not -path "api/.env/*" -exec sed -i 's/my_solid_app/your_app/g' {} \;
+find . -type f -name "*" -not -path "ui/node_modules/*" -not -path "api/.env/*" -exec sed -i 's/mysolidapp/yourapp/g' {} \;
+find . -type f -name "*" -not -path "ui/node_modules/*" -not -path "api/.env/*" -exec sed -i 's/MY_SOLID_APP/YOUR_APP/g' {} \;
+```
+
 When you have all of this installed, setup all docker services:
 
 ```bash
-cd solid-flask-web-app-template/
+cd solid-flask-web-app-template/  # Or your folder
 make docker_up
 ```
 
@@ -64,4 +75,6 @@ Now you can visit the local web application at http://localhost:5173
 
 
 ## Deployment
-This project currently supports deployment onto a single VPS (frontend, backend and database all running on that VPS). For more information on how to do this, see the [deployment docs](docs/web_deployment.md).
+This project currently supports deployment onto a single VPS, i.e. frontend, backend and database all running on that VPS, for both staging and production. For more information on how to do this, see the [deployment docs](docs/web_deployment.md).
+
+You can visit the running staging and production version of this application at [](https://my-solid-app.nl) and [](https://staging.my-solid-app.nl:8443).
