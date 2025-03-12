@@ -16,6 +16,7 @@ import {
 } from '@modular-forms/solid'
 
 import { forgotPassword, getErrorMessage } from '../api'
+import { Button } from '../components/Button'
 
 type ForgotPasswordFormData = {
   email: string
@@ -101,20 +102,16 @@ export function ForgotPasswordPage(): JSXElement {
                 {t('back_to_home')}
               </A>
 
-              <button
+              <Button
+                type="submit"
+                isLoading={forgotPasswordForm.submitting}
                 class={clsx(
-                  'btn btn-primary ml-4',
-                  (forgotPasswordForm.response.status === 'success' ||
-                    forgotPasswordForm.submitting) &&
+                  forgotPasswordForm.response.status === 'success' &&
                     'btn-disabled'
                 )}
-                type="submit"
               >
                 {t('send_reset_email')}
-                <Show when={forgotPasswordForm.submitting}>
-                  <span class="loading loading-ball" />
-                </Show>
-              </button>
+              </Button>
             </div>
           </ForgotPassword.Form>
         </div>

@@ -11,6 +11,7 @@ import { Disable2FAModal } from './Disable2FAModal'
 import { DeleteAccountModal } from './DeleteAccountModal'
 import { createModalState } from '../../components/Modal'
 import { Table, TableRow } from '../../components/Table'
+import { Button } from '../../components/Button'
 
 export function UserAccountPage(): JSXElement {
   const { t } = useLocale()
@@ -65,13 +66,10 @@ export function UserAccountPage(): JSXElement {
         </Table>
 
         <div class="mt-4">
-          <button
-            class="btn btn-error"
-            onClick={() => openModal('deleteAcount')}
-          >
+          <Button onClick={() => openModal('deleteAcount')} variant="error">
             <i class="fa-solid fa-trash" />
             {t('delete_account')}
-          </button>
+          </Button>
         </div>
 
         <ChangePasswordModal
