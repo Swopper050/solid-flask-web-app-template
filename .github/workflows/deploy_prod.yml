@@ -95,3 +95,5 @@ jobs:
             docker compose -f docker-compose.prod.yml up -d --remove-orphans
             sleep 10
             docker compose -f docker-compose.prod.yml run api make db_upgrade
+            sleep 5
+            docker image prune -af
