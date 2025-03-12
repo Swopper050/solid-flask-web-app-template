@@ -1,5 +1,5 @@
 import { JSXElement, createSignal, Show } from 'solid-js'
-import { useNavigate, Link } from '@solidjs/router'
+import { useNavigate, A } from '@solidjs/router'
 import { clsx } from 'clsx'
 
 import {
@@ -147,12 +147,12 @@ export function LoginModal(props: ModalBaseProps): JSXElement {
         </Show>
 
         <Show when={!at2FAStep()}>
-          <Link
+          <A
             class="flex justify-center text-primary mt-4"
             href="/forgot-password"
           >
             {t('forgot_password')}
-          </Link>
+          </A>
 
           <div class="modal-action">
             <button
