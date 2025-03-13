@@ -20,8 +20,6 @@ class User(db.Model, UserMixin):
     is_admin: Mapped[bool] = mapped_column(default=False)
     hashed_password: Mapped[str] = mapped_column(String(256))
 
-    wolla: Mapped[str | None] = mapped_column(String(256), nullable=True)
-
     password_reset_token: Mapped[str | None] = mapped_column(String(256), nullable=True)
     password_reset_time: Mapped[int | None] = mapped_column(nullable=True)
 

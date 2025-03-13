@@ -69,7 +69,7 @@ database:  ## Creates an empty database
 fixtures: ## Adds initial fixtures to the database
 	python scripts/add_fixtures.py
 
-migrate: ## Create database migration
+migrate: database db_upgrade ## Create database migration
 	flask --app server db migrate
 
 db_downgrade: ## Downgrade database
