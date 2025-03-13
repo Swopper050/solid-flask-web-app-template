@@ -90,15 +90,10 @@ jobs:
     - name: Check for unmigrated changes
       run: |
         cd api
-        # Apply current migrations to get the database to the latest known state
         make db_upgrade
-        
-        # Try to create a new migration and check if it's empty
         make migrate
-        
-        # Check if a real migration was created (non-empty migration)
         if grep -q "op\." migrations/versions/$(ls -t migrations/versions/ | head -n 1); then
-          echo "::error::Database model changes detected without corresponding migration. Please run 'cd api && make migrate' to create the required migration."
+          echo "::error::Database model changes detected without corresponding migration. Please use 'make migrate' to create the required migration."
           exit 1
         fi
 
