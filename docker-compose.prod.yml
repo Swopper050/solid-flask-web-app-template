@@ -74,7 +74,7 @@ services:
       - '/var/www/certbot:/var/www/certbot'
       - '/var/lib/letsencrypt/:/var/lib/letsencrypt/'
       - '/etc/letsencrypt/:/etc/letsencrypt/'
-    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew --webroot -w /var/www/certbot --quiet; sleep 12h & wait $${!}; done;'"
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew --webroot -w /var/www/certbot -v; sleep 12h & wait $${!}; done;'"
     networks:
       - my-solid-app-network
     logging:

@@ -62,6 +62,40 @@ jobs:
 
     - name: Tests
       run: cd api && make test
+      
+  check-migrations:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: my_solid_app_db_root_password
+          MYSQL_DATABASE: my_solid_app_db
+          MYSQL_USER: my_solid_app_user
+          MYSQL_PASSWORD: my_solid_app_password
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup python
+      uses: actions/setup-python@v5
+      with:
+        python-version: 3.13
+
+    - name: Install dependencies
+      run: cd api && make deps
+
+    - name: Check for unmigrated changes
+      run: |
+        cd api
+        make db_upgrade
+        make migrate
+        if grep -q "op\." migrations/versions/$(ls -t migrations/versions/ | head -n 1); then
+          echo "::error::Database model changes detected without corresponding migration. Please use 'make migrate' to create the required migration."
+          exit 1
+        fi
 
   check-translations:
     runs-on: ubuntu-latest
