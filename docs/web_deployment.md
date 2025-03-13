@@ -82,25 +82,22 @@ mkdir -p ~/certificates ~/certbot/www ~/certbot/lib
 mkdir -p ~/certificates ~/certbot/www ~/certbot/www-staging ~/certbot/lib-staging
 ```
 
-3. Generate initial certificates using standalone mode:
+3. Generate initial certificates using standalone mode and fix permissions:
 
 For production (as production user):
 ```bash
-certbot certonly --config-dir ~/certificates --work-dir ~/certificates --logs-dir ~/certificates \
+sudo certbot certonly --config-dir ~/certificates --work-dir ~/certificates --logs-dir ~/certificates \
   --standalone --preferred-challenges http \
   -d my-solid-app.nl -d www.my-solid-app.nl
+sudo chown -R mysolidapp:mysolidapp certificates/
 ```
 
 For staging (as staging user):
 ```bash
-certbot certonly --config-dir ~/certificates --work-dir ~/certificates --logs-dir ~/certificates \
+sudo certbot certonly --config-dir ~/certificates --work-dir ~/certificates --logs-dir ~/certificates \
   --standalone --preferred-challenges http \
   -d staging.my-solid-app.nl -d www.staging.my-solid-app.nl
-```
-
-4. Fix permissions:
-```bash
-sudo chown -R $(whoami):$(whoami) ~/certificates
+sudo chown -R mysolidapp-staging:mysolidapp-staging certificates/
 ```
 
 #### Certificate Renewal
