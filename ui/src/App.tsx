@@ -1,14 +1,9 @@
-import type { Component } from 'solid-js'
-import { useRoutes } from '@solidjs/router'
+import type { ParentProps } from 'solid-js'
 
-import { routes } from './routes'
-
-const App: Component = () => {
-  const Route = useRoutes(routes)
-
+const App = (props: ParentProps) => {
   return (
     <main>
-      <Route />
+      {props.children}
     </main>
   )
 }
