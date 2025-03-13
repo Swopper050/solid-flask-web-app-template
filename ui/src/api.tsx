@@ -11,7 +11,6 @@ export async function getErrorMessage(
   response: Response
 ): Promise<keyof TranslationKeys> {
   const errorData: ErrorData = await response.json()
-  console.log(errorData.error)
   return errorMessages[errorData.error] || 'an_unknown_error_occurred'
 }
 

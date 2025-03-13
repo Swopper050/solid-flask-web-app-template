@@ -2,7 +2,6 @@ import { User, UserAttributes } from '../../models/User'
 import { createEffect, JSXElement, Show } from 'solid-js'
 import { useUser } from '../../context/UserProvider'
 import { useLocale } from '../../context/LocaleProvider'
-import { clsx } from 'clsx'
 
 import { changePassword, getErrorMessage } from '../../api'
 import {
@@ -20,6 +19,7 @@ import {
 import { Alert } from '../../components/Alert'
 import { TextInput } from '../../components/TextInput'
 import { Modal, ModalBaseProps } from '../../components/Modal'
+import { Button } from '../../components/Button'
 
 type ChangePasswordFormData = {
   currentPassword: string
@@ -158,18 +158,9 @@ export function ChangePasswordModal(props: ModalBaseProps): JSXElement {
         </Show>
 
         <div class="modal-action">
-          <button
-            class={clsx(
-              'btn btn-primary',
-              changePasswordForm.submitting && 'btn-disabled'
-            )}
-            type="submit"
-          >
+          <Button type="submit" isLoading={changePasswordForm.submitting}>
             {t('change_password')}
-            <Show when={changePasswordForm.submitting}>
-              <span class="loading loading-ball" />
-            </Show>
-          </button>
+          </Button>
         </div>
       </Form>
     </Modal>

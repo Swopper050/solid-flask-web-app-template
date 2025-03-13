@@ -1,12 +1,10 @@
-# My Solid App UI
+# Solid.js Web Application UI
 
+This is the UI for the Solid.js Flask web application template.
 
+## Installation
 
-### Components
-
- - Alert components
- - Toast components
- - Routes
- - Forms
- - Modals
- - Language translations
+```bash
+make deps
+make server
+```

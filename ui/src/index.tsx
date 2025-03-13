@@ -1,10 +1,9 @@
-/* @refresh reload */
 import './index.css'
 
-import { Suspense } from 'solid-js'
+import { Suspense, type ParentProps, For } from 'solid-js'
 import { render } from 'solid-js/web'
-import { Router } from '@solidjs/router'
-import App from './App'
+import { Router, Route } from '@solidjs/router'
+import { routes } from './routes'
 import { UserProvider } from './context/UserProvider'
 import { LocaleProvider } from './context/LocaleProvider'
 
@@ -16,16 +15,20 @@ if (import.meta.env.DEV && !(root instanceof HTMLElement)) {
   )
 }
 
+const RootLayout = (props: ParentProps) => (
+  <UserProvider>
+    <LocaleProvider>
+      <Suspense>{props.children}</Suspense>
+    </LocaleProvider>
+  </UserProvider>
+)
+
 render(
   () => (
-    <Router>
-      <UserProvider>
-        <LocaleProvider>
-          <Suspense>
-            <App />
-          </Suspense>
-        </LocaleProvider>
-      </UserProvider>
+    <Router root={RootLayout}>
+      <For each={routes}>
+        {(route) => <Route path={route.path} component={route.component} />}
+      </For>
     </Router>
   ),
   root

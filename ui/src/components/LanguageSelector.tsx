@@ -17,7 +17,7 @@ export function LanguageSelector(): JSXElement {
         {countryCodeToFlag(locale())}
       </summary>
 
-      <ul class="menu dropdown-content bg-base-100 rounded-box shadow z-[100]">
+      <ul class="menu dropdown-content bg-base-100 rounded-box shadow-sm z-100">
         <For each={locales}>
           {(language) => (
             <li>

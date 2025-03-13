@@ -1,6 +1,5 @@
 import { createSignal, onMount, JSXElement, Show } from 'solid-js'
 import { enable2FA, generate2FASecret, getErrorMessage } from '../../api'
-import { clsx } from 'clsx'
 import { useUser } from '../../context/UserProvider'
 import { useLocale } from '../../context/LocaleProvider'
 
@@ -17,6 +16,7 @@ import {
 import { Alert } from '../../components/Alert'
 import { Modal, ModalBaseProps } from '../../components/Modal'
 import { TextInput } from '../../components/TextInput'
+import { Button } from '../../components/Button'
 
 type TotpFormData = {
   totpCode: string
@@ -130,18 +130,9 @@ export function Enable2FAModal(props: ModalBaseProps): JSXElement {
           </Show>
 
           <div class="modal-action">
-            <button
-              class={clsx(
-                'btn btn-primary',
-                totpForm.submitting && 'btn-disabled'
-              )}
-              type="submit"
-            >
+            <Button type="submit" isLoading={totpForm.submitting}>
               {t('enable_2fa')}
-              <Show when={totpForm.submitting}>
-                <span class="loading loading-ball" />
-              </Show>
-            </button>
+            </Button>
           </div>
         </Totp.Form>
       </div>
