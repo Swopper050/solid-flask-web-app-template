@@ -15,7 +15,7 @@ export function LandingPage(): JSXElement {
       <div class="flex justify-center mt-40">
         <h1 class="text-4xl font-bold">
           {t('this_is')}
-          <span class="text-transparent bg-clip-text bg-gradient-to-tr from-primary to-secondary">
+          <span class="text-transparent bg-clip-text bg-linear-to-tr from-primary to-secondary">
             {t('your')}
           </span>
           {t('web_application')}

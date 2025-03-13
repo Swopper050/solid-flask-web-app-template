@@ -23,7 +23,7 @@ export function TextInput(props: TextInputProps) {
       <label
         for={props.name}
         class={clsx(
-          'input input-bordered flex items-center mt-4',
+          'input input-bordered flex items-center mt-4 w-full',
           props.error !== '' && 'input-error'
         )}
       >

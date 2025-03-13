@@ -113,7 +113,7 @@ function VerifyEmailButton(): JSXElement {
       when={user().isVerified}
       fallback={
         <div class="flex items-center">
-          <p class="flex-grow" />
+          <p class="grow" />
           <p
             class="tooltip tooltip-left"
             data-tip={t('your_email_is_not_verified_yet')}

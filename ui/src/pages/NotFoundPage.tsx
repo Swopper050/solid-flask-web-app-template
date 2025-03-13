@@ -20,7 +20,7 @@ export function NotFoundPage(): JSXElement {
       <div class="flex justify-center items-center mt-10">
         <h1 class="text-3xl text-center font-bold">
           {t('here_is_a_picture_of_a')}
-          <span class="text-transparent bg-clip-text bg-gradient-to-tr from-primary to-secondary">
+          <span class="text-transparent bg-clip-text bg-linear-to-tr from-primary to-secondary">
             {t('puppy')}
           </span>
         </h1>
