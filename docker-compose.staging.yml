@@ -3,7 +3,8 @@ services:
     image: $DOCKERHUB_NAMESPACE/my-solid-app-ui:latest
     container_name: my-solid-app-ui-staging
     volumes:
-      - '/home/${MY_SOLID_APP_SERVER_USER}/certificates/:/etc/letsencrypt/'
+      - '/var/www/certbot:/var/www/certbot'
+      - '/etc/letsencrypt/:/etc/letsencrypt/'
       - '/home/${MY_SOLID_APP_SERVER_USER}/nginx.staging.conf:/etc/nginx/conf.d/default.conf:ro'
     ports:
       - '8080:80'
