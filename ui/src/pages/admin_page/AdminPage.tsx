@@ -25,7 +25,7 @@ export function AdminPage(): JSXElement {
         </a>
       </div>
 
-      <div class="flex-grow overflow-hidden">
+      <div class="grow overflow-hidden">
         <Switch>
           <Match when={tab() === 'users'}>
             <UsersAdmin />

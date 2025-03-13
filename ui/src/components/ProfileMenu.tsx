@@ -39,7 +39,7 @@ export function ProfileMenu(): JSXElement {
         <i class="fa-solid fa-ellipsis" />
       </summary>
 
-      <ul class="menu dropdown-content bg-base-200 w-40 rounded-box z-[100]">
+      <ul class="menu dropdown-content bg-base-200 w-40 rounded-box z-100">
         <li>
           <A class="btn btn-ghost justify-start" href="/account">
             <i class="fa-regular fa-address-card" />
