@@ -66,26 +66,45 @@ sudo ufw enable
 ```
 
 ### SSL certificates
+
+#### Initial Setup
 1. Install certbot:
 ```bash
 sudo apt install certbot
 ```
-2. Create directories for certbot webroot:
+
+2. Create necessary directories:
 ```bash
-sudo mkdir -p /var/www/certbot
-sudo mkdir -p /var/www/certbot-staging
-```
-3. Create directory for certificates in the user's home directory:
-```bash
-mkdir -p ~/certificates
-```
-4. Add certificates for your domain (staging and production, make sure the subdomains are created and pointing to your VPS first):
-```bash
-sudo certbot certonly --config-dir ~/certificates --work-dir ~/certificates --logs-dir ~/certificates --webroot -w /var/www/certbot --preferred-challenges http -d my-solid-app.nl -d www.my-solid-app.nl
-sudo certbot certonly --config-dir ~/certificates --work-dir ~/certificates --logs-dir ~/certificates --webroot -w /var/www/certbot --preferred-challenges http -d staging.my-solid-app.nl -d www.staging.my-solid-app.nl
+# Production user
+mkdir -p ~/certificates ~/certbot/www ~/certbot/lib
+
+# Staging user
+mkdir -p ~/certificates ~/certbot/www ~/certbot/www-staging ~/certbot/lib-staging
 ```
 
-The certificates will be automatically renewed by the certbot containers included in the docker-compose files. The certificates are stored in the user's home directory under 'certificates/' to separate production and staging certificates.
+3. Generate initial certificates using standalone mode and fix permissions:
+
+For production (as production user):
+```bash
+sudo certbot certonly --config-dir ~/certificates --work-dir ~/certificates --logs-dir ~/certificates \
+  --standalone --preferred-challenges http \
+  -d my-solid-app.nl -d www.my-solid-app.nl
+sudo chown -R mysolidapp:mysolidapp certificates/
+```
+
+For staging (as staging user):
+```bash
+sudo certbot certonly --config-dir ~/certificates --work-dir ~/certificates --logs-dir ~/certificates \
+  --standalone --preferred-challenges http \
+  -d staging.my-solid-app.nl -d www.staging.my-solid-app.nl
+sudo chown -R mysolidapp-staging:mysolidapp-staging certificates/
+```
+
+#### Certificate Renewal
+- **Production**: Certificates are automatically renewed by the certbot container included in the docker-compose.prod.yml file.
+- **Staging**: Certificates are **not** automatically renewed when running on 1 VPS. This is because port 80 is already in use by the production application.
+
+The certificates are stored in the user's home directory under 'certificates/'.
 
 
 ### Allow Github Actions to push and pull docker images
