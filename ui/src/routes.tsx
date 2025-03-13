@@ -1,4 +1,4 @@
-import { JSXElement, Switch, Match } from 'solid-js'
+import { JSXElement, Switch, Match, type Component } from 'solid-js'
 
 import { Navigate } from '@solidjs/router'
 import type { RouteDefinition } from '@solidjs/router'
@@ -15,13 +15,13 @@ import { VerifyEmailPage } from './pages/VerifyEmailPage'
 import { NotFoundPage } from './pages/NotFoundPage'
 
 function ProtectedRoute(props: {
-  route: () => JSXElement
+  component: Component
   adminOnly?: boolean
 }): JSXElement {
   const { user, loading } = useUser()
 
   return (
-    <Switch fallback={props.route()}>
+    <Switch fallback={<props.component />}>
       <Match when={!loading() && user() === null}>
         <Navigate href="/" />
       </Match>
@@ -48,14 +48,14 @@ export const routes: RouteDefinition[] = [
   {
     path: '/home',
     component: () => (
-      <ProtectedRoute route={() => <BasePage mainComponent={Home} />} />
+      <ProtectedRoute component={() => <BasePage mainComponent={Home} />} />
     ),
   },
   {
     path: '/account',
     component: () => (
       <ProtectedRoute
-        route={() => <BasePage mainComponent={UserAccountPage} />}
+        component={() => <BasePage mainComponent={UserAccountPage} />}
       />
     ),
   },
@@ -64,7 +64,7 @@ export const routes: RouteDefinition[] = [
     component: () => (
       <ProtectedRoute
         adminOnly={true}
-        route={() => <BasePage mainComponent={AdminPage} />}
+        component={() => <BasePage mainComponent={AdminPage} />}
       />
     ),
   },

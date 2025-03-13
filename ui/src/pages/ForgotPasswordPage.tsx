@@ -97,7 +97,7 @@ export function ForgotPasswordPage(): JSXElement {
               </div>
             </Show>
 
-            <div class="flex justify-center mt-10">
+            <div class="flex justify-center mt-10 gap-2">
               <A class="btn btn-primary btn-outline" href="/home">
                 {t('back_to_home')}
               </A>
