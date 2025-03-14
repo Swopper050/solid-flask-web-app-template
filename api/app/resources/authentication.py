@@ -2,7 +2,7 @@ import re
 import time
 
 import pyotp
-from flask import request, session
+from flask import current_app, request, session
 from flask_login import current_user, login_required, login_user, logout_user
 from flask_restx import Resource
 from marshmallow import Schema, fields
@@ -52,6 +52,8 @@ class Register(Resource):
         db.session.add(new_user)
         db.session.commit()
 
+        current_app.logger.info("New user registered with id %d", new_user.id)
+
         return UserSchema().dump(new_user)
 
 
@@ -76,7 +78,11 @@ class Login(Resource):
         if user.two_factor_enabled:
             session.pop("partially_authenticated_user", None)
             session["partially_authenticated_user"] = user.id
+            current_app.logger.info("User with id %d partially logged in", user.id)
         else:
+            current_app.logger.info(
+                "User with id %d successfully logged in with password only", user.id
+            )
             login_user(user)
 
         return UserSchema().dump(user)
@@ -118,6 +124,10 @@ class Login2FA(Resource):
         session.pop("partially_authenticated_user", None)
 
         login_user(user)
+
+        current_app.logger.info(
+            "User with id %d successfully logged in with 2FA", user.id
+        )
 
         return UserSchema().dump(user)
 

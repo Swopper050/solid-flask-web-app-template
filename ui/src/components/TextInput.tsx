@@ -10,6 +10,7 @@ type TextInputProps = {
   error: string
   icon?: JSXElement
   required?: boolean
+  disabled?: boolean
   ref: (element: HTMLInputElement) => void
   onInput: JSX.EventHandler<HTMLInputElement, InputEvent>
   onChange: JSX.EventHandler<HTMLInputElement, Event>
@@ -36,6 +37,7 @@ export function TextInput(props: TextInputProps) {
           value={props.value || ''}
           aria-invalid={!!props.error}
           aria-errormessage={`${props.name}-error`}
+          disabled={props.disabled || false}
         />
       </label>
       {props.error && <div id={`${props.name}-error`}>{props.error}</div>}
