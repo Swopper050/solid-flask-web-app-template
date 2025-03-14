@@ -39,7 +39,7 @@ export function Modal(props: {
   return (
     <>
       <dialog class={clsx('modal', isOpen() ? 'modal-open' : 'modal-close')}>
-        <div class="modal-box">
+        <div class="modal-box w-90vw max-w-sm sm:max-w-md">
           <button
             class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4"
             onClick={() => props.onClose()}
@@ -49,6 +49,8 @@ export function Modal(props: {
           <h3 class="font-bold text-lg">{props.title}</h3>
           {props.children}
         </div>
+
+        <div class="modal-backdrop" onClick={() => props.onClose()} />
       </dialog>
     </>
   )
