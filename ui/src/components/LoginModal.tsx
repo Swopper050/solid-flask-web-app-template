@@ -126,6 +126,7 @@ export function LoginModal(props: ModalBaseProps): JSXElement {
                 error={field.error}
                 placeholder={t('email_placeholder')}
                 icon={<i class="fa-solid fa-envelope" />}
+                disabled={at2FAStep()}
               />
             )}
           </Login.Field>
@@ -138,7 +139,8 @@ export function LoginModal(props: ModalBaseProps): JSXElement {
                 value={field.value}
                 error={field.error}
                 placeholder={t('password')}
-                icon={<i class="fa-solid fa-key" />}
+                icon={<i class="fa-solid fa-key" />}\
+                disabled={at2FAStep()}
               />
             )}
           </Login.Field>
