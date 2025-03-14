@@ -1,6 +1,5 @@
 import { JSXElement, Show } from 'solid-js'
 import { useNavigate } from '@solidjs/router'
-import { clsx } from 'clsx'
 
 import {
   clearResponse,

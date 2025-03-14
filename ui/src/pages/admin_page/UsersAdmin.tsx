@@ -1,5 +1,4 @@
 import { createSignal, createResource, JSXElement, Show, For } from 'solid-js'
-import { clsx } from 'clsx'
 
 import { UserAttributes } from '../../models/User'
 import { Alert } from '../../components/Alert'
@@ -217,7 +216,6 @@ function DeleteUserModal(props: DeleteUserModalProps): JSXElement {
         </Show>
 
         <div class="modal-action">
-
           <Button
             label={t('cancel')}
             class="btn-outline"

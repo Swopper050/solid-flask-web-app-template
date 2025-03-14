@@ -24,7 +24,7 @@ export function Button(props: {
         props.class
       )}
       type={props.type ?? 'button'}
-      onClick={() => props.onClick()}
+      onClick={() => props.onClick?.()}
     >
       <Show when={props.icon}>
         <i class={props.icon} />
@@ -45,6 +45,7 @@ export function IconButton(props: {
   variant?: 'primary' | 'secondary' | 'error' | 'success'
   class?: string
   isLoading?: boolean
+  disabled?: boolean
 }): JSXElement {
   return (
     <button
@@ -54,6 +55,7 @@ export function IconButton(props: {
         props.class
       )}
       onClick={() => props.onClick()}
+      disabled={props.disabled}
     >
       <Show
         when={props.isLoading}
