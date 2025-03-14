@@ -24,6 +24,7 @@ import { User } from '../models/User'
 import { TextInput } from './TextInput'
 import { Modal, ModalBaseProps } from './Modal'
 import { Alert } from './Alert'
+import { Button } from './Button'
 
 type RegisterFormData = {
   email: string
@@ -151,18 +152,11 @@ export function RegisterModal(props: ModalBaseProps): JSXElement {
         </Show>
 
         <div class="modal-action">
-          <button
-            class={clsx(
-              'mt-4 btn btn-primary',
-              registerForm.submitting && 'btn-disabled'
-            )}
+          <Button
+            label={t('register')}
+            isLoading={registerForm.submitting}
             type="submit"
-          >
-            {t('register')}
-            <Show when={registerForm.submitting}>
-              <span class="loading loading-ball" />
-            </Show>
-          </button>
+          />
         </div>
       </Register.Form>
     </Modal>

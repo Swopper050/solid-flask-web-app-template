@@ -217,30 +217,22 @@ function DeleteUserModal(props: DeleteUserModalProps): JSXElement {
         </Show>
 
         <div class="modal-action">
-          <button
-            class={clsx(
-              'btn btn-outline',
-              deleteForm.submitting && 'btn-disabled'
-            )}
+
+          <Button
+            label={t('cancel')}
+            class="btn-outline"
+            isLoading={deleteForm.submitting}
             onClick={(e) => {
               e.preventDefault()
               props.onClose()
             }}
-          >
-            {t('cancel')}
-          </button>
-          <button
-            class={clsx(
-              'btn btn-error',
-              deleteForm.submitting && 'btn_disabled'
-            )}
-            type="submit"
-          >
-            {t('delete')}
-            <Show when={deleteForm.submitting}>
-              <span class="loading loading-ball" />
-            </Show>
-          </button>
+          />
+
+          <Button
+            label={t('delete')}
+            variant="error"
+            isLoading={deleteForm.submitting}
+          />
         </div>
       </Delete.Form>
     </Modal>
@@ -350,12 +342,11 @@ function CreateUserModal(props: CreateUserModalProps): JSXElement {
 
         <div class="modal-action">
           <Button
+            label={t('create_user')}
             type="submit"
             class="mt-4"
             isLoading={createUserForm.submitting}
-          >
-            {t('create_user')}
-          </Button>
+          />
         </div>
       </Create.Form>
     </Modal>
