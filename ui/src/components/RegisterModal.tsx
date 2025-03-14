@@ -89,80 +89,82 @@ export function RegisterModal(props: ModalBaseProps): JSXElement {
         props.onClose()
       }}
     >
-      <Register.Form onSubmit={onSubmit}>
-        <Register.Field
-          name="email"
-          validate={[
-            required(t('please_enter_your_email')),
-            email(t('please_enter_a_valid_email')),
-          ]}
-        >
-          {(field, props) => (
-            <TextInput
-              {...props}
-              type="email"
-              value={field.value}
-              error={field.error}
-              placeholder={t('email_placeholder')}
-              icon={<i class="fa-solid fa-envelope" />}
-            />
-          )}
-        </Register.Field>
-
-        <Register.Field
-          name="password"
-          validate={[
-            minLength(8, t('your_password_must_have_8_characters_or_more')),
-            pattern(/[A-Z]/, t('your_password_must_have_1_uppercase_letter')),
-            pattern(/[a-z]/, t('your_password_must_have_1_lowercase_letter')),
-            pattern(/[0-9]/, t('your_password_must_have_1_digit')),
-          ]}
-        >
-          {(field, props) => (
-            <TextInput
-              {...props}
-              type="password"
-              value={field.value}
-              error={field.error}
-              placeholder={t('password')}
-              icon={<i class="fa-solid fa-key" />}
-            />
-          )}
-        </Register.Field>
-
-        <Register.Field
-          name="checkPassword"
-          validate={[mustMatch(t('passwords_do_not_match'))]}
-        >
-          {(field, props) => (
-            <TextInput
-              {...props}
-              type="password"
-              value={field.value}
-              error={field.error}
-              placeholder={t('confirm_password')}
-              icon={<i class="fa-solid fa-key" />}
-            />
-          )}
-        </Register.Field>
-
-        <Show when={registerForm.response.status === 'error'}>
-          <Alert type="error" message={registerForm.response.message} />
-        </Show>
-
-        <div class="modal-action">
-          <button
-            class={clsx(
-              'mt-4 btn btn-primary',
-              registerForm.submitting && 'btn-disabled'
-            )}
-            type="submit"
+      <Register.Form onSubmit={onSubmit} class="w-full">
+        <div class="space-y-4">
+          <Register.Field
+            name="email"
+            validate={[
+              required(t('please_enter_your_email')),
+              email(t('please_enter_a_valid_email')),
+            ]}
           >
-            {t('register')}
-            <Show when={registerForm.submitting}>
-              <span class="loading loading-ball" />
-            </Show>
-          </button>
+            {(field, props) => (
+              <TextInput
+                {...props}
+                type="email"
+                value={field.value}
+                error={field.error}
+                placeholder={t('email_placeholder')}
+                icon={<i class="fa-solid fa-envelope" />}
+              />
+            )}
+          </Register.Field>
+
+          <Register.Field
+            name="password"
+            validate={[
+              minLength(8, t('your_password_must_have_8_characters_or_more')),
+              pattern(/[A-Z]/, t('your_password_must_have_1_uppercase_letter')),
+              pattern(/[a-z]/, t('your_password_must_have_1_lowercase_letter')),
+              pattern(/[0-9]/, t('your_password_must_have_1_digit')),
+            ]}
+          >
+            {(field, props) => (
+              <TextInput
+                {...props}
+                type="password"
+                value={field.value}
+                error={field.error}
+                placeholder={t('password')}
+                icon={<i class="fa-solid fa-key" />}
+              />
+            )}
+          </Register.Field>
+
+          <Register.Field
+            name="checkPassword"
+            validate={[mustMatch(t('passwords_do_not_match'))]}
+          >
+            {(field, props) => (
+              <TextInput
+                {...props}
+                type="password"
+                value={field.value}
+                error={field.error}
+                placeholder={t('confirm_password')}
+                icon={<i class="fa-solid fa-key" />}
+              />
+            )}
+          </Register.Field>
+
+          <Show when={registerForm.response.status === 'error'}>
+            <Alert type="error" message={registerForm.response.message} />
+          </Show>
+
+          <div class="modal-action">
+            <button
+              class={clsx(
+                'btn btn-primary w-full',
+                registerForm.submitting && 'btn-disabled'
+              )}
+              type="submit"
+            >
+              {t('register')}
+              <Show when={registerForm.submitting}>
+                <span class="loading loading-ball" />
+              </Show>
+            </button>
+          </div>
         </div>
       </Register.Form>
     </Modal>

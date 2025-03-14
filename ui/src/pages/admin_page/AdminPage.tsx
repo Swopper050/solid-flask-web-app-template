@@ -8,12 +8,13 @@ export function AdminPage(): JSXElement {
 
   return (
     <>
-      <div class="tabs tabs-lift m-2">
+      <div class="tabs tabs-lift">
         <input
           type="radio"
           name="admin-tabs"
           class="tab text-lg"
           aria-label={t('users')}
+          checked
         />
         <div class="tab-content bg-base-100 border-base-300 p-6">
           <UsersAdmin />
@@ -24,7 +25,6 @@ export function AdminPage(): JSXElement {
           name="admin-tabs"
           class="tab text-lg"
           aria-label="Another tab"
-          checked
         />
         <div class="tab-content bg-base-100 border-base-300 p-6">
           Another tab
