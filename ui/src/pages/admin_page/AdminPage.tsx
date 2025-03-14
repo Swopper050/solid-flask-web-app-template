@@ -1,36 +1,34 @@
-import { JSXElement, Switch, Match, createSignal } from 'solid-js'
-import { clsx } from 'clsx'
+import { JSXElement } from 'solid-js'
 import { UsersAdmin } from './UsersAdmin'
 
 import { useLocale } from '../../context/LocaleProvider'
 
-type AdminTab = 'organisations' | 'users'
-
 export function AdminPage(): JSXElement {
   const { t } = useLocale()
 
-  const [tab, setTab] = createSignal<AdminTab>('users')
-
   return (
     <>
-      <div class="navbar bg-base-100 border-b border-primary">
-        <a
-          class={clsx(
-            'btn font-bold text-lg mx-2',
-            tab() === 'users' ? 'btn-outline' : 'btn-ghost'
-          )}
-          onClick={() => setTab('users')}
-        >
-          {t('users')}
-        </a>
-      </div>
+      <div class="tabs tabs-lift m-2">
+        <input
+          type="radio"
+          name="admin-tabs"
+          class="tab text-lg"
+          aria-label={t('users')}
+        />
+        <div class="tab-content bg-base-100 border-base-300 p-6">
+          <UsersAdmin />
+        </div>
 
-      <div class="grow overflow-hidden">
-        <Switch>
-          <Match when={tab() === 'users'}>
-            <UsersAdmin />
-          </Match>
-        </Switch>
+        <input
+          type="radio"
+          name="admin-tabs"
+          class="tab text-lg"
+          aria-label="Another tab"
+          checked
+        />
+        <div class="tab-content bg-base-100 border-base-300 p-6">
+          Another tab
+        </div>
       </div>
     </>
   )
