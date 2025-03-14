@@ -8,7 +8,7 @@ export function AdminPage(): JSXElement {
 
   return (
     <>
-      <div class="tabs tabs-lift m-2">
+      <div class="tabs tabs-lift">
         <input
           type="radio"
           name="admin-tabs"
