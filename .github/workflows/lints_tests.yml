@@ -84,8 +84,6 @@ jobs:
           - 1025:1025
 
     steps:
-      - uses: cypress-io/github-action@v6
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
