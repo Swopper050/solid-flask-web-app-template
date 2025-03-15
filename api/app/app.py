@@ -45,19 +45,6 @@ def create_app(config_object: DevConfig | ProdConfig | TestConfig = ProdConfig()
             "message": "An unknown error occurred",
         }, 500
 
-    gunicorn_logger = logging.getLogger("gunicorn.error")
-    app.logger.handlers = gunicorn_logger.handlers
-    app.logger.setLevel(logging.DEBUG if app.config["DEBUG"] else logging.INFO)
-
-    file_handler = RotatingFileHandler("api.log")
-    file_handler.setLevel(logging.DEBUG if app.config["DEBUG"] else logging.INFO)
-    file_handler.setFormatter(
-        logging.Formatter(
-            "%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]"
-        )
-    )
-    app.logger.addHandler(file_handler)
-
     @app.after_request
     def logging_after_request(response):
         app.logger.info(
@@ -70,5 +57,19 @@ def create_app(config_object: DevConfig | ProdConfig | TestConfig = ProdConfig()
             request.user_agent,
         )
         return response
+
+    gunicorn_logger = logging.getLogger("gunicorn.error")
+    app.logger.handlers = gunicorn_logger.handlers
+    app.logger.setLevel(logging.DEBUG if app.config["DEBUG"] else logging.INFO)
+
+    if app.config["FILE_LOGGING"]:
+        file_handler = RotatingFileHandler("api.log")
+        file_handler.setLevel(logging.DEBUG if app.config["DEBUG"] else logging.INFO)
+        file_handler.setFormatter(
+            logging.Formatter(
+                "%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]"
+            )
+        )
+        app.logger.addHandler(file_handler)
 
     return app

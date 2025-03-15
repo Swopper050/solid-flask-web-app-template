@@ -128,8 +128,8 @@ jobs:
       mail:
         image: maildev/maildev
         env:
-          MAILDEV_INCOMING_USER=mysolidapp@mail.com
-          MAILDEV_INCOMING_PASS=12345678
+          MAILDEV_INCOMING_USER: mysolidapp@mail.com
+          MAILDEV_INCOMING_PASS: 12345678
         ports:
           - 1080:1080
           - 1025:1025
@@ -156,7 +156,7 @@ jobs:
         run: cd api && python -m venv .env && source .env/bin/activate && make deps
 
       - name: Run API server on background 
-        run: cd api && source .env/bin/activate && make server &
+        run: cd api && source .env/bin/activate && make MY_SOLID_APP_FILE_LOGGING=True server &
 
       - name: Run Cypress Tests
         uses: cypress-io/github-action@v6
