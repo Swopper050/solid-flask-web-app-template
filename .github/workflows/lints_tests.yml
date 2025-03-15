@@ -92,6 +92,7 @@ jobs:
           
       - name: Check translations
         run: cd ui && make check_translations
+
   tests-api:
     runs-on: ubuntu-latest
     needs: [lint-ui, lint-api, check-translations, check-migrations]
@@ -129,6 +130,9 @@ jobs:
         ports:
           - 1080:1080
           - 1025:1025
+        options: >-
+          --incoming-user=mysolidapp@mail.com
+          --incoming-pass=12345678
 
     steps:
       - uses: actions/checkout@v4
