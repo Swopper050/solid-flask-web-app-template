@@ -115,7 +115,7 @@ export function UsersAdmin(): JSXElement {
             onClick={() => openModal('createUser')}
           >
             <i class="fa-solid fa-plus" />
-            {t('create_new_user')}
+            <p class="hidden md:block">{t('create_new_user')}</p>
           </button>,
         ]}
       >
@@ -280,73 +280,76 @@ function CreateUserModal(props: CreateUserModalProps): JSXElement {
 
   return (
     <Modal title={t('create_new_user')} isOpen={props.isOpen} onClose={onClose}>
-      <Create.Form onSubmit={handleCreate}>
-        <Create.Field
-          name="email"
-          validate={[
-            required(t('please_enter_your_email')),
-            email(t('please_enter_a_valid_email')),
-          ]}
-        >
-          {(field, props) => (
-            <TextInput
-              {...props}
-              type="email"
-              value={field.value}
-              error={field.error}
-              placeholder={t('email_placeholder')}
-              icon={<i class="fa-solid fa-envelope" />}
+      <div class="space-y-4">
+        <Create.Form onSubmit={handleCreate} class="w-full">
+          <Create.Field
+            name="email"
+            validate={[
+              required(t('please_enter_your_email')),
+              email(t('please_enter_a_valid_email')),
+            ]}
+          >
+            {(field, props) => (
+              <TextInput
+                {...props}
+                type="email"
+                value={field.value}
+                error={field.error}
+                placeholder={t('email_placeholder')}
+                icon={<i class="fa-solid fa-envelope" />}
+              />
+            )}
+          </Create.Field>
+
+          <Create.Field
+            name="password"
+            validate={[
+              required(t('please_enter_a_password')),
+              minLength(8, t('your_password_must_have_8_characters_or_more')),
+              pattern(/[A-Z]/, t('your_password_must_have_1_uppercase_letter')),
+              pattern(/[a-z]/, t('your_password_must_have_1_lowercase_letter')),
+              pattern(/[0-9]/, t('your_password_must_have_1_digit')),
+            ]}
+          >
+            {(field, props) => (
+              <TextInput
+                {...props}
+                type="password"
+                value={field.value}
+                error={field.error}
+                placeholder={t('password')}
+                icon={<i class="fa-solid fa-key" />}
+              />
+            )}
+          </Create.Field>
+
+          <Create.Field name="isAdmin" type="boolean">
+            {(field, props) => (
+              <BooleanInput
+                {...props}
+                type="checkbox"
+                value={field.value}
+                error={field.error}
+                label={t('make_this_user_an_admin')}
+              />
+            )}
+          </Create.Field>
+
+          <Show when={createUserForm.response.status === 'error'}>
+            <Alert type="error" message={createUserForm.response.message} />
+          </Show>
+
+          <div class="modal-action">
+            <Button
+              label={t('create_user')}
+              type="submit"
+              color="primary"
+              class="mt-4 w-full"
+              isLoading={createUserForm.submitting}
             />
-          )}
-        </Create.Field>
-
-        <Create.Field
-          name="password"
-          validate={[
-            required(t('please_enter_a_password')),
-            minLength(8, t('your_password_must_have_8_characters_or_more')),
-            pattern(/[A-Z]/, t('your_password_must_have_1_uppercase_letter')),
-            pattern(/[a-z]/, t('your_password_must_have_1_lowercase_letter')),
-            pattern(/[0-9]/, t('your_password_must_have_1_digit')),
-          ]}
-        >
-          {(field, props) => (
-            <TextInput
-              {...props}
-              type="password"
-              value={field.value}
-              error={field.error}
-              placeholder={t('password')}
-              icon={<i class="fa-solid fa-key" />}
-            />
-          )}
-        </Create.Field>
-
-        <Create.Field name="isAdmin" type="boolean">
-          {(field, props) => (
-            <BooleanInput
-              {...props}
-              type="checkbox"
-              value={field.value}
-              error={field.error}
-              label={t('make_this_user_an_admin')}
-            />
-          )}
-        </Create.Field>
-
-        <Show when={createUserForm.response.status === 'error'}>
-          <Alert type="error" message={createUserForm.response.message} />
-        </Show>
-
-        <div class="modal-action">
-          <Button
-            label={t('create_user')}
-            type="submit"
-            class="mt-4"
-            isLoading={createUserForm.submitting}
-          />
-        </div>
-      </Create.Form>
+          </div>
+        </Create.Form>
+      </div>
     </Modal>
   )
 }

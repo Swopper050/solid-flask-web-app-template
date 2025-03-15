@@ -109,60 +109,65 @@ export function LoginModal(props: ModalBaseProps): JSXElement {
         props.onClose()
       }}
     >
-      <Login.Form onSubmit={onPasswordLogin}>
-        <Login.Field
-          name="email"
-          validate={[
-            required(t('please_enter_your_email')),
-            email(t('please_enter_a_valid_email')),
-          ]}
-        >
-          {(field, props) => (
-            <TextInput
-              {...props}
-              type="email"
-              value={field.value}
-              error={field.error}
-              placeholder={t('email_placeholder')}
-              icon={<i class="fa-solid fa-envelope" />}
-            />
-          )}
-        </Login.Field>
-
-        <Login.Field name="password">
-          {(field, props) => (
-            <TextInput
-              {...props}
-              type="password"
-              value={field.value}
-              error={field.error}
-              placeholder={t('password')}
-              icon={<i class="fa-solid fa-key" />}
-            />
-          )}
-        </Login.Field>
-
-        <Show when={loginForm.response.status === 'error'}>
-          <Alert type="error" message={loginForm.response.message} />
-        </Show>
-
-        <Show when={!at2FAStep()}>
-          <A
-            class="flex justify-center text-primary mt-4"
-            href="/forgot-password"
+      <Login.Form onSubmit={onPasswordLogin} class="w-full">
+        <div class="space-y-4">
+          <Login.Field
+            name="email"
+            validate={[
+              required(t('please_enter_your_email')),
+              email(t('please_enter_a_valid_email')),
+            ]}
           >
-            {t('forgot_password')}
-          </A>
+            {(field, props) => (
+              <TextInput
+                {...props}
+                type="email"
+                value={field.value}
+                error={field.error}
+                placeholder={t('email_placeholder')}
+                icon={<i class="fa-solid fa-envelope" />}
+                disabled={at2FAStep()}
+              />
+            )}
+          </Login.Field>
 
-          <div class="modal-action">
-            <Button
-              label={t('login')}
-              isLoading={loginForm.submitting}
-              color="primary"
-              type="submit"
-            />
-          </div>
-        </Show>
+          <Login.Field name="password">
+            {(field, props) => (
+              <TextInput
+                {...props}
+                type="password"
+                value={field.value}
+                error={field.error}
+                placeholder={t('password')}
+                icon={<i class="fa-solid fa-key" />}
+                disabled={at2FAStep()}
+              />
+            )}
+          </Login.Field>
+
+          <Show when={loginForm.response.status === 'error'}>
+            <Alert type="error" message={loginForm.response.message} />
+          </Show>
+
+          <Show when={!at2FAStep()}>
+            <A
+              class="flex justify-center text-primary mt-4"
+              href="/forgot-password"
+            >
+              {t('forgot_password')}
+            </A>
+
+            <div class="modal-action">
+              <Button
+                label={t('login')}
+                type="submit"
+                color="primary"
+                class="w-full"
+                isLoading={loginForm.submitting}
+              />
+            </div>
+          </Show>
+        </div>
       </Login.Form>
 
       <Show when={at2FAStep()}>

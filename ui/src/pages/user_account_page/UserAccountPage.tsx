@@ -36,7 +36,7 @@ export function UserAccountPage(): JSXElement {
 
   return (
     <>
-      <div class="mt-4 ml-10">
+      <div class="mx-auto">
         <Show when={user().isAdmin}>
           <p class="text-lg text-success mr-4 mb-6 col-span-4">
             <i class="fa-solid fa-screwdriver-wrench mr-2" />
