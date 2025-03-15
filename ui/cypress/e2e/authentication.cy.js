@@ -18,6 +18,7 @@ describe('authentication', () => {
 
   it('Register new user', function() {
     cy.visit('/');
+
     cy.get('.hidden > :nth-child(2)').click();
     cy.get('.modal-open > .modal-box > form.w-full > .space-y-4 > :nth-child(1) > .input > #email').clear('b');
     cy.get('.modal-open > .modal-box > form.w-full > .space-y-4 > :nth-child(1) > .input > #email').type('test@test.nl');
@@ -26,6 +27,8 @@ describe('authentication', () => {
     cy.get('#checkPassword').clear();
     cy.get('#checkPassword').type('Testing1');
     cy.get('.modal-open > .modal-box > form.w-full > .space-y-4 > .modal-action > .btn').click();
+
+    cy.screenshot();
 
     cy.url().should('include', '/home')
   });
