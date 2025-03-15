@@ -4,7 +4,7 @@ from logging.handlers import RotatingFileHandler
 from flask import Flask, request
 
 from app.config import DevConfig, ProdConfig, TestConfig
-from app.errors import APIError
+from app.errors import APIError, APIErrorEnum
 from app.extensions import api, db, login_manager, mail, migrate
 
 
@@ -30,12 +30,27 @@ def create_app(config_object: DevConfig | ProdConfig | TestConfig = ProdConfig()
         )
         return error.to_response()
 
+    @app.errorhandler(Exception)
+    def handle_generic_error(error):
+        app.logger.exception(
+            "Internal Server Error: %s %s [%s] %s %s",
+            request.method,
+            request.path,
+            500,
+            str(error),
+            repr(error),
+        )
+        return {
+            "error": APIErrorEnum.unknown_error.value,
+            "message": "An unknown error occurred",
+        }, 500
+
     gunicorn_logger = logging.getLogger("gunicorn.error")
     app.logger.handlers = gunicorn_logger.handlers
     app.logger.setLevel(logging.DEBUG if app.config["DEBUG"] else logging.INFO)
 
     file_handler = RotatingFileHandler("api.log")
-    file_handler.setLevel(logging.INFO)
+    file_handler.setLevel(logging.DEBUG if app.config["DEBUG"] else logging.INFO)
     file_handler.setFormatter(
         logging.Formatter(
             "%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]"
@@ -55,19 +70,5 @@ def create_app(config_object: DevConfig | ProdConfig | TestConfig = ProdConfig()
             request.user_agent,
         )
         return response
-
-    @app.errorhandler(Exception)
-    def handle_internal_error(error):
-        code = 500
-
-        app.logger.exception(
-            "Internal Server Error: %s %s [%s] %s %s",
-            request.method,
-            request.path,
-            code,
-            str(error),
-            repr(error),
-        )
-        return {"error": "Internal Server Error"}, 500
 
     return app

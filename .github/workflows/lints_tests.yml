@@ -127,12 +127,12 @@ jobs:
 
       mail:
         image: maildev/maildev
+        env:
+          MAILDEV_INCOMING_USER=mysolidapp@mail.com
+          MAILDEV_INCOMING_PASS=12345678
         ports:
           - 1080:1080
           - 1025:1025
-        options: >-
-          --incoming-user=mysolidapp@mail.com
-          --incoming-pass=12345678
 
     steps:
       - uses: actions/checkout@v4
