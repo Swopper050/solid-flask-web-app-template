@@ -63,7 +63,7 @@ jobs:
     - name: Tests
       run: cd api && make test
 
-  tests-ui-cypress:
+  tests-cypress-e2e:
     runs-on: ubuntu-latest
     services:
       db:
@@ -105,7 +105,7 @@ jobs:
         run: cd api && python -m venv .env && source .env/bin/activate && make deps
 
       - name: Run API server on background 
-        run: cd api && make server &
+        run: cd api && source .env/bin/activate && make server &
 
       - name: Run Cypress Tests
         uses: cypress-io/github-action@v6
