@@ -24,7 +24,7 @@ export function Button(props: {
         props.class
       )}
       type={props.type ?? 'button'}
-      onClick={() => props.onClick()}
+      onClick={() => props.onClick?.()}
     >
       {props.children}
       <Show when={props.isLoading}>

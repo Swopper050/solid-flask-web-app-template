@@ -19,6 +19,7 @@ import {
 } from '@modular-forms/solid'
 
 import { getErrorMessage, resetPassword } from '../api'
+import { getSingleParam } from './SearchParams'
 
 type PasswordResetFormData = {
   password: string
@@ -35,8 +36,8 @@ export function ResetPasswordPage(): JSXElement {
     values
   ) => {
     const response = await resetPassword(
-      searchParams.email,
-      searchParams.reset_token,
+      getSingleParam(searchParams.email),
+      getSingleParam(searchParams.reset_token),
       values.password
     )
 

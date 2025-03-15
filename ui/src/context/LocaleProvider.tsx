@@ -42,6 +42,8 @@ export function LocaleProvider(props: { children: JSXElement }) {
     return await fetchDictionary(locale)
   })
 
+  const translationsAccessor = () => translations() ?? defaultDict
+
   const t = i18n.translator(() => translations() ?? {})
 
   const updateLocale = async (newLocale: Locale) => {
@@ -55,7 +57,12 @@ export function LocaleProvider(props: { children: JSXElement }) {
 
   return (
     <LocaleContext.Provider
-      value={{ locale, setLocale: updateLocale, translations, t }}
+      value={{
+        locale,
+        setLocale: updateLocale,
+        translations: translationsAccessor,
+        t,
+      }}
     >
       <Suspense
         fallback={

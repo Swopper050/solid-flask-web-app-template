@@ -5,10 +5,10 @@ import { clsx } from 'clsx'
 
 import { resendVerificationMail } from '../../api'
 
-import { ChangePasswordModal } from './ChangePasswordModal'
-import { Enable2FAModal } from './Enable2FAModal'
-import { Disable2FAModal } from './Disable2FAModal'
-import { DeleteAccountModal } from './DeleteAccountModal'
+import { ChangePasswordModal } from './modals/ChangePassword'
+import { Enable2FAModal } from './modals/Enable2FA'
+import { Disable2FAModal } from './modals/Disable2FA'
+import { DeleteAccountModal } from './modals/DeleteAccount'
 import { createModalState } from '../../components/Modal'
 import { Table, TableRow } from '../../components/Table'
 import { Button } from '../../components/Button'
@@ -27,7 +27,7 @@ export function UserAccountPage(): JSXElement {
   return (
     <>
       <div class="mx-auto">
-        <Show when={user().isAdmin}>
+        <Show when={user()?.isAdmin}>
           <p class="text-lg text-success mr-4 mb-6 col-span-4">
             <i class="fa-solid fa-screwdriver-wrench mr-2" />
             {t('this_user_is_an_admin')}
@@ -35,7 +35,9 @@ export function UserAccountPage(): JSXElement {
         </Show>
 
         <Table>
-          <TableRow cells={[t('email'), user().email, <VerifyEmailButton />]} />
+          <TableRow
+            cells={[t('email'), user()?.email, <VerifyEmailButton />]}
+          />
           <TableRow
             cells={[
               t('password'),
@@ -55,7 +57,7 @@ export function UserAccountPage(): JSXElement {
             cells={[
               t('enabled_2fa'),
               <p class="col-span-2">
-                {user().twoFactorEnabled ? t('yes') : t('no')}
+                {user()?.twoFactorEnabled ? t('yes') : t('no')}
               </p>,
               <Toggle2FAButton
                 enable2FA={() => openModal('enable2FA')}
@@ -110,7 +112,7 @@ function VerifyEmailButton(): JSXElement {
 
   return (
     <Show
-      when={user().isVerified}
+      when={user()?.isVerified}
       fallback={
         <div class="flex items-center">
           <p class="grow" />
@@ -159,7 +161,7 @@ function Toggle2FAButton(props: {
 
   return (
     <>
-      <Show when={user().twoFactorEnabled}>
+      <Show when={user()?.twoFactorEnabled}>
         <p class="tooltip tooltip-left" data-tip={t('disable_2fa')}>
           <button
             class="btn btn-ghost btn-sm"
@@ -170,7 +172,7 @@ function Toggle2FAButton(props: {
         </p>
       </Show>
 
-      <Show when={!user().twoFactorEnabled}>
+      <Show when={!user()?.twoFactorEnabled}>
         <p class="tooltip tooltip-left" data-tip={t('enable_2fa')}>
           <button
             class="btn btn-ghost btn-sm"

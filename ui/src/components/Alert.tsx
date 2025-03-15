@@ -3,7 +3,7 @@ import { clsx } from 'clsx'
 
 interface AlertProps {
   type: 'info' | 'error' | 'success' | 'warning'
-  message: string
+  message?: string
   extraClasses?: string
 }
 

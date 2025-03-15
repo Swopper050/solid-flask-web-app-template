@@ -15,9 +15,16 @@ format: ## Format code with eslint and prettier
 	pnpm eslint $(LINT_FILES) --fix
 	pnpm prettier --write $(LINT_FILES)
 
-lint: ## Run lint check with eslint and prettier
+lint: ## Run lint check with eslint, prettier and typescript
 	pnpm eslint $(LINT_FILES)
 	pnpm prettier --check $(LINT_FILES)
+	pnpm tsc
+
+ts_check: ## Run the typescript compiler
+	pnpm tsc
+
+ts_watch: ## Run the typescript compiler in watch mode
+	pnpm tsc --watch
 
 formatlint: format lint ## First format code, then run linters
 

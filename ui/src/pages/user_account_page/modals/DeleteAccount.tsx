@@ -1,12 +1,12 @@
 import { createSignal, JSXElement, Show } from 'solid-js'
 import { useNavigate } from '@solidjs/router'
-import { useUser } from '../../context/UserProvider'
-import { useLocale } from '../../context/LocaleProvider'
+import { useUser } from '../../../context/UserProvider'
+import { useLocale } from '../../../context/LocaleProvider'
 
-import { deleteAccount, getErrorMessage } from '../../api'
-import { Modal, ModalBaseProps } from '../../components/Modal'
-import { Alert } from '../../components/Alert'
-import { Button } from '../../components/Button'
+import { deleteAccount, getErrorMessage } from '../../../api'
+import { Modal, ModalBaseProps } from '../../../components/Modal'
+import { Alert } from '../../../components/Alert'
+import { Button } from '../../../components/Button'
 
 export function DeleteAccountModal(props: ModalBaseProps): JSXElement {
   const { t } = useLocale()
@@ -15,11 +15,11 @@ export function DeleteAccountModal(props: ModalBaseProps): JSXElement {
   const navigate = useNavigate()
 
   const [deleting, setDeleting] = createSignal(false)
-  const [errorMsg, setErrorMsg] = createSignal<string | null>(null)
+  const [errorMsg, setErrorMsg] = createSignal<string | undefined>(undefined)
 
   const onDeleteAccount = async () => {
     setDeleting(true)
-    setErrorMsg(null)
+    setErrorMsg(undefined)
 
     const response = await deleteAccount()
     if (response.status !== 200) {

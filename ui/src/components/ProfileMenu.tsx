@@ -35,7 +35,7 @@ export function ProfileMenu(): JSXElement {
   return (
     <details class="dropdown dropdown-end">
       <summary class="btn btn-ghost">
-        <span class="text">{user().email}</span>
+        <span class="text">{user()?.email}</span>
         <i class="fa-solid fa-ellipsis" />
       </summary>
 
@@ -47,7 +47,7 @@ export function ProfileMenu(): JSXElement {
           </A>
         </li>
 
-        <Show when={user().isAdmin}>
+        <Show when={user()?.isAdmin}>
           <li>
             <A class="btn btn-ghost justify-start" href="/admin-panel">
               <i class="fa-solid fa-screwdriver-wrench text-success" />

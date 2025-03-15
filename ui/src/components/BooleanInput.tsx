@@ -1,6 +1,6 @@
 import { JSX, splitProps, JSXElement } from 'solid-js'
 
-type BooleanInputProps = {
+export function BooleanInput(props: {
   name: string
   type: 'checkbox'
   label?: string
@@ -10,9 +10,7 @@ type BooleanInputProps = {
   ref: (element: HTMLInputElement) => void
   onInput: JSX.EventHandler<HTMLInputElement, InputEvent>
   onChange: JSX.EventHandler<HTMLInputElement, Event>
-}
-
-export function BooleanInput(props: BooleanInputProps): JSXElement {
+}): JSXElement {
   const [, inputProps] = splitProps(props, ['value', 'label', 'error'])
   return (
     <div class="flex items-center mt-4 gap-2">

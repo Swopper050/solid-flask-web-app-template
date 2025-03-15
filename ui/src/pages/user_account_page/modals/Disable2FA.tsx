@@ -1,7 +1,7 @@
 import { JSXElement, Show } from 'solid-js'
-import { disable2FA, getErrorMessage } from '../../api'
-import { useUser } from '../../context/UserProvider'
-import { useLocale } from '../../context/LocaleProvider'
+import { disable2FA, getErrorMessage } from '../../../api'
+import { useUser } from '../../../context/UserProvider'
+import { useLocale } from '../../../context/LocaleProvider'
 
 import {
   required,
@@ -13,10 +13,10 @@ import {
   SubmitHandler,
 } from '@modular-forms/solid'
 
-import { Alert } from '../../components/Alert'
-import { Modal, ModalBaseProps } from '../../components/Modal'
-import { TextInput } from '../../components/TextInput'
-import { Button } from '../../components/Button'
+import { Alert } from '../../../components/Alert'
+import { Modal, ModalBaseProps } from '../../../components/Modal'
+import { TextInput } from '../../../components/TextInput'
+import { Button } from '../../../components/Button'
 
 type TotpFormData = {
   totpCode: string

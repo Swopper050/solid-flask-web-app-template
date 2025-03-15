@@ -121,7 +121,7 @@ export function UsersAdmin(): JSXElement {
         ]}
       >
         <Show when={!users.loading && !users.error}>
-          <For each={users().items}>
+          <For each={users()?.items}>
             {(user) => {
               return (
                 <>
@@ -176,17 +176,21 @@ export function UsersAdmin(): JSXElement {
   )
 }
 
-interface DeleteUserModalProps extends ModalBaseProps {
-  user: UserAttributes
-  onDelete: () => void
-}
-
-function DeleteUserModal(props: DeleteUserModalProps): JSXElement {
+function DeleteUserModal(
+  props: {
+    user: UserAttributes | null
+    onDelete: () => void
+  } & ModalBaseProps
+): JSXElement {
   const { t } = useLocale()
 
   const [deleteForm, Delete] = createForm()
 
   const handleDelete = async () => {
+    if (props.user === null || props.user.id === null) {
+      return
+    }
+
     const response = await deleteUser(props.user.id)
 
     if (response.status !== 200) {
@@ -209,7 +213,7 @@ function DeleteUserModal(props: DeleteUserModalProps): JSXElement {
       onClose={props.onClose}
     >
       <p class="mt-4">{t('delete_user_confirmation')}</p>
-      <p class="mt-2 font-bold">{props.user.email}</p>
+      <p class="mt-2 font-bold">{props.user?.email}</p>
 
       <Delete.Form onSubmit={handleDelete}>
         <Show when={deleteForm.response.status === 'error'}>
@@ -338,7 +342,7 @@ function CreateUserModal(props: CreateUserModalProps): JSXElement {
               <BooleanInput
                 {...props}
                 type="checkbox"
-                value={field.value}
+                value={field.value ?? false}
                 error={field.error}
                 label={t('make_this_user_an_admin')}
               />

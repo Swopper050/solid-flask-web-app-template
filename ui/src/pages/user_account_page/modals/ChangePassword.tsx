@@ -1,8 +1,9 @@
+import { User, UserAttributes } from '../../../models/User'
 import { createEffect, JSXElement, Show } from 'solid-js'
-import { useUser } from '../../context/UserProvider'
-import { useLocale } from '../../context/LocaleProvider'
+import { useUser } from '../../../context/UserProvider'
+import { useLocale } from '../../../context/LocaleProvider'
 
-import { changePassword, getErrorMessage } from '../../api'
+import { changePassword, getErrorMessage } from '../../../api'
 import {
   clearResponse,
   createForm,
@@ -15,11 +16,10 @@ import {
   SubmitHandler,
 } from '@modular-forms/solid'
 
-import { Alert } from '../../components/Alert'
-import { TextInput } from '../../components/TextInput'
-import { Modal, ModalBaseProps } from '../../components/Modal'
-import { Button } from '../../components/Button'
-import { User, UserAttributes } from '../../models/User'
+import { Alert } from '../../../components/Alert'
+import { TextInput } from '../../../components/TextInput'
+import { Modal, ModalBaseProps } from '../../../components/Modal'
+import { Button } from '../../../components/Button'
 
 type ChangePasswordFormData = {
   currentPassword: string
