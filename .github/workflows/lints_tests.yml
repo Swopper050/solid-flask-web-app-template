@@ -104,12 +104,15 @@ jobs:
       - name: Install API dependencies
         run: cd api && make deps
 
+      - name: Run API server on background 
+        run: cd api && make server &
+
       - name: Run Cypress Tests
         uses: cypress-io/github-action@v6
         with:
           install-command: make deps
           working-directory: ui
-          start: bash -c "cd ../api && make server & cd ../ui && pnpm start"
+          start: pnpm run dev
           wait-on: 'http://localhost:5173'
           wait-on-timeout: 10
         env:
