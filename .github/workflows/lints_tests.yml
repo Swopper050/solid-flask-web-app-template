@@ -101,25 +101,19 @@ jobs:
         with:
           python-version: 3.13
 
-      - name: Install UI dependencies
-        run: cd ui && make deps
-
       - name: Install API dependencies
         run: cd api && make deps
-
-      - name: Start API server
-        run: |
-          cd api
-          make server &
-          sleep 2
 
       - name: Run Cypress Tests
         uses: cypress-io/github-action@v6
         with:
+          install-command: make deps
           working-directory: ui
-          start: pnpm run dev 
+          start: |
+            cd ../api && make server &
+            pnpm run dev 
           wait-on: 'http://localhost:5173'
-          wait-on-timeout: 5
+          wait-on-timeout: 10
         env:
           CYPRESS_BASE_URL: http://localhost:5173
           CYPRESS_MAIL_HOST: localhost
@@ -139,38 +133,38 @@ jobs:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Setup python
-      uses: actions/setup-python@v5
-      with:
-        python-version: 3.13
+      - name: Setup python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.13
 
-    - name: Install dependencies
-      run: cd api && make deps
+      - name: Install dependencies
+        run: cd api && make deps
 
-    - name: Check for unmigrated changes
-      run: |
-        cd api
-        make db_upgrade
-        make migrate
-        if grep -q "op\." migrations/versions/$(ls -t migrations/versions/ | head -n 1); then
-          echo "::error::Database model changes detected without corresponding migration. Please use 'make migrate' to create the required migration."
-          exit 1
-        fi
+      - name: Check for unmigrated changes
+        run: |
+          cd api
+          make db_upgrade
+          make migrate
+          if grep -q "op\." migrations/versions/$(ls -t migrations/versions/ | head -n 1); then
+            echo "::error::Database model changes detected without corresponding migration. Please use 'make migrate' to create the required migration."
+            exit 1
+          fi
 
   check-translations:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Setup Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: 3.13
-        
-    - name: Check translations
-      run: cd ui && make check_translations
+      - uses: actions/checkout@v4
+      
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.13
+          
+      - name: Check translations
+        run: cd ui && make check_translations
 
   docker-api-build-test:
     runs-on: ubuntu-latest
