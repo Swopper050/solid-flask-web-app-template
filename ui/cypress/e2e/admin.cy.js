@@ -7,27 +7,45 @@ describe('admin', () => {
     cy.visit('/')
 
     cy.get('.hidden > :nth-child(1)').click();
+
+    cy.wait(100);
+
     cy.get('.modal-open > .modal-box > form.w-full > .space-y-4 > :nth-child(1) > .input > #email').clear('ad');
     cy.get('.modal-open > .modal-box > form.w-full > .space-y-4 > :nth-child(1) > .input > #email').type('admin@test.nl');
     cy.get('.modal-open > .modal-box > form.w-full > .space-y-4 > :nth-child(2) > .input > #password').clear();
     cy.get('.modal-open > .modal-box > form.w-full > .space-y-4 > :nth-child(2) > .input > #password').type('admin');
     cy.get('.modal-open > .modal-box > form.w-full > .space-y-4 > .modal-action > .btn').click();
+
+    cy.wait(100);
+
     cy.get('.text').click();
     cy.get('p.text-success').click();
     cy.get('thead > tr > .text-end > .btn').click();
+
+    cy.wait(100);
+
     cy.get('#email').clear('te');
     cy.get('#email').type('test@test.nl');
     cy.get('#password').clear();
     cy.get('#password').type('Testing1');
     cy.get('.modal-action > .btn').click();
+
+    cy.wait(100);
+
     cy.get(':nth-child(3) > summary.btn').click();
+    cy.wait(50);
     cy.get('.menu > :nth-child(3) > .btn').click();
+    cy.wait(50);
     cy.get('.hidden > :nth-child(1)').click();
+    cy.wait(50);
+
     cy.get('.modal-open > .modal-box > form.w-full > .space-y-4 > :nth-child(1) > .input').click();
     cy.get('.modal-open > .modal-box > form.w-full > .space-y-4 > :nth-child(1) > .input > #email').type('test@test.nl');
     cy.get('.modal-open > .modal-box > form.w-full > .space-y-4 > :nth-child(2) > .input > #password').clear();
     cy.get('.modal-open > .modal-box > form.w-full > .space-y-4 > :nth-child(2) > .input > #password').type('Testing1');
     cy.get('.modal-open > .modal-box > form.w-full > .space-y-4 > .modal-action > .btn').click();
+
+    cy.wait(50);
 
     cy.url().should('include', '/home')
   })

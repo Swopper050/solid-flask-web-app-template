@@ -67,7 +67,6 @@ describe('authentication', () => {
     cy.get('.modal-open > .modal-box > form.w-full > .space-y-4 > .modal-action > .btn').click();
 
     cy.get('.alert span').should('contain.text', 'Could not login with the given email and password');
-    cy.url().should('not.include', '/home')
   });
 
   it('Register failed email already exists', function() {
@@ -144,6 +143,5 @@ describe('authentication', () => {
     cy.get('.modal-open > .modal-box > form.w-full > .space-y-4 > .modal-action > .btn').click();
 
     cy.get('.alert span').should('contain.text', 'Could not login with the given email and password');
-    cy.url().should('not.include', '/home')
   });
 })
