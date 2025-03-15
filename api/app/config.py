@@ -39,6 +39,7 @@ class BaseConfig:
     MAIL_DEFAULT_SENDER = os.environ.get(
         "MY_SOLID_APP_MAIL_DEFAULT_SENDER", "mysolidapp@mail.com"
     )
+    FILE_LOGGING = os.environ.get("MY_SOLID_APP_FILE_LOGGING", "False") == "True"
 
 
 class ProdConfig(BaseConfig):
