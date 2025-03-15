@@ -62,6 +62,72 @@ jobs:
 
     - name: Tests
       run: cd api && make test
+
+  tests-ui-cypress:
+    runs-on: ubuntu-latest
+    services:
+    db:
+      image: mariadb:latest
+      env:
+        MYSQL_ROOT_PASSWORD: my_solid_app_root_password
+        MYSQL_DATABASE: my_solid_app_db
+        MYSQL_USER: my_solid_app_user
+        MYSQL_PASSWORD: my_solid_app_password
+      ports:
+        - 3306:3306
+      options: >-
+        --health-cmd="mysqladmin ping" 
+        --health-interval=10s 
+        --health-timeout=5s 
+        --health-retries=3
+
+    mail:
+      image: maildev/maildev
+      ports:
+        - 1080:1080
+        - 1025:1025
+
+    steps:
+      - uses: cypress-io/github-action@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 23
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.13
+
+      - name: Install UI dependencies
+        run: cd ui && make deps
+
+      - name: Install API dependencies
+        run: cd api && make deps
+
+      - name: Start API server
+        run: |
+          cd api
+          make server &
+          sleep 2
+
+      - name: Run Cypress Tests
+        uses: cypress-io/github-action@v6
+        with:
+          working-directory: ui
+          start: pnpm run dev 
+          wait-on: 'http://localhost:5173'
+          wait-on-timeout: 5
+        env:
+          CYPRESS_BASE_URL: http://localhost:5173
+          CYPRESS_MAIL_HOST: localhost
+          CYPRESS_MAIL_PORT: 1080
       
   check-migrations:
     runs-on: ubuntu-latest
