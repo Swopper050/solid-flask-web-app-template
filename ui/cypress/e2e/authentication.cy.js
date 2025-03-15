@@ -28,8 +28,6 @@ describe('authentication', () => {
     cy.get('#checkPassword').type('Testing1');
     cy.get('.modal-open > .modal-box > form.w-full > .space-y-4 > .modal-action > .btn').click();
 
-    cy.screenshot();
-
     cy.url().should('include', '/home')
   });
 

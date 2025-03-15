@@ -127,6 +127,13 @@ jobs:
         with:
           name: cypress-screenshots
           path: ui/cypress/screenshots
+
+      - name: Upload API Logs
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: api-logs
+          path: api/logs/api.log
       
   check-migrations:
     runs-on: ubuntu-latest
