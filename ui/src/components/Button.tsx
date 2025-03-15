@@ -59,7 +59,7 @@ export function Button(props: {
       <Show when={props.isLoading}>
         <span
           class={clsx(
-            "loading loading-ball",
+            'loading loading-ball',
             props.size ? `loading-${props.size}` : undefined
           )}
         />
@@ -85,7 +85,7 @@ export function IconButton(props: {
         props.style ? `btn-${props.style}` : 'btn-ghost',
         props.size ? `btn-${props.size}` : 'btn-sm',
         props.isLoading && 'btn-disabled',
-        props.class,
+        props.class
       )}
       onClick={() => props.onClick()}
       disabled={props.disabled}
