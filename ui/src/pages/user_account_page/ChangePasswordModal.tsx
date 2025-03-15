@@ -161,6 +161,7 @@ export function ChangePasswordModal(props: ModalBaseProps): JSXElement {
           <Button
             label={t('change_password')}
             type="submit"
+            color="primary"
             isLoading={changePasswordForm.submitting}
           />
         </div>

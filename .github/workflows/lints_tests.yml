@@ -102,7 +102,7 @@ jobs:
           python-version: 3.13
 
       - name: Install API dependencies
-        run: cd api && make deps
+        run: cd api && python -m venv .env && source .env/bin/activate && make deps
 
       - name: Run API server on background 
         run: cd api && make server &

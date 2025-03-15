@@ -84,7 +84,7 @@ export function UserAccountPage(): JSXElement {
                       ? () => openModal('disable2FA')
                       : () => openModal('enable2FA')
                   }
-                  color={twoFactorEnabled() ? 'error' : 'success'}
+                  color={twoFactorEnabled() ? 'success' : 'error'}
                   icon={
                     twoFactorEnabled()
                       ? 'fa-solid fa-toggle-on'
