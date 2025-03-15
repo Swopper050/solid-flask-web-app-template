@@ -120,6 +120,13 @@ jobs:
           CYPRESS_BASE_URL: http://localhost:5173
           CYPRESS_MAIL_HOST: localhost
           CYPRESS_MAIL_PORT: 1080
+
+      - name: Upload screenshots
+        uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: cypress-screenshots
+          path: cypress/screenshots
       
   check-migrations:
     runs-on: ubuntu-latest
