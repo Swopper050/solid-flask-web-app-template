@@ -67,19 +67,15 @@ jobs:
     runs-on: ubuntu-latest
     services:
       db:
-        image: mariadb:latest
+        image: mysql:8.0
         env:
-          MYSQL_ROOT_PASSWORD: my_solid_app_root_password
+          MYSQL_ROOT_PASSWORD: my_solid_app_db_root_password
           MYSQL_DATABASE: my_solid_app_db
           MYSQL_USER: my_solid_app_user
           MYSQL_PASSWORD: my_solid_app_password
         ports:
           - 3306:3306
-        options: >-
-          --health-cmd="mysqladmin ping --password=my_solid_app_root_password" 
-          --health-interval=10s 
-          --health-timeout=5s 
-          --health-retries=3
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
       mail:
         image: maildev/maildev
