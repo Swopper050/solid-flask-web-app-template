@@ -160,9 +160,11 @@ export function ChangePasswordModal(props: ModalBaseProps): JSXElement {
         </Show>
 
         <div class="modal-action">
-          <Button type="submit" isLoading={changePasswordForm.submitting}>
-            {t('change_password')}
-          </Button>
+          <Button
+            label={t('change_password')}
+            type="submit"
+            isLoading={changePasswordForm.submitting}
+          />
         </div>
       </Form>
     </Modal>

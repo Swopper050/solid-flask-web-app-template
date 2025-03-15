@@ -1,6 +1,7 @@
 import { JSXElement, Show } from 'solid-js'
 
 import { useLocale } from '../context/LocaleProvider'
+import { IconButton } from './Button'
 
 interface PaginationProps {
   page: number
@@ -17,13 +18,11 @@ export function Pagination(props: PaginationProps): JSXElement {
 
   return (
     <div class="flex justify-center items-center gap-4">
-      <button
-        class="btn btn-small btn-ghost"
+      <IconButton
+        icon="fa-solid fa-arrow-left-long"
         onClick={() => onPageChange(props.page - 1)}
         disabled={props.page === 1}
-      >
-        <i class="fa-solid fa-arrow-left-long" />
-      </button>
+      />
 
       <div class="flex gap-2">
         <p class="font-bold">{props.page}</p>
@@ -38,15 +37,13 @@ export function Pagination(props: PaginationProps): JSXElement {
         </p>
       </div>
 
-      <button
-        class="btn btn-small btn-ghost"
+      <IconButton
+        icon="fa-solid fa-arrow-right-long"
         onClick={() => onPageChange(props.page + 1)}
         disabled={
           props.totalPages === undefined || props.page >= props.totalPages
         }
-      >
-        <i class="fa-solid fa-arrow-right-long" />
-      </button>
+      />
     </div>
   )
 }

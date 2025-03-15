@@ -1,5 +1,4 @@
 import { createSignal, createResource, JSXElement, Show, For } from 'solid-js'
-import { clsx } from 'clsx'
 
 import { UserAttributes } from '../../models/User'
 import { Alert } from '../../components/Alert'
@@ -221,30 +220,22 @@ function DeleteUserModal(
         </Show>
 
         <div class="modal-action">
-          <button
-            class={clsx(
-              'btn btn-outline',
-              deleteForm.submitting && 'btn-disabled'
-            )}
+          <Button
+            label={t('cancel')}
+            class="btn-outline"
+            isLoading={deleteForm.submitting}
             onClick={(e) => {
-              e.preventDefault()
+              e?.preventDefault()
               props.onClose()
             }}
-          >
-            {t('cancel')}
-          </button>
-          <button
-            class={clsx(
-              'btn btn-error',
-              deleteForm.submitting && 'btn_disabled'
-            )}
+          />
+
+          <Button
+            label={t('delete')}
             type="submit"
-          >
-            {t('delete')}
-            <Show when={deleteForm.submitting}>
-              <span class="loading loading-ball" />
-            </Show>
-          </button>
+            color="error"
+            isLoading={deleteForm.submitting}
+          />
         </div>
       </Delete.Form>
     </Modal>
@@ -355,12 +346,12 @@ function CreateUserModal(props: CreateUserModalProps): JSXElement {
 
           <div class="modal-action">
             <Button
+              label={t('create_user')}
               type="submit"
+              color="primary"
               class="mt-4 w-full"
               isLoading={createUserForm.submitting}
-            >
-              {t('create_user')}
-            </Button>
+            />
           </div>
         </Create.Form>
       </div>
