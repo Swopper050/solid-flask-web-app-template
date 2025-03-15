@@ -1,6 +1,5 @@
 import { JSXElement, createSignal, Show } from 'solid-js'
 import { useNavigate, A } from '@solidjs/router'
-import { clsx } from 'clsx'
 
 import {
   clearResponse,
@@ -21,6 +20,7 @@ import { useLocale } from '../context/LocaleProvider'
 import { Alert } from './Alert'
 import { TextInput } from './TextInput'
 import { Modal, ModalBaseProps } from './Modal'
+import { Button } from './Button'
 
 type LoginFormData = {
   email: string
@@ -158,18 +158,13 @@ export function LoginModal(props: ModalBaseProps): JSXElement {
             </A>
 
             <div class="modal-action">
-              <button
-                class={clsx(
-                  'btn btn-primary w-full',
-                  loginForm.submitting && 'btn-disabled'
-                )}
+              <Button
+                label={t('login')}
                 type="submit"
-              >
-                {t('login')}
-                <Show when={loginForm.submitting}>
-                  <span class="loading loading-ball" />
-                </Show>
-              </button>
+                color="primary"
+                class="w-full"
+                isLoading={loginForm.submitting}
+              />
             </div>
           </Show>
         </div>
@@ -205,18 +200,12 @@ export function LoginModal(props: ModalBaseProps): JSXElement {
           </Show>
 
           <div class="modal-action">
-            <button
-              class={clsx(
-                'btn btn-primary',
-                totpForm.submitting && 'btn-disabled'
-              )}
+            <Button
+              label={t('login')}
+              isLoading={totpForm.submitting}
+              color="primary"
               type="submit"
-            >
-              {t('login')}
-              <Show when={totpForm.submitting}>
-                <span class="loading loading-ball" />
-              </Show>
-            </button>
+            />
           </div>
         </Totp.Form>
       </Show>

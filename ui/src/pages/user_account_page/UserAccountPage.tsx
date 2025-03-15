@@ -1,7 +1,6 @@
 import { createSignal, JSXElement, Show } from 'solid-js'
 import { useUser } from '../../context/UserProvider'
 import { useLocale } from '../../context/LocaleProvider'
-import { clsx } from 'clsx'
 
 import { resendVerificationMail } from '../../api'
 
@@ -11,11 +10,20 @@ import { Disable2FAModal } from './Disable2FAModal'
 import { DeleteAccountModal } from './DeleteAccountModal'
 import { createModalState } from '../../components/Modal'
 import { Table, TableRow } from '../../components/Table'
-import { Button } from '../../components/Button'
+import { Button, IconButton } from '../../components/Button'
+import { Tooltip } from '../../components/Tooltip'
 
 export function UserAccountPage(): JSXElement {
   const { t } = useLocale()
   const { user } = useUser()
+
+  const [sending, setSending] = createSignal(false)
+
+  const onResendVerificationMail = async () => {
+    setSending(true)
+    await resendVerificationMail()
+    setSending(false)
+  }
 
   const [modalState, openModal, closeModal] = createModalState(
     'password',
@@ -23,6 +31,8 @@ export function UserAccountPage(): JSXElement {
     'disable2FA',
     'deleteAcount'
   )
+
+  const twoFactorEnabled = () => user().twoFactorEnabled
 
   return (
     <>
@@ -35,41 +45,64 @@ export function UserAccountPage(): JSXElement {
         </Show>
 
         <Table>
-          <TableRow cells={[t('email'), user().email, <VerifyEmailButton />]} />
+          <TableRow
+            cells={[
+              t('email'),
+              user().email,
+              <VerifyEmailButton
+                isSending={sending()}
+                isVerified={user().isVerified}
+                onClick={() => onResendVerificationMail()}
+              />,
+            ]}
+          />
           <TableRow
             cells={[
               t('password'),
               '*******',
-              <p class="tooltip tooltip-left" data-tip={t('change_password')}>
-                <button
-                  class={clsx('btn btn-ghost btn-sm')}
+              <Tooltip position="left" text={t('change_password')}>
+                <IconButton
+                  icon="fa-solid fa-edit"
                   onClick={() => openModal('password')}
-                >
-                  <i class="fa-solid fa-edit text-primary" />
-                </button>
-              </p>,
+                  color="primary"
+                />
+              </Tooltip>,
             ]}
           />
 
           <TableRow
             cells={[
               t('enabled_2fa'),
-              <p class="col-span-2">
-                {user().twoFactorEnabled ? t('yes') : t('no')}
-              </p>,
-              <Toggle2FAButton
-                enable2FA={() => openModal('enable2FA')}
-                disable2FA={() => openModal('disable2FA')}
-              />,
+              <>{user().twoFactorEnabled ? t('yes') : t('no')}</>,
+              <Tooltip
+                position="left"
+                text={twoFactorEnabled() ? t('disable_2fa') : t('enable_2fa')}
+              >
+                <IconButton
+                  onClick={
+                    twoFactorEnabled()
+                      ? () => openModal('disable2FA')
+                      : () => openModal('enable2FA')
+                  }
+                  color={twoFactorEnabled() ? 'error' : 'success'}
+                  icon={
+                    twoFactorEnabled()
+                      ? 'fa-solid fa-toggle-on'
+                      : 'fa-solid fa-toggle-off'
+                  }
+                />
+              </Tooltip>,
             ]}
           />
         </Table>
 
         <div class="mt-4">
-          <Button onClick={() => openModal('deleteAcount')} variant="error">
-            <i class="fa-solid fa-trash" />
-            {t('delete_account')}
-          </Button>
+          <Button
+            label={t('delete_account')}
+            onClick={() => openModal('deleteAcount')}
+            color="error"
+            icon="fa-solid fa-trash"
+          />
         </div>
 
         <ChangePasswordModal
@@ -96,90 +129,38 @@ export function UserAccountPage(): JSXElement {
   )
 }
 
-function VerifyEmailButton(): JSXElement {
+function VerifyEmailButton(props: {
+  isSending: boolean
+  isVerified: boolean
+  onClick: () => void
+}): JSXElement {
   const { t } = useLocale()
-  const { user } = useUser()
-
-  const [sending, setSending] = createSignal(false)
-
-  const onResendVerificationMail = async () => {
-    setSending(true)
-    await resendVerificationMail()
-    setSending(false)
-  }
 
   return (
     <Show
-      when={user().isVerified}
+      when={props.isVerified}
       fallback={
-        <div class="flex items-center">
-          <p class="grow" />
-          <p
-            class="tooltip tooltip-left"
-            data-tip={t('your_email_is_not_verified_yet')}
-          >
-            <i class="fa-solid fa-triangle-exclamation text-warning" />
-          </p>
+        <>
+          <Tooltip position="left" text={t('your_email_is_not_verified_yet')}>
+            <div class="px-3">
+              <i class="fa-solid fa-triangle-exclamation text-warning" />
+            </div>
+          </Tooltip>
 
-          <span
-            class="tooltip tooltip-left ml-2"
-            data-tip={t('resend_verification_email')}
-          >
-            <button
-              class={clsx('btn btn-ghost btn-sm', sending() && 'btn-disabled')}
-              onClick={onResendVerificationMail}
-            >
-              <Show
-                when={!sending()}
-                fallback={<span class="loading loading-ball loading-sm" />}
-              >
-                <i class="fa-solid fa-arrow-rotate-left" />
-              </Show>
-            </button>
-          </span>
-        </div>
+          <Tooltip position="left" text={t('resend_verification_email')}>
+            <IconButton
+              onClick={() => props.onClick()}
+              isLoading={props.isSending}
+              icon="fa-solid fa-arrow-rotate-left"
+              color="primary"
+            />
+          </Tooltip>
+        </>
       }
     >
-      <p
-        class="tooltip tooltip-left mr-3"
-        data-tip={t('your_email_has_been_verified')}
-      >
+      <Tooltip position="left" text={t('your_email_has_been_verified')}>
         <i class="fa-solid fa-check text-success" />
-      </p>
+      </Tooltip>
     </Show>
-  )
-}
-
-function Toggle2FAButton(props: {
-  enable2FA: () => void
-  disable2FA: () => void
-}): JSXElement {
-  const { t } = useLocale()
-  const { user } = useUser()
-
-  return (
-    <>
-      <Show when={user().twoFactorEnabled}>
-        <p class="tooltip tooltip-left" data-tip={t('disable_2fa')}>
-          <button
-            class="btn btn-ghost btn-sm"
-            onClick={() => props.disable2FA()}
-          >
-            <i class="fa-solid fa-toggle-on text-success" />
-          </button>
-        </p>
-      </Show>
-
-      <Show when={!user().twoFactorEnabled}>
-        <p class="tooltip tooltip-left" data-tip={t('enable_2fa')}>
-          <button
-            class="btn btn-ghost btn-sm"
-            onClick={() => props.enable2FA()}
-          >
-            <i class="fa-solid fa-toggle-off text-error" />
-          </button>
-        </p>
-      </Show>
-    </>
   )
 }

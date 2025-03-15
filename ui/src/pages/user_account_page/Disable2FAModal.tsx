@@ -86,9 +86,11 @@ export function Disable2FAModal(props: ModalBaseProps): JSXElement {
           </Show>
 
           <div class="modal-action">
-            <Button type="submit" isLoading={totpForm.submitting}>
-              {t('disable_2fa')}
-            </Button>
+            <Button
+              label={t('disable_2fa')}
+              type="submit"
+              isLoading={totpForm.submitting}
+            />
           </div>
         </Totp.Form>
       </div>

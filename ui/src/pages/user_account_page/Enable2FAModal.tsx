@@ -88,13 +88,13 @@ export function Enable2FAModal(props: ModalBaseProps): JSXElement {
         </div>
 
         <div class="flex justify-center">
-          <button
-            class="btn btn-primary btn-sm btn-outline"
-            onClick={fetchQRCode}
-          >
-            <i class="fas fa-undo mr-2" />
-            {t('regenerate_qr_code')}
-          </button>
+          <Button
+            label={t('regenerate_qr_code')}
+            color="primary"
+            class="btn-sm btn-outline"
+            onClick={() => fetchQRCode()}
+            icon="fas fa-undo"
+          />
         </div>
       </div>
 
@@ -102,6 +102,7 @@ export function Enable2FAModal(props: ModalBaseProps): JSXElement {
         <h3 class="font-bold text-lg">
           {t('step_2_verify_the_setup_by_filling_in_the_2fa_code')}
         </h3>
+
         <p class="py-4">
           {t('enter_the_6_digit_code_generated_by_your_authenticator_app')}
         </p>
@@ -130,9 +131,11 @@ export function Enable2FAModal(props: ModalBaseProps): JSXElement {
           </Show>
 
           <div class="modal-action">
-            <Button type="submit" isLoading={totpForm.submitting}>
-              {t('enable_2fa')}
-            </Button>
+            <Button
+              label={t('enable_2fa')}
+              type="submit"
+              isLoading={totpForm.submitting}
+            />
           </div>
         </Totp.Form>
       </div>

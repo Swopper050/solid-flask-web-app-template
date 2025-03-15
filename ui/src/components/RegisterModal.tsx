@@ -1,6 +1,5 @@
 import { JSXElement, Show } from 'solid-js'
 import { useNavigate } from '@solidjs/router'
-import { clsx } from 'clsx'
 
 import {
   clearResponse,
@@ -24,6 +23,7 @@ import { User } from '../models/User'
 import { TextInput } from './TextInput'
 import { Modal, ModalBaseProps } from './Modal'
 import { Alert } from './Alert'
+import { Button } from './Button'
 
 type RegisterFormData = {
   email: string
@@ -152,18 +152,13 @@ export function RegisterModal(props: ModalBaseProps): JSXElement {
           </Show>
 
           <div class="modal-action">
-            <button
-              class={clsx(
-                'btn btn-primary w-full',
-                registerForm.submitting && 'btn-disabled'
-              )}
+            <Button
+              label={t('register')}
               type="submit"
-            >
-              {t('register')}
-              <Show when={registerForm.submitting}>
-                <span class="loading loading-ball" />
-              </Show>
-            </button>
+              class="w-full"
+              color="primary"
+              isLoading={registerForm.submitting}
+            />
           </div>
         </div>
       </Register.Form>

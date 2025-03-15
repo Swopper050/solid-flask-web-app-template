@@ -1,6 +1,5 @@
 import { JSXElement, Show } from 'solid-js'
 import { A, useSearchParams } from '@solidjs/router'
-import { clsx } from 'clsx'
 
 import { TopBar } from '../components/TopBar'
 import { TextInput } from '../components/TextInput'
@@ -19,6 +18,7 @@ import {
 } from '@modular-forms/solid'
 
 import { getErrorMessage, resetPassword } from '../api'
+import { Button } from '../components/Button'
 
 type PasswordResetFormData = {
   password: string
@@ -146,25 +146,16 @@ export function ResetPasswordPage(): JSXElement {
               </div>
             </Show>
 
-            <div class="flex justify-center mt-10">
+            <div class="flex justify-center mt-10 gap-2">
               <A class="btn btn-primary btn-outline" href="/home">
                 {t('back_to_home')}
               </A>
-
-              <button
-                class={clsx(
-                  'btn btn-primary ml-4',
-                  (resetPasswordForm.response.status === 'success' ||
-                    resetPasswordForm.submitting) &&
-                    'btn-disabled'
-                )}
+              <Button
+                label={t('reset_password')}
+                isLoading={resetPasswordForm.submitting}
                 type="submit"
-              >
-                {t('reset_password')}
-                <Show when={resetPasswordForm.submitting}>
-                  <span class="loading loading-ball" />
-                </Show>
-              </button>
+                color="primary"
+              />
             </div>
           </ResetPassword.Form>
         </div>
