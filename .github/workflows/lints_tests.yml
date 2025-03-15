@@ -66,26 +66,26 @@ jobs:
   tests-ui-cypress:
     runs-on: ubuntu-latest
     services:
-    db:
-      image: mariadb:latest
-      env:
-        MYSQL_ROOT_PASSWORD: my_solid_app_root_password
-        MYSQL_DATABASE: my_solid_app_db
-        MYSQL_USER: my_solid_app_user
-        MYSQL_PASSWORD: my_solid_app_password
-      ports:
-        - 3306:3306
-      options: >-
-        --health-cmd="mysqladmin ping" 
-        --health-interval=10s 
-        --health-timeout=5s 
-        --health-retries=3
+      db:
+        image: mariadb:latest
+        env:
+          MYSQL_ROOT_PASSWORD: my_solid_app_root_password
+          MYSQL_DATABASE: my_solid_app_db
+          MYSQL_USER: my_solid_app_user
+          MYSQL_PASSWORD: my_solid_app_password
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping" 
+          --health-interval=10s 
+          --health-timeout=5s 
+          --health-retries=3
 
-    mail:
-      image: maildev/maildev
-      ports:
-        - 1080:1080
-        - 1025:1025
+      mail:
+        image: maildev/maildev
+        ports:
+          - 1080:1080
+          - 1025:1025
 
     steps:
       - uses: cypress-io/github-action@v6
