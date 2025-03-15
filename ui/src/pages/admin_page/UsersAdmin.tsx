@@ -228,6 +228,7 @@ function DeleteUserModal(props: DeleteUserModalProps): JSXElement {
 
           <Button
             label={t('delete')}
+            type="submit"
             color="error"
             isLoading={deleteForm.submitting}
           />
