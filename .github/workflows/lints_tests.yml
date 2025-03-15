@@ -115,6 +115,7 @@ jobs:
           start: pnpm run dev
           wait-on: 'http://localhost:5173'
           wait-on-timeout: 10
+          browser: firefox
         env:
           CYPRESS_BASE_URL: http://localhost:5173
           CYPRESS_MAIL_HOST: localhost
