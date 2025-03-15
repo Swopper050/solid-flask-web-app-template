@@ -34,11 +34,13 @@ def create_app(config_object: DevConfig | ProdConfig | TestConfig = ProdConfig()
     app.logger.handlers = gunicorn_logger.handlers
     app.logger.setLevel(logging.DEBUG if app.config["DEBUG"] else logging.INFO)
 
-    file_handler = RotatingFileHandler('logs/api.log', maxBytes=10240, backupCount=3)
+    file_handler = RotatingFileHandler("api.log")
     file_handler.setLevel(logging.INFO)
-    file_handler.setFormatter(logging.Formatter(
-        '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
-    ))
+    file_handler.setFormatter(
+        logging.Formatter(
+            "%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]"
+        )
+    )
     app.logger.addHandler(file_handler)
 
     @app.after_request
