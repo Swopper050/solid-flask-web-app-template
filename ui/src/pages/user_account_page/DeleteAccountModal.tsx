@@ -50,14 +50,14 @@ export function DeleteAccountModal(props: ModalBaseProps): JSXElement {
         <Button
           label={t('cancel')}
           onClick={() => props.onClose()}
-          variant="secondary"
+          color="secondary"
           isLoading={deleting()}
         />
 
         <Button
           label={t('delete_account')}
           onClick={() => onDeleteAccount()}
-          variant="error"
+          color="error"
           isLoading={deleting()}
         />
       </div>

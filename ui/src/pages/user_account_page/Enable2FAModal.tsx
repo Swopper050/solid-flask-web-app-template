@@ -90,7 +90,7 @@ export function Enable2FAModal(props: ModalBaseProps): JSXElement {
         <div class="flex justify-center">
           <Button
             label={t('regenerate_qr_code')}
-            variant="primary"
+            color="primary"
             class="btn-sm btn-outline"
             onClick={() => fetchQRCode()}
             icon="fas fa-undo"

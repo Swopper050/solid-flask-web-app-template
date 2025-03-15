@@ -1,6 +1,5 @@
 import { JSXElement, Show } from 'solid-js'
 import { A } from '@solidjs/router'
-import { clsx } from 'clsx'
 
 import { Alert } from '../components/Alert'
 import { TopBar } from '../components/TopBar'
@@ -55,7 +54,7 @@ export function ForgotPasswordPage(): JSXElement {
       </div>
 
       <div class="flex justify-center mt-20">
-        <div class="flex flex-col w-80">
+        <div class="flex flex-col">
           <ForgotPassword.Form onSubmit={onPasswordReset}>
             <ForgotPassword.Field
               name="email"
@@ -103,15 +102,11 @@ export function ForgotPasswordPage(): JSXElement {
               </A>
 
               <Button
+                label={t('send_reset_email')}
+                color="primary"
                 type="submit"
                 isLoading={forgotPasswordForm.submitting}
-                class={clsx(
-                  forgotPasswordForm.response.status === 'success' &&
-                    'btn-disabled'
-                )}
-              >
-                {t('send_reset_email')}
-              </Button>
+              />
             </div>
           </ForgotPassword.Form>
         </div>

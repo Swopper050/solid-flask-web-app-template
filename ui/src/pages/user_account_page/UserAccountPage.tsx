@@ -48,9 +48,7 @@ export function UserAccountPage(): JSXElement {
           <TableRow
             cells={[
               t('email'),
-
               user().email,
-
               <VerifyEmailButton
                 isSending={sending()}
                 isVerified={user().isVerified}
@@ -61,14 +59,12 @@ export function UserAccountPage(): JSXElement {
           <TableRow
             cells={[
               t('password'),
-
               '*******',
-
               <Tooltip position="left" text={t('change_password')}>
                 <IconButton
                   icon="fa-solid fa-edit"
                   onClick={() => openModal('password')}
-                  variant="secondary"
+                  color="primary"
                 />
               </Tooltip>,
             ]}
@@ -78,7 +74,6 @@ export function UserAccountPage(): JSXElement {
             cells={[
               t('enabled_2fa'),
               <>{user().twoFactorEnabled ? t('yes') : t('no')}</>,
-
               <Tooltip
                 position="left"
                 text={twoFactorEnabled() ? t('disable_2fa') : t('enable_2fa')}
@@ -89,10 +84,10 @@ export function UserAccountPage(): JSXElement {
                       ? () => openModal('disable2FA')
                       : () => openModal('enable2FA')
                   }
-                  variant={'secondary'}
+                  color={twoFactorEnabled() ? 'error' : 'success'}
                   icon={
                     twoFactorEnabled()
-                      ? 'fa-solid fa-toggle-off'
+                      ? 'fa-solid fa-toggle-on'
                       : 'fa-solid fa-toggle-off'
                   }
                 />
@@ -105,7 +100,7 @@ export function UserAccountPage(): JSXElement {
           <Button
             label={t('delete_account')}
             onClick={() => openModal('deleteAcount')}
-            variant="error"
+            color="error"
             icon="fa-solid fa-trash"
           />
         </div>
@@ -157,7 +152,7 @@ function VerifyEmailButton(props: {
               onClick={() => props.onClick()}
               isLoading={props.isSending}
               icon="fa-solid fa-arrow-rotate-left"
-              variant="secondary"
+              color="primary"
             />
           </Tooltip>
         </>

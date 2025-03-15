@@ -158,6 +158,7 @@ export function LoginModal(props: ModalBaseProps): JSXElement {
             <Button
               label={t('login')}
               isLoading={loginForm.submitting}
+              color="primary"
               type="submit"
             />
           </div>
@@ -197,6 +198,7 @@ export function LoginModal(props: ModalBaseProps): JSXElement {
             <Button
               label={t('login')}
               isLoading={totpForm.submitting}
+              color="primary"
               type="submit"
             />
           </div>

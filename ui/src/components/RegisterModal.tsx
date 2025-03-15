@@ -155,6 +155,7 @@ export function RegisterModal(props: ModalBaseProps): JSXElement {
             label={t('register')}
             isLoading={registerForm.submitting}
             type="submit"
+            color="primary"
           />
         </div>
       </Register.Form>
