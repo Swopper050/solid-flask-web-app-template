@@ -109,9 +109,7 @@ jobs:
         with:
           install-command: make deps
           working-directory: ui
-          start: |
-            cd ../api && make server &
-            pnpm run dev 
+          start: bash -c "cd ../api && make server & cd ../ui && pnpm start"
           wait-on: 'http://localhost:5173'
           wait-on-timeout: 10
         env:
