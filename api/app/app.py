@@ -56,4 +56,18 @@ def create_app(config_object: DevConfig | ProdConfig | TestConfig = ProdConfig()
         )
         return response
 
+    @app.errorhandler(Exception)
+    def handle_internal_error(error):
+        code = 500
+
+        app.logger.exception(
+            "Internal Server Error: %s %s [%s] %s %s",
+            request.method,
+            request.path,
+            code,
+            str(error),
+            repr(error),
+        )
+        return {"error": "Internal Server Error"}, 500
+
     return app

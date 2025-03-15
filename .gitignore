@@ -2,4 +2,4 @@ prod_db_backup.sql
 
 secrets.env
 
-screenshots/
+artifacts/

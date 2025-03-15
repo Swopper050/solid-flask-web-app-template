@@ -74,7 +74,6 @@ jobs:
       - name: Check for unmigrated changes
         run: |
           cd api
-          make db_upgrade
           make migrate
           if grep -q "op\." migrations/versions/$(ls -t migrations/versions/ | head -n 1); then
             echo "::error::Database model changes detected without corresponding migration. Please use 'make migrate' to create the required migration."
