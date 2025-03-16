@@ -14,7 +14,9 @@ export function LanguageSelector(): JSXElement {
   return (
     <details ref={detailsRef} class="dropdown dropdown-end">
       <summary class="btn btn-sm btn-ghost">
-        {countryCodeToFlag(locale())}
+        <div class="flex gap-2">
+          <CountryFlag countryCode={locale()} />
+        </div>
       </summary>
 
       <ul class="menu dropdown-content bg-base-100 rounded-box shadow-sm z-100">
@@ -28,8 +30,8 @@ export function LanguageSelector(): JSXElement {
                   detailsRef?.removeAttribute('open')
                 }}
               >
-                <div class="flex gap-2">
-                  <span>{countryCodeToFlag(language)}</span>
+                <div class="flex gap-2 mr-2">
+                  <CountryFlag countryCode={language} />
                   <span>{language}</span>
                 </div>
               </button>
@@ -41,21 +43,21 @@ export function LanguageSelector(): JSXElement {
   )
 }
 
-function countryCodeToFlag(countryCode: string): string {
-  if (countryCode === 'en') {
-    countryCode = 'gb'
-  }
+interface CountryFlagProps {
+  countryCode: string
+  width?: number
+}
 
-  // Convert the country code to uppercase to match the regional indicator symbols
-  const code = countryCode.toUpperCase()
+function resolveCountryCode(code: string): string {
+  return code.toUpperCase() === 'EN' ? 'GB' : code.toUpperCase()
+}
 
-  // Calculate the offset for the regional indicator symbols
-  const offset = 127397
-
-  // Convert each letter in the country code to its corresponding regional indicator symbol
-  const flag = Array.from(code)
-    .map((letter) => String.fromCodePoint(letter.charCodeAt(0) + offset))
-    .join('')
-
-  return flag
+function CountryFlag(props: CountryFlagProps): JSXElement {
+  return (
+    <img
+      width={`${props.width || 15}px`}
+      alt={resolveCountryCode(props.countryCode)}
+      src={`https://purecatamphetamine.github.io/country-flag-icons/3x2/${resolveCountryCode(props.countryCode)}.svg`}
+    />
+  )
 }
