@@ -44,6 +44,7 @@ export function Button(props: {
         props.color ? `btn-${props.color}` : undefined,
         props.style && !props.color ? `btn-${props.style}` : undefined,
         props.size ? `btn-${props.size}` : undefined,
+        props.isLoading && 'btn-disabled',
         props.class
       )}
       type={props.type ?? 'button'}
@@ -56,7 +57,12 @@ export function Button(props: {
       {props.label}
 
       <Show when={props.isLoading}>
-        <span class="loading loading-ball" />
+        <span
+          class={clsx(
+            'loading loading-ball',
+            props.size ? `loading-${props.size}` : undefined
+          )}
+        />
       </Show>
     </button>
   )
@@ -78,6 +84,7 @@ export function IconButton(props: {
         'btn',
         props.style ? `btn-${props.style}` : 'btn-ghost',
         props.size ? `btn-${props.size}` : 'btn-sm',
+        props.isLoading && 'btn-disabled',
         props.class
       )}
       onClick={() => props.onClick?.()}

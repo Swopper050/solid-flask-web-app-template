@@ -28,6 +28,9 @@ ts_watch: ## Run the typescript compiler in watch mode
 
 formatlint: format lint ## First format code, then run linters
 
+cypress: ## Open cypress for creating and running tests
+	pnpm cypress open
+
 server: ## Start the development server
 	pnpm run dev
 
@@ -57,3 +60,5 @@ docker_push_latest: ## Push the odcker container with the tag 'latest'
 docker_push_stable: ## Push the odcker containers with the current git version tag and 'stable'
 	docker push $(DOCKERHUB_NAMESPACE)/my-solid-app-ui:$(VERSION)
 	docker push $(DOCKERHUB_NAMESPACE)/my-solid-app-ui:stable
+
+.PHONY: cypress

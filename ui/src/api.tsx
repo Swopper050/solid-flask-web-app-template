@@ -165,4 +165,5 @@ const errorMessages: Record<number, keyof TranslationKeys> = {
   10: 'incorrect_2fa_code_try_again',
   11: 'twofa_is_already_disabled',
   12: 'user_not_found',
+  13: 'an_unknown_error_occurred',
 }

@@ -49,22 +49,6 @@ jobs:
     - name: Lint
       run: cd api && make lint
 
-  tests-api:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-
-    - name: Setup python
-      uses: actions/setup-python@v5
-      with:
-        python-version: 3.13
-
-    - name: Install dependencies
-      run: cd api && make deps
-
-    - name: Tests
-      run: cd api && make test
-      
   check-migrations:
     runs-on: ubuntu-latest
     services:
@@ -79,6 +63,42 @@ jobs:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
     steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.13
+
+      - name: Install dependencies
+        run: cd api && make deps
+
+      - name: Check for unmigrated changes
+        run: |
+          cd api
+          make migrate
+          if grep -q "op\." migrations/versions/$(ls -t migrations/versions/ | head -n 1); then
+            echo "::error::Database model changes detected without corresponding migration. Please use 'make migrate' to create the required migration."
+            exit 1
+          fi
+
+  check-translations:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.13
+          
+      - name: Check translations
+        run: cd ui && make check_translations
+
+  tests-api:
+    runs-on: ubuntu-latest
+    needs: [lint-ui, lint-api, check-translations, check-migrations]
+    steps:
     - uses: actions/checkout@v4
 
     - name: Setup python
@@ -89,31 +109,88 @@ jobs:
     - name: Install dependencies
       run: cd api && make deps
 
-    - name: Check for unmigrated changes
-      run: |
-        cd api
-        make db_upgrade
-        make migrate
-        if grep -q "op\." migrations/versions/$(ls -t migrations/versions/ | head -n 1); then
-          echo "::error::Database model changes detected without corresponding migration. Please use 'make migrate' to create the required migration."
-          exit 1
-        fi
+    - name: Tests
+      run: cd api && make test
 
-  check-translations:
+  tests-cypress-e2e:
     runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    
-    - name: Setup Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: 3.13
-        
-    - name: Check translations
-      run: cd ui && make check_translations
+    needs: [lint-ui, lint-api, check-translations, check-migrations]
+    services:
+      db:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: my_solid_app_db_root_password
+          MYSQL_DATABASE: my_solid_app_db
+          MYSQL_USER: my_solid_app_user
+          MYSQL_PASSWORD: my_solid_app_password
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
+      mail:
+        image: maildev/maildev
+        env:
+          MAILDEV_INCOMING_USER: mysolidapp@mail.com
+          MAILDEV_INCOMING_PASS: 12345678
+        ports:
+          - 1080:1080
+          - 1025:1025
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 23
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.13
+
+      - name: Install API dependencies
+        run: cd api && python -m venv .env && source .env/bin/activate && make deps
+
+      - name: Run API server on background 
+        run: cd api && source .env/bin/activate && make MY_SOLID_APP_FILE_LOGGING=True server &
+
+      - name: Run Cypress Tests
+        uses: cypress-io/github-action@v6
+        with:
+          install-command: make deps
+          working-directory: ui
+          start: pnpm run dev
+          wait-on: 'http://localhost:5173'
+          wait-on-timeout: 10
+          browser: chrome
+        env:
+          CYPRESS_BASE_URL: http://localhost:5173
+          CYPRESS_MAIL_HOST: localhost
+          CYPRESS_MAIL_PORT: 1080
+
+      - name: Upload screenshots
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: cypress-screenshots
+          path: ui/cypress/screenshots
+
+      - name: Upload API Logs
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: api-logs
+          path: api/api.log
+      
   docker-api-build-test:
     runs-on: ubuntu-latest
+    needs: [tests-api, tests-cypress-e2e]
     steps:
       - name: Setup
         uses: actions/checkout@v4
@@ -123,6 +200,7 @@ jobs:
 
   docker-ui-build-test:
     runs-on: ubuntu-latest
+    needs: [tests-api, tests-cypress-e2e]
     steps:
       - name: Setup
         uses: actions/checkout@v4

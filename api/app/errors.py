@@ -15,6 +15,7 @@ class APIErrorEnum(IntEnum):
     incorrect_totp_code = 10
     already_2fa_disabled = 11
     user_not_found = 12
+    unknown_error = 13
 
 
 class APIError(Exception):
