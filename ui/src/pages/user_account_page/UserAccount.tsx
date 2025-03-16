@@ -159,7 +159,9 @@ function VerifyEmailButton(props: {
       }
     >
       <Tooltip position="left" text={t('your_email_has_been_verified')}>
-        <i class="fa-solid fa-check text-success" />
+        <div class="mr-3">
+          <i class="fa-solid fa-check text-success" />
+        </div>
       </Tooltip>
     </Show>
   )
