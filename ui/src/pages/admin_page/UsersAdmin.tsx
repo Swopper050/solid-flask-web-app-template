@@ -3,7 +3,13 @@ import { createSignal, createResource, JSXElement, Show, For } from 'solid-js'
 import { UserAttributes } from '../../models/User'
 import { Alert } from '../../components/Alert'
 import { Pagination } from '../../components/Pagination'
-import { createUser, getUsers, deleteUser } from '../../api'
+import {
+  createUser,
+  getUsers,
+  deleteUser,
+  CreateUserFormData,
+  DeleteUserData,
+} from '../../api'
 
 import { BooleanInput } from '../../components/BooleanInput'
 import { TextInput } from '../../components/TextInput'
@@ -12,19 +18,16 @@ import { createModalState, Modal, ModalBaseProps } from '../../components/Modal'
 import { useLocale } from '../../context/LocaleProvider'
 
 import {
-  clearResponse,
   createForm,
-  reset,
   pattern,
   email,
   minLength,
   required,
-  setResponse,
-  SubmitHandler,
 } from '@modular-forms/solid'
 import { Table, TableRow } from '../../components/Table'
 import { Tooltip } from '../../components/Tooltip'
 import { Button } from '../../components/Button'
+import { createFormWithSubmit, createSubmitHandler } from '../../form_helpers'
 
 export function UsersAdmin(): JSXElement {
   const { t } = useLocale()
@@ -182,28 +185,16 @@ function DeleteUserModal(
   } & ModalBaseProps
 ): JSXElement {
   const { t } = useLocale()
+  const user = () => props.user
 
-  const [deleteForm, Delete] = createForm()
-
-  const handleDelete = async () => {
-    if (props.user === null || props.user.id === null) {
-      return
-    }
-
-    const response = await deleteUser(props.user.id)
-
-    if (response.status !== 200) {
-      setResponse(deleteForm, {
-        status: 'error',
-        message: (await response.json()).error_message,
-      })
-      return
-    }
-
-    setResponse(deleteForm, { status: 'success' })
-    props.onClose()
-    props.onDelete()
-  }
+  const [deleteForm, onSubmit, Delete] = createFormWithSubmit<DeleteUserData>({
+    action: deleteUser,
+    onFinish: () => {
+      props.onDelete()
+      props.onClose()
+    },
+    formOptions: { initialValues: { userID: user()?.id ?? 0 } },
+  })
 
   return (
     <Modal
@@ -214,7 +205,7 @@ function DeleteUserModal(
       <p class="mt-4">{t('delete_user_confirmation')}</p>
       <p class="mt-2 font-bold">{props.user?.email}</p>
 
-      <Delete.Form onSubmit={handleDelete}>
+      <Delete.Form onSubmit={onSubmit}>
         <Show when={deleteForm.response.status === 'error'}>
           <Alert type="error" message={deleteForm.response.message} />
         </Show>
@@ -246,45 +237,25 @@ interface CreateUserModalProps extends ModalBaseProps {
   onCreate: () => void
 }
 
-type CreateUserFormData = {
-  email: string
-  password: string
-  isAdmin: boolean
-}
-
 function CreateUserModal(props: CreateUserModalProps): JSXElement {
   const { t } = useLocale()
 
   const [createUserForm, Create] = createForm<CreateUserFormData>()
 
-  const handleCreate: SubmitHandler<CreateUserFormData> = async (values) => {
-    const response = await createUser(
-      values.email,
-      values.password,
-      values.isAdmin
-    )
-
-    if (response.status !== 200) {
-      setResponse(createUserForm, {
-        status: 'error',
-        message: (await response.json()).error_message,
-      })
-      return
-    }
-
-    setResponse(createUserForm, { status: 'success' })
-    onClose()
-    props.onCreate()
-  }
-
-  const onClose = () => {
-    reset(createUserForm)
-    clearResponse(createUserForm)
-    props.onClose()
-  }
+  const handleCreate = createSubmitHandler<CreateUserFormData>({
+    form: createUserForm,
+    action: createUser,
+    onFinish: () => {
+      props.onClose()
+    },
+  })
 
   return (
-    <Modal title={t('create_new_user')} isOpen={props.isOpen} onClose={onClose}>
+    <Modal
+      title={t('create_new_user')}
+      isOpen={props.isOpen}
+      onClose={() => props.onClose()}
+    >
       <div class="space-y-4">
         <Create.Form onSubmit={handleCreate} class="w-full">
           <Create.Field

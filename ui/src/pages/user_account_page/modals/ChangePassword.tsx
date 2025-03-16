@@ -3,46 +3,42 @@ import { createEffect, JSXElement, Show } from 'solid-js'
 import { useUser } from '../../../context/UserProvider'
 import { useLocale } from '../../../context/LocaleProvider'
 
-import { changePassword, getErrorMessage } from '../../../api'
+import { changePassword, ChangePasswordData } from '../../../api'
 import {
-  clearResponse,
-  createForm,
   getValue,
   minLength,
   pattern,
-  reset,
-  setResponse,
   required,
-  SubmitHandler,
+  reset,
 } from '@modular-forms/solid'
 
 import { Alert } from '../../../components/Alert'
 import { TextInput } from '../../../components/TextInput'
 import { Modal, ModalBaseProps } from '../../../components/Modal'
 import { Button } from '../../../components/Button'
-
-type ChangePasswordFormData = {
-  currentPassword: string
-  newPassword: string
-  confirmNewPassword: string
-}
+import { createFormWithSubmit } from '../../../form_helpers'
 
 export function ChangePasswordModal(props: ModalBaseProps): JSXElement {
   const { t } = useLocale()
-
-  const [changePasswordForm, { Form, Field }] = createForm<
-    ChangePasswordFormData,
-    UserAttributes
-  >()
-
   const { setUser } = useUser()
 
-  const saved = () => {
-    return changePasswordForm.submitted === true
+  const [state, onSubmit, { Form, Field }] = createFormWithSubmit<
+    ChangePasswordData,
+    UserAttributes
+  >({
+    action: changePassword,
+    onFinish: () => {
+      props.onClose()
+    },
+  })
+
+  const onClose = () => {
+    reset(state)
+    props.onClose()
   }
 
   const newPassword = () => {
-    return getValue(changePasswordForm, 'newPassword', {
+    return getValue(state, 'newPassword', {
       shouldActive: false,
       shouldTouched: true,
       shouldDirty: true,
@@ -62,49 +58,17 @@ export function ChangePasswordModal(props: ModalBaseProps): JSXElement {
   }
 
   createEffect(() => {
-    if (saved()) {
-      if (changePasswordForm.response.status === 'success') {
-        if (changePasswordForm.response.data !== undefined) {
-          setUser(new User(changePasswordForm.response.data))
+    if (state.submitted === true) {
+      if (state.response.status === 'success') {
+        if (state.response.data !== undefined) {
+          setUser(new User(state.response.data))
         }
       }
     }
   })
 
-  const onSubmit: SubmitHandler<ChangePasswordFormData> = async (values) => {
-    const response = await changePassword(
-      values.currentPassword,
-      values.newPassword
-    )
-
-    if (response.status !== 200) {
-      setResponse(changePasswordForm, {
-        status: 'error',
-        message: t(await getErrorMessage(response)),
-      })
-
-      return
-    }
-
-    const data = await response.json()
-
-    setResponse(changePasswordForm, {
-      status: 'success',
-      data: data,
-    })
-
-    props.onClose()
-
-    clearResponse(changePasswordForm)
-    reset(changePasswordForm)
-  }
-
   return (
-    <Modal
-      title={t('change_password')}
-      isOpen={props.isOpen}
-      onClose={props.onClose}
-    >
+    <Modal title={t('change_password')} isOpen={props.isOpen} onClose={onClose}>
       <Form onSubmit={onSubmit}>
         <Field name="currentPassword">
           {(field, props) => (
@@ -155,8 +119,8 @@ export function ChangePasswordModal(props: ModalBaseProps): JSXElement {
           )}
         </Field>
 
-        <Show when={changePasswordForm.response.status === 'error'}>
-          <Alert type="error" message={changePasswordForm.response.message} />
+        <Show when={state.response.status === 'error'}>
+          <Alert type="error" message={state.response.message} />
         </Show>
 
         <div class="modal-action">
@@ -164,7 +128,7 @@ export function ChangePasswordModal(props: ModalBaseProps): JSXElement {
             label={t('change_password')}
             type="submit"
             color="primary"
-            isLoading={changePasswordForm.submitting}
+            isLoading={state.submitting}
           />
         </div>
       </Form>

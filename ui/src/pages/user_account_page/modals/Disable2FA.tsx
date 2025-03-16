@@ -1,55 +1,28 @@
 import { JSXElement, Show } from 'solid-js'
-import { disable2FA, getErrorMessage } from '../../../api'
+import { disable2FA, Disable2FAData } from '../../../api'
 import { useUser } from '../../../context/UserProvider'
 import { useLocale } from '../../../context/LocaleProvider'
 
-import {
-  required,
-  pattern,
-  createForm,
-  clearResponse,
-  reset,
-  setResponse,
-  SubmitHandler,
-} from '@modular-forms/solid'
+import { required, pattern } from '@modular-forms/solid'
 
 import { Alert } from '../../../components/Alert'
 import { Modal, ModalBaseProps } from '../../../components/Modal'
 import { TextInput } from '../../../components/TextInput'
 import { Button } from '../../../components/Button'
-
-type TotpFormData = {
-  totpCode: string
-}
+import { createFormWithSubmit } from '../../../form_helpers'
 
 export function Disable2FAModal(props: ModalBaseProps): JSXElement {
   const { t } = useLocale()
   const { fetchUser } = useUser()
 
-  const [totpForm, Totp] = createForm<TotpFormData>()
-
-  const onDisable2FA: SubmitHandler<TotpFormData> = async (values) => {
-    const response = await disable2FA(values.totpCode)
-
-    if (response.status !== 200) {
-      setResponse(totpForm, {
-        status: 'error',
-        message: t(await getErrorMessage(response)),
-      })
-      return
-    }
-
-    await fetchUser()
-    setResponse(totpForm, { status: 'success' })
-
-    onClose()
-    props.onClose()
-  }
-
-  const onClose = () => {
-    clearResponse(totpForm)
-    reset(totpForm)
-  }
+  const [state, onSubmit, { Form, Field }] =
+    createFormWithSubmit<Disable2FAData>({
+      action: disable2FA,
+      onFinish: () => {
+        fetchUser()
+        props.onClose()
+      },
+    })
 
   return (
     <Modal
@@ -62,8 +35,8 @@ export function Disable2FAModal(props: ModalBaseProps): JSXElement {
           {t('enter_the_6_digit_code_generated_by_your_authenticator_app')}
         </p>
 
-        <Totp.Form onSubmit={onDisable2FA}>
-          <Totp.Field
+        <Form onSubmit={onSubmit}>
+          <Field
             name="totpCode"
             validate={[
               required(t('please_enter_a_6_digit_code')),
@@ -79,10 +52,10 @@ export function Disable2FAModal(props: ModalBaseProps): JSXElement {
                 icon={<i class="fa-solid fa-hashtag" />}
               />
             )}
-          </Totp.Field>
+          </Field>
 
-          <Show when={totpForm.response.status === 'error'}>
-            <Alert type="error" message={totpForm.response.message} />
+          <Show when={state.response.status === 'error'}>
+            <Alert type="error" message={state.response.message} />
           </Show>
 
           <div class="modal-action">
@@ -90,10 +63,10 @@ export function Disable2FAModal(props: ModalBaseProps): JSXElement {
               label={t('disable_2fa')}
               type="submit"
               color="primary"
-              isLoading={totpForm.submitting}
+              isLoading={state.submitting}
             />
           </div>
-        </Totp.Form>
+        </Form>
       </div>
     </Modal>
   )

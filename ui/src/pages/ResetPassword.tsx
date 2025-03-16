@@ -7,53 +7,31 @@ import { Alert } from '../components/Alert'
 
 import { useLocale } from '../context/LocaleProvider'
 
-import {
-  getValue,
-  createForm,
-  required,
-  minLength,
-  pattern,
-  setResponse,
-  SubmitHandler,
-} from '@modular-forms/solid'
+import { getValue, required, minLength, pattern } from '@modular-forms/solid'
 
-import { getErrorMessage, resetPassword } from '../api'
+import { resetPassword, ResetPasswordData } from '../api'
 import { getSingleParam } from './SearchParams'
 import { Button } from '../components/Button'
-
-type PasswordResetFormData = {
-  password: string
-  checkPassword: string
-}
+import { createFormWithSubmit } from '../form_helpers'
 
 export function ResetPasswordPage(): JSXElement {
   const { t } = useLocale()
 
   const [searchParams] = useSearchParams()
-  const [resetPasswordForm, ResetPassword] = createForm<PasswordResetFormData>()
 
-  const onResetPassword: SubmitHandler<PasswordResetFormData> = async (
-    values
-  ) => {
-    const response = await resetPassword(
-      getSingleParam(searchParams.email),
-      getSingleParam(searchParams.reset_token),
-      values.password
-    )
-
-    if (response.status !== 200) {
-      setResponse(resetPasswordForm, {
-        status: 'error',
-        message: t(await getErrorMessage(response)),
-      })
-      return
-    }
-
-    setResponse(resetPasswordForm, { status: 'success' })
-  }
+  const [resetPasswordForm, onSubmit, { Form, Field }] =
+    createFormWithSubmit<ResetPasswordData>({
+      action: resetPassword,
+      formOptions: {
+        initialValues: {
+          email: getSingleParam(searchParams.email),
+          resetToken: getSingleParam(searchParams.resetToken),
+        },
+      },
+    })
 
   const newPassword = () => {
-    return getValue(resetPasswordForm, 'password', {
+    return getValue(resetPasswordForm, 'newPassword', {
       shouldActive: false,
       shouldTouched: true,
       shouldDirty: true,
@@ -79,9 +57,9 @@ export function ResetPasswordPage(): JSXElement {
 
       <div class="flex justify-center mt-20">
         <div class="flex flex-col w-80">
-          <ResetPassword.Form onSubmit={onResetPassword}>
-            <ResetPassword.Field
-              name="password"
+          <Form onSubmit={onSubmit}>
+            <Field
+              name="newPassword"
               validate={[
                 required(t('please_enter_a_new_password')),
                 minLength(8, t('your_password_must_have_8_characters_or_more')),
@@ -106,9 +84,9 @@ export function ResetPasswordPage(): JSXElement {
                   icon={<i class="fa-solid fa-key" />}
                 />
               )}
-            </ResetPassword.Field>
+            </Field>
 
-            <ResetPassword.Field
+            <Field
               name="checkPassword"
               validate={[
                 required(t('please_confirm_your_new_password')),
@@ -125,7 +103,7 @@ export function ResetPasswordPage(): JSXElement {
                   icon={<i class="fa-solid fa-key" />}
                 />
               )}
-            </ResetPassword.Field>
+            </Field>
 
             <Show when={resetPasswordForm.response.status === 'success'}>
               <div class="flex justify-center">
@@ -158,7 +136,7 @@ export function ResetPasswordPage(): JSXElement {
                 color="primary"
               />
             </div>
-          </ResetPassword.Form>
+          </Form>
         </div>
       </div>
     </>

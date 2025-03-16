@@ -2,45 +2,47 @@ import { JSXElement, Show } from 'solid-js'
 import { useNavigate } from '@solidjs/router'
 
 import {
-  clearResponse,
-  createForm,
-  reset,
   minLength,
   getValue,
   pattern,
   email,
   required,
-  setResponse,
-  SubmitHandler,
 } from '@modular-forms/solid'
 
-import { getErrorMessage, register } from '../api'
+import { register, RegisterUserData } from '../api'
 
 import { useUser } from '../context/UserProvider'
 import { useLocale } from '../context/LocaleProvider'
-import { User } from '../models/User'
+import { User, UserAttributes } from '../models/User'
 
 import { TextInput } from './TextInput'
 import { Modal, ModalBaseProps } from './Modal'
 import { Alert } from './Alert'
 import { Button } from './Button'
-
-type RegisterFormData = {
-  email: string
-  password: string
-  checkPassword: string
-}
+import { createFormWithSubmit } from '../form_helpers'
 
 export function RegisterModal(props: ModalBaseProps): JSXElement {
   const { t } = useLocale()
   const { setUser } = useUser()
 
-  const [registerForm, Register] = createForm<RegisterFormData>()
+  const [state, onSubmit, {Form, Field}] = createFormWithSubmit<
+    RegisterUserData,
+    UserAttributes
+  >({
+    action: register,
+    onFinish: (response) => {
+      if (response !== undefined) {
+        setUser(new User(response))
+      }
+
+      navigate('/home')
+    },
+  })
 
   const navigate = useNavigate()
 
   const newPassword = () => {
-    return getValue(registerForm, 'password', {
+    return getValue(state, 'password', {
       shouldActive: false,
       shouldTouched: true,
       shouldDirty: true,
@@ -56,42 +58,17 @@ export function RegisterModal(props: ModalBaseProps): JSXElement {
     }
   }
 
-  const onSubmit: SubmitHandler<RegisterFormData> = async (values) => {
-    const response = await register(values.email, values.password)
-
-    if (response.status !== 200) {
-      setResponse(registerForm, {
-        status: 'error',
-        message: t(await getErrorMessage(response)),
-      })
-      return
-    }
-
-    const data = await response.json()
-    setUser(new User(data))
-    setResponse(registerForm, { status: 'success', data: data })
-
-    onClose()
-    navigate('/home')
-  }
-
-  const onClose = () => {
-    clearResponse(registerForm)
-    reset(registerForm)
-  }
-
   return (
     <Modal
       title={t('register')}
       isOpen={props.isOpen}
       onClose={() => {
-        onClose()
         props.onClose()
       }}
     >
-      <Register.Form onSubmit={onSubmit} class="w-full">
+      <Form onSubmit={onSubmit} class="w-full">
         <div class="space-y-4">
-          <Register.Field
+          <Field
             name="email"
             validate={[
               required(t('please_enter_your_email')),
@@ -108,9 +85,9 @@ export function RegisterModal(props: ModalBaseProps): JSXElement {
                 icon={<i class="fa-solid fa-envelope" />}
               />
             )}
-          </Register.Field>
+          </Field>
 
-          <Register.Field
+          <Field
             name="password"
             validate={[
               minLength(8, t('your_password_must_have_8_characters_or_more')),
@@ -129,9 +106,9 @@ export function RegisterModal(props: ModalBaseProps): JSXElement {
                 icon={<i class="fa-solid fa-key" />}
               />
             )}
-          </Register.Field>
+          </Field>
 
-          <Register.Field
+          <Field
             name="checkPassword"
             validate={[mustMatch(t('passwords_do_not_match'))]}
           >
@@ -145,10 +122,10 @@ export function RegisterModal(props: ModalBaseProps): JSXElement {
                 icon={<i class="fa-solid fa-key" />}
               />
             )}
-          </Register.Field>
+          </Field>
 
-          <Show when={registerForm.response.status === 'error'}>
-            <Alert type="error" message={registerForm.response.message} />
+          <Show when={state.response.status === 'error'}>
+            <Alert type="error" message={state.response.message} />
           </Show>
 
           <div class="modal-action">
@@ -157,11 +134,11 @@ export function RegisterModal(props: ModalBaseProps): JSXElement {
               type="submit"
               class="w-full"
               color="primary"
-              isLoading={registerForm.submitting}
+              isLoading={state.submitting}
             />
           </div>
         </div>
-      </Register.Form>
+      </Form>
     </Modal>
   )
 }
