@@ -3,7 +3,7 @@ import { enable2FA, Enable2FAData, generate2FASecret } from '../../../api'
 import { useUser } from '../../../context/UserProvider'
 import { useLocale } from '../../../context/LocaleProvider'
 
-import { required, pattern, setValue, getValue } from '@modular-forms/solid'
+import { required, pattern, } from '@modular-forms/solid'
 
 import { Alert } from '../../../components/Alert'
 import { Modal, ModalBaseProps } from '../../../components/Modal'
@@ -17,39 +17,20 @@ export function Enable2FAModal(props: ModalBaseProps): JSXElement {
 
   const [qrCode, setQrCode] = createSignal('')
 
-  const [state, onSubmit, { Form, Field }] =
+  const [state, onSubmit, { Form, Field }, setData] =
     createFormWithSubmit<Enable2FAData>({
       action: enable2FA,
       onFinish: () => {
         fetchUser()
         props.onClose()
       },
-      formOptions:{initialValues: {totpSecret: ""}}
     })
 
   const fetchQRCode = async () => {
     const response = await generate2FASecret()
     const data = await response.json()
     setQrCode(data.qr_code)
-
-    // TODO this is not correctly set yet.
-    setValue(state, 'totpSecret', data.totp_secret)
-
-    // Dirty hack to get the fieldsette to work
-    if (state.internal.fields.totpSecret !== undefined) {
-        state.internal.fields.totpSecret.dirty.set(true) 
-        state.internal.fields.totpSecret.touched.set(true) 
-        state.internal.fields.totpSecret.active.set(true) 
-    }
-
-    console.log(
-      getValue(state, 'totpSecret', {
-        shouldDirty: false,
-        shouldTouched: false,
-        shouldValid: false,
-        shouldActive: false,
-      })
-    )
+    setData({totpSecret: data.totp_secret})
   }
 
   onMount(() => {

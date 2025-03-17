@@ -1,7 +1,7 @@
 import { JSXElement, createSignal, Show } from 'solid-js'
 import { useNavigate, A } from '@solidjs/router'
 
-import { pattern, email, required, setValue } from '@modular-forms/solid'
+import { pattern, email, required } from '@modular-forms/solid'
 
 import {
   passwordLogin,
@@ -24,7 +24,7 @@ export function LoginModal(props: ModalBaseProps): JSXElement {
   const { setUser } = useUser()
 
   const [at2FAStep, setAt2FAStep] = createSignal(false)
-  const [closed, setClose] = createSignal(false)
+  const [closed, setClose] = createSignal()
 
   const navigate = useNavigate()
 
@@ -41,7 +41,7 @@ export function LoginModal(props: ModalBaseProps): JSXElement {
 
       if (user.twoFactorEnabled) {
         setAt2FAStep(true)
-        setValue(totpForm, 'email', user.email)
+        setData({ email: user.email })
 
         return
       }
@@ -52,7 +52,7 @@ export function LoginModal(props: ModalBaseProps): JSXElement {
     },
   })
 
-  const [totpForm, onTotpSubmit, Totp] = createFormWithSubmit<
+  const [totpForm, onTotpSubmit, Totp, setData] = createFormWithSubmit<
     TotpLoginData,
     UserAttributes
   >({

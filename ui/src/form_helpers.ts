@@ -16,9 +16,13 @@ import {
   ResponseData,
   setResponse,
 } from '@modular-forms/solid'
-import { JSXElement } from 'solid-js'
+import { Accessor, createSignal, JSXElement, Setter } from 'solid-js'
 import { getErrorMessage } from './api'
 
+/**
+ * TODO
+ *
+ */
 export function createFormWithSubmit<
   TType extends FieldValues,
   TResponse extends ResponseData = undefined,
@@ -43,18 +47,22 @@ export function createFormWithSubmit<
       props: Omit<FieldArrayProps<TType, TResponse, TFieldArrayName>, 'of'>
     ) => JSXElement
   },
+  Setter<Partial<TType | undefined>>,
 ] {
   const [store, { Form, Field, FieldArray }] = createForm<TType, TResponse>(
     options.formOptions
   )
 
+  const [data, setData] = createSignal<Partial<TType>>()
+
   const onSubmit = createSubmitHandler({
     form: store,
     action: options.action,
     onFinish: options.onFinish,
+    additionalData: data,
   })
 
-  return [store, onSubmit, { Form, Field, FieldArray }]
+  return [store, onSubmit, { Form, Field, FieldArray }, setData]
 }
 
 export function createSubmitHandler<
@@ -64,9 +72,15 @@ export function createSubmitHandler<
   form: FormStore<TType, TResponse>
   action: (values: TType) => Promise<Response>
   onFinish?: (response: TResponse | undefined) => void | Promise<void>
+  additionalData?: Accessor<Partial<TType | undefined>>
 }): (values: TType) => void {
   return async (values: TType) => {
-    const response = await options.action(values)
+    let merged = values
+    if (options.additionalData !== undefined) {
+      merged = { ...options.additionalData(), ...values }
+    }
+
+    const response = await options.action(merged)
     const data = await response.json()
 
     if (response.status !== 200) {
