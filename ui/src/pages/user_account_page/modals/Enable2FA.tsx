@@ -33,7 +33,14 @@ export function Enable2FAModal(props: ModalBaseProps): JSXElement {
     setQrCode(data.qr_code)
 
     // TODO this is not correctly set yet.
-    setValue(state, 'totpSecret', data.totp_secret, { shouldTouched: true, shouldDirty: true})
+    setValue(state, 'totpSecret', data.totp_secret)
+
+    // Dirty hack to get the fieldsette to work
+    if (state.internal.fields.totpSecret !== undefined) {
+        state.internal.fields.totpSecret.dirty.set(true) 
+        state.internal.fields.totpSecret.touched.set(true) 
+        state.internal.fields.totpSecret.active.set(true) 
+    }
 
     console.log(
       getValue(state, 'totpSecret', {
