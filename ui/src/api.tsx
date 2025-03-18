@@ -1,6 +1,5 @@
 import { PaginationResult } from './models/Base'
 import { UserAttributes } from './models/User'
-import { TranslationKeys, useLocale } from './context/LocaleProvider'
 
 interface ErrorData {
   error: number
@@ -8,9 +7,7 @@ interface ErrorData {
 }
 
 export function getErrorMessage(response: ErrorData): string {
-  const { t } = useLocale()
-
-  return t(errorMessages[response.error]) || t('an_unknown_error_occurred')
+  return errorMessages[response.error] || 'an_unknown_error_occurred'
 }
 
 export type ChangePasswordData = {
@@ -26,9 +23,13 @@ export async function changePassword(data: ChangePasswordData) {
   })
 }
 
-export async function forgotPassword(email: string) {
+export type ForgotPasswordData = {
+  email: string
+}
+
+export async function forgotPassword(data: ForgotPasswordData) {
   return post('api/forgot_password', {
-    email: email,
+    email: data.email,
   })
 }
 
@@ -143,13 +144,13 @@ export async function whoAmI() {
   return get('api/whoami')
 }
 
-export type CreateUserFormData = {
+export type CreateUserData = {
   email: string
   password: string
   isAdmin: boolean
 }
 
-export async function createUser(data: CreateUserFormData) {
+export async function createUser(data: CreateUserData) {
   return post(`api/users`, {
     email: data.email,
     password: data.password,

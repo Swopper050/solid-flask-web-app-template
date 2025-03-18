@@ -19,7 +19,7 @@ export function ResetPasswordPage(): JSXElement {
 
   const [searchParams] = useSearchParams()
 
-  const [resetPasswordForm, onSubmit, { Form, Field }] =
+  const [state, onSubmit, { Form, Field }] =
     createFormWithSubmit<ResetPasswordData>({
       action: resetPassword,
       formOptions: {
@@ -30,8 +30,9 @@ export function ResetPasswordPage(): JSXElement {
       },
     })
 
+  // TODO this could be shared.
   const newPassword = () => {
-    return getValue(resetPasswordForm, 'newPassword', {
+    return getValue(state, 'newPassword', {
       shouldActive: false,
       shouldTouched: true,
       shouldDirty: true,
@@ -105,7 +106,7 @@ export function ResetPasswordPage(): JSXElement {
               )}
             </Field>
 
-            <Show when={resetPasswordForm.response.status === 'success'}>
+            <Show when={state.response.status === 'success'}>
               <div class="flex justify-center">
                 <Alert
                   type="success"
@@ -115,11 +116,11 @@ export function ResetPasswordPage(): JSXElement {
               </div>
             </Show>
 
-            <Show when={resetPasswordForm.response.status === 'error'}>
+            <Show when={state.response.status === 'error'}>
               <div class="flex justify-center">
                 <Alert
                   type="error"
-                  message={resetPasswordForm.response.message}
+                  message={state.response.message}
                   extraClasses="w-96"
                 />
               </div>
@@ -131,7 +132,7 @@ export function ResetPasswordPage(): JSXElement {
               </A>
               <Button
                 label={t('reset_password')}
-                isLoading={resetPasswordForm.submitting}
+                isLoading={state.submitting}
                 type="submit"
                 color="primary"
               />
