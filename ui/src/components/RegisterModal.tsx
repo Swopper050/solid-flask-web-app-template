@@ -24,8 +24,9 @@ import { createFormWithSubmit } from '../form_helpers'
 export function RegisterModal(props: ModalBaseProps): JSXElement {
   const { t } = useLocale()
   const { setUser } = useUser()
+  const navigate = useNavigate()
 
-  const [state, onSubmit, {Form, Field}] = createFormWithSubmit<
+  const [state, onSubmit, { Form, Field }] = createFormWithSubmit<
     RegisterUserData,
     UserAttributes
   >({
@@ -38,8 +39,6 @@ export function RegisterModal(props: ModalBaseProps): JSXElement {
       navigate('/home')
     },
   })
-
-  const navigate = useNavigate()
 
   const newPassword = () => {
     return getValue(state, 'password', {

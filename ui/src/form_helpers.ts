@@ -3,18 +3,20 @@ import {
   createForm,
   FieldArrayPath,
   FieldArrayProps,
-  FieldPath,
   FieldPathValue,
   FieldProps,
   FieldValues,
   FormOptions,
   FormProps,
   FormStore,
+  FieldPath,
+  getValue,
   MaybeValue,
   PartialKey,
   reset,
   ResponseData,
   setResponse,
+  Maybe,
 } from '@modular-forms/solid'
 import { Accessor, createSignal, JSXElement, Setter } from 'solid-js'
 import { getErrorMessage } from './api'
@@ -48,12 +50,22 @@ export function createFormWithSubmit<
     ) => JSXElement
   },
   Setter<Partial<TType | undefined>>,
+  (name: FieldPath<TType>) => Maybe<FieldPathValue<TType, FieldPath<TType>>>
 ] {
   const [store, { Form, Field, FieldArray }] = createForm<TType, TResponse>(
     options.formOptions
   )
 
   const [data, setData] = createSignal<Partial<TType>>()
+
+  const accessor = (name: FieldPath<TType>) => {
+    return getValue(store, name, {
+      shouldActive: false,
+      shouldTouched: true,
+      shouldDirty: true,
+      shouldValid: true,
+    })
+  }
 
   const onSubmit = createSubmitHandler({
     form: store,
@@ -62,7 +74,7 @@ export function createFormWithSubmit<
     additionalData: data,
   })
 
-  return [store, onSubmit, { Form, Field, FieldArray }, setData]
+  return [store, onSubmit, { Form, Field, FieldArray }, setData, accessor]
 }
 
 export function createSubmitHandler<

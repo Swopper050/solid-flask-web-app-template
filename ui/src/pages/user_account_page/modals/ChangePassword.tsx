@@ -4,58 +4,26 @@ import { useUser } from '../../../context/UserProvider'
 import { useLocale } from '../../../context/LocaleProvider'
 
 import { changePassword, ChangePasswordData } from '../../../api'
-import {
-  getValue,
-  minLength,
-  pattern,
-  required,
-  reset,
-} from '@modular-forms/solid'
+import { minLength, pattern, required } from '@modular-forms/solid'
 
 import { Alert } from '../../../components/Alert'
 import { TextInput } from '../../../components/TextInput'
 import { Modal, ModalBaseProps } from '../../../components/Modal'
 import { Button } from '../../../components/Button'
 import { createFormWithSubmit } from '../../../form_helpers'
+import { mustMatch } from '../../../validators'
 
 export function ChangePasswordModal(props: ModalBaseProps): JSXElement {
   const { t } = useLocale()
   const { setUser } = useUser()
 
-  const [state, onSubmit, { Form, Field }] = createFormWithSubmit<
-    ChangePasswordData,
-    UserAttributes
-  >({
-    action: changePassword,
-    onFinish: () => {
-      props.onClose()
-    },
-  })
-
-  const onClose = () => {
-    reset(state)
-    props.onClose()
-  }
-
-  const newPassword = () => {
-    return getValue(state, 'newPassword', {
-      shouldActive: false,
-      shouldTouched: true,
-      shouldDirty: true,
-      shouldValid: true,
+  const [state, onSubmit, { Form, Field }, setData, getValue] =
+    createFormWithSubmit<ChangePasswordData, UserAttributes>({
+      action: changePassword,
+      onFinish: () => {
+        props.onClose()
+      },
     })
-  }
-
-  /**
-   * Custom validator that checks whether the new password matches the new password.
-   */
-  const mustMatch = (
-    error: string
-  ): ((value: string | undefined) => string) => {
-    return (value: string | undefined) => {
-      return value !== newPassword() ? error : ''
-    }
-  }
 
   createEffect(() => {
     if (state.submitted === true) {
@@ -66,6 +34,8 @@ export function ChangePasswordModal(props: ModalBaseProps): JSXElement {
       }
     }
   })
+
+  const newPassword = () => getValue('newPassword')
 
   return (
     <Modal title={t('change_password')} isOpen={props.isOpen} onClose={onClose}>
@@ -105,7 +75,7 @@ export function ChangePasswordModal(props: ModalBaseProps): JSXElement {
         </Field>
         <Field
           name="confirmNewPassword"
-          validate={[mustMatch(t('passwords_do_not_match'))]}
+          validate={[mustMatch(newPassword)(t('passwords_do_not_match'))]}
         >
           {(field, props) => (
             <TextInput

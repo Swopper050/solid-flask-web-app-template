@@ -1,4 +1,4 @@
-import { JSXElement, Show } from 'solid-js'
+import {  JSXElement, Show } from 'solid-js'
 import { A, useSearchParams } from '@solidjs/router'
 
 import { TopBar } from '../components/TopBar'
@@ -7,19 +7,21 @@ import { Alert } from '../components/Alert'
 
 import { useLocale } from '../context/LocaleProvider'
 
-import { getValue, required, minLength, pattern } from '@modular-forms/solid'
+import { required, minLength, pattern } from '@modular-forms/solid'
 
 import { resetPassword, ResetPasswordData } from '../api'
 import { getSingleParam } from './SearchParams'
 import { Button } from '../components/Button'
 import { createFormWithSubmit } from '../form_helpers'
+import { mustMatch } from '../validators'
+
 
 export function ResetPasswordPage(): JSXElement {
   const { t } = useLocale()
 
   const [searchParams] = useSearchParams()
 
-  const [state, onSubmit, { Form, Field }] =
+  const [state, onSubmit, { Form, Field }, setData, getValue] =
     createFormWithSubmit<ResetPasswordData>({
       action: resetPassword,
       formOptions: {
@@ -30,23 +32,7 @@ export function ResetPasswordPage(): JSXElement {
       },
     })
 
-  // TODO this could be shared.
-  const newPassword = () => {
-    return getValue(state, 'newPassword', {
-      shouldActive: false,
-      shouldTouched: true,
-      shouldDirty: true,
-      shouldValid: true,
-    })
-  }
-
-  const mustMatch = (
-    error: string
-  ): ((value: string | undefined) => string) => {
-    return (value: string | undefined) => {
-      return value !== newPassword() ? error : ''
-    }
-  }
+  const newPassword = () => getValue('newPassword')
 
   return (
     <>
@@ -91,7 +77,7 @@ export function ResetPasswordPage(): JSXElement {
               name="checkPassword"
               validate={[
                 required(t('please_confirm_your_new_password')),
-                mustMatch(t('passwords_do_not_match')),
+                mustMatch(newPassword)(t('passwords_do_not_match')),
               ]}
             >
               {(field, props) => (
