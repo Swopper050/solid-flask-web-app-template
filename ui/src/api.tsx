@@ -1,3 +1,4 @@
+import { TranslationKey, TranslationKeys } from './context/LocaleProvider'
 import { PaginationResult } from './models/Base'
 import { UserAttributes } from './models/User'
 
@@ -6,7 +7,7 @@ interface ErrorData {
   message: string
 }
 
-export function getErrorMessage(response: ErrorData): string {
+export function getErrorMessage(response: ErrorData): TranslationKey {
   return errorMessages[response.error] || 'an_unknown_error_occurred'
 }
 

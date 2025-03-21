@@ -10,20 +10,24 @@ import { Alert } from '../../../components/Alert'
 import { TextInput } from '../../../components/TextInput'
 import { Modal, ModalBaseProps } from '../../../components/Modal'
 import { Button } from '../../../components/Button'
-import { createFormWithSubmit } from '../../../form_helpers'
+import { createFormState } from '../../../form_helpers'
 import { mustMatch } from '../../../validators'
 
 export function ChangePasswordModal(props: ModalBaseProps): JSXElement {
   const { t } = useLocale()
   const { setUser } = useUser()
 
-  const [state, onSubmit, { Form, Field }, setData, getValue] =
-    createFormWithSubmit<ChangePasswordData, UserAttributes>({
-      action: changePassword,
-      onFinish: () => {
-        props.onClose()
-      },
-    })
+  const {
+    state,
+    onSubmit,
+    accessor,
+    components: { Form, Field },
+  } = createFormState<ChangePasswordData, UserAttributes>({
+    action: changePassword,
+    onFinish: () => {
+      props.onClose()
+    },
+  })
 
   createEffect(() => {
     if (state.submitted === true) {
@@ -35,10 +39,14 @@ export function ChangePasswordModal(props: ModalBaseProps): JSXElement {
     }
   })
 
-  const newPassword = () => getValue('newPassword')
+  const newPassword = () => accessor().newPassword
 
   return (
-    <Modal title={t('change_password')} isOpen={props.isOpen} onClose={onClose}>
+    <Modal
+      title={t('change_password')}
+      isOpen={props.isOpen}
+      onClose={() => props.onClose()}
+    >
       <Form onSubmit={onSubmit}>
         <Field name="currentPassword">
           {(field, props) => (

@@ -9,20 +9,23 @@ import { Alert } from '../../../components/Alert'
 import { Modal, ModalBaseProps } from '../../../components/Modal'
 import { TextInput } from '../../../components/TextInput'
 import { Button } from '../../../components/Button'
-import { createFormWithSubmit } from '../../../form_helpers'
+import { createFormState } from '../../../form_helpers'
 
 export function Disable2FAModal(props: ModalBaseProps): JSXElement {
   const { t } = useLocale()
   const { fetchUser } = useUser()
 
-  const [state, onSubmit, { Form, Field }] =
-    createFormWithSubmit<Disable2FAData>({
-      action: disable2FA,
-      onFinish: () => {
-        fetchUser()
-        props.onClose()
-      },
-    })
+  const {
+    state,
+    onSubmit,
+    components: { Form, Field },
+  } = createFormState<Disable2FAData>({
+    action: disable2FA,
+    onFinish: () => {
+      fetchUser()
+      props.onClose()
+    },
+  })
 
   return (
     <Modal

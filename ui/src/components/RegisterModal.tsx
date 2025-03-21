@@ -19,17 +19,18 @@ import { TextInput } from './TextInput'
 import { Modal, ModalBaseProps } from './Modal'
 import { Alert } from './Alert'
 import { Button } from './Button'
-import { createFormWithSubmit } from '../form_helpers'
+import { createFormState } from '../form_helpers'
 
 export function RegisterModal(props: ModalBaseProps): JSXElement {
   const { t } = useLocale()
   const { setUser } = useUser()
   const navigate = useNavigate()
 
-  const [state, onSubmit, { Form, Field }] = createFormWithSubmit<
-    RegisterUserData,
-    UserAttributes
-  >({
+  const {
+    state,
+    onSubmit,
+    components: { Form, Field },
+  } = createFormState<RegisterUserData, UserAttributes>({
     action: register,
     onFinish: (response) => {
       if (response !== undefined) {

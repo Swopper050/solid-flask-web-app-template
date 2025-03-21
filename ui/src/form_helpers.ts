@@ -10,32 +10,48 @@ import {
   FormProps,
   FormStore,
   FieldPath,
-  getValue,
   MaybeValue,
   PartialKey,
   reset,
   ResponseData,
   setResponse,
-  Maybe,
+  getValues,
+  PartialValues,
 } from '@modular-forms/solid'
-import { Accessor, createSignal, JSXElement, Setter } from 'solid-js'
+import {
+  Accessor,
+  createMemo,
+  createSignal,
+  JSXElement,
+  Setter,
+} from 'solid-js'
 import { getErrorMessage } from './api'
 
 /**
- * TODO
+ * The form state can be used to keep track of a piece of data for a form.
+ * It provides the sate of the form read and write access to the form data
+ * bypassing user input as wel as an onSubmit callback that should be called
+ * when the form is submitted.
  *
  */
-export function createFormWithSubmit<
-  TType extends FieldValues,
-  TResponse extends ResponseData = undefined,
->(options: {
-  action: (values: TType) => Promise<Response>
-  onFinish?: (respone?: TResponse) => void | Promise<void>
-  formOptions?: FormOptions<TType>
-}): [
-  FormStore<TType, TResponse>,
-  (values: TType) => void,
-  {
+interface FormState<TType extends FieldValues, TResponse extends ResponseData> {
+  /**
+   * The form state gives access to information about the state of the forms data.
+   */
+  state: FormStore<TType, TResponse>
+  /**
+   * The callback that will be called when the form is submitted by the user.
+   */
+  onSubmit: (values: TType) => void
+  /*
+   * A setter to for write access to the data bypassing user input.
+   */
+  setter: Setter<Partial<TType | undefined>>
+  accessor: Accessor<PartialValues<TType>>
+  /*
+   * The form components
+   */
+  components: {
     Form: (props: Omit<FormProps<TType, TResponse>, 'of'>) => JSXElement
     Field: <TFieldName extends FieldPath<TType>>(
       props: FieldPathValue<TType, TFieldName> extends MaybeValue<string>
@@ -48,33 +64,45 @@ export function createFormWithSubmit<
     FieldArray: <TFieldArrayName extends FieldArrayPath<TType>>(
       props: Omit<FieldArrayProps<TType, TResponse, TFieldArrayName>, 'of'>
     ) => JSXElement
-  },
-  Setter<Partial<TType | undefined>>,
-  (name: FieldPath<TType>) => Maybe<FieldPathValue<TType, FieldPath<TType>>>
-] {
-  const [store, { Form, Field, FieldArray }] = createForm<TType, TResponse>(
+  }
+}
+
+/**
+ *  Creates a from state
+ *
+ */
+export function createFormState<
+  TType extends FieldValues,
+  TResponse extends ResponseData = undefined,
+>(options: {
+  action: (values: TType) => Promise<Response>
+  onFinish?: (respone?: TResponse) => void | Promise<void>
+  formOptions?: FormOptions<TType>
+}): FormState<TType, TResponse> {
+  const [state, { Form, Field, FieldArray }] = createForm<TType, TResponse>(
     options.formOptions
   )
 
-  const [data, setData] = createSignal<Partial<TType>>()
+  const [data, setter] = createSignal<Partial<TType>>()
 
-  const accessor = (name: FieldPath<TType>) => {
-    return getValue(store, name, {
-      shouldActive: false,
-      shouldTouched: true,
-      shouldDirty: true,
-      shouldValid: true,
-    })
-  }
+  const accessor: Accessor<PartialValues<TType>> = createMemo(() =>
+    getValues(state, { shouldActive: false })
+  )
 
   const onSubmit = createSubmitHandler({
-    form: store,
+    form: state,
     action: options.action,
     onFinish: options.onFinish,
     additionalData: data,
   })
 
-  return [store, onSubmit, { Form, Field, FieldArray }, setData, accessor]
+  return {
+    state,
+    onSubmit,
+    setter,
+    accessor,
+    components: { Form, Field, FieldArray },
+  }
 }
 
 export function createSubmitHandler<

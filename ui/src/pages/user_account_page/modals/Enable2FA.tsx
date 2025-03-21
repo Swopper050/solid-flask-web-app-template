@@ -3,13 +3,13 @@ import { enable2FA, Enable2FAData, generate2FASecret } from '../../../api'
 import { useUser } from '../../../context/UserProvider'
 import { useLocale } from '../../../context/LocaleProvider'
 
-import { required, pattern, } from '@modular-forms/solid'
+import { required, pattern } from '@modular-forms/solid'
 
 import { Alert } from '../../../components/Alert'
 import { Modal, ModalBaseProps } from '../../../components/Modal'
 import { TextInput } from '../../../components/TextInput'
 import { Button } from '../../../components/Button'
-import { createFormWithSubmit } from '../../../form_helpers'
+import { createFormState } from '../../../form_helpers'
 
 export function Enable2FAModal(props: ModalBaseProps): JSXElement {
   const { t } = useLocale()
@@ -17,20 +17,24 @@ export function Enable2FAModal(props: ModalBaseProps): JSXElement {
 
   const [qrCode, setQrCode] = createSignal('')
 
-  const [state, onSubmit, { Form, Field }, setData] =
-    createFormWithSubmit<Enable2FAData>({
-      action: enable2FA,
-      onFinish: () => {
-        fetchUser()
-        props.onClose()
-      },
-    })
+  const {
+    state,
+    onSubmit,
+    setter: setTotpSecret,
+    components: { Form, Field },
+  } = createFormState<Enable2FAData>({
+    action: enable2FA,
+    onFinish: () => {
+      fetchUser()
+      props.onClose()
+    },
+  })
 
   const fetchQRCode = async () => {
     const response = await generate2FASecret()
     const data = await response.json()
     setQrCode(data.qr_code)
-    setData({totpSecret: data.totp_secret})
+    setTotpSecret({ totpSecret: data.totp_secret })
   }
 
   onMount(() => {

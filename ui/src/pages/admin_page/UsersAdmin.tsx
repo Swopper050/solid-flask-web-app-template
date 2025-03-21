@@ -15,13 +15,13 @@ import { BooleanInput } from '../../components/BooleanInput'
 import { TextInput } from '../../components/TextInput'
 import { createModalState, Modal, ModalBaseProps } from '../../components/Modal'
 
-import { useLocale } from '../../context/LocaleProvider'
+import { TranslationKeys, useLocale } from '../../context/LocaleProvider'
 
 import { pattern, email, minLength, required } from '@modular-forms/solid'
 import { Table, TableRow } from '../../components/Table'
 import { Tooltip } from '../../components/Tooltip'
 import { Button } from '../../components/Button'
-import { createFormWithSubmit } from '../../form_helpers'
+import { createFormState } from '../../form_helpers'
 
 export function UsersAdmin(): JSXElement {
   const { t } = useLocale()
@@ -147,7 +147,7 @@ export function UsersAdmin(): JSXElement {
           <Alert
             type="error"
             message={t('error_loading_users')}
-            extraClasses="w-80"
+            class="w-80"
           />
         </div>
       </Show>
@@ -181,16 +181,18 @@ function DeleteUserModal(
   const { t } = useLocale()
   const user = () => props.user
 
-  const [state, onSubmit, { Form }] = createFormWithSubmit<DeleteUserData>(
-    {
-      action: deleteUser,
-      onFinish: () => {
-        props.onDelete()
-        props.onClose()
-      },
-      formOptions: { initialValues: { userID: user()?.id ?? 0 } },
-    }
-  )
+  const {
+    state,
+    onSubmit,
+    components: { Form },
+  } = createFormState<DeleteUserData>({
+    action: deleteUser,
+    onFinish: () => {
+      props.onDelete()
+      props.onClose()
+    },
+    formOptions: { initialValues: { userID: user()?.id ?? 0 } },
+  })
 
   return (
     <Modal
@@ -236,13 +238,16 @@ interface CreateUserModalProps extends ModalBaseProps {
 function CreateUserModal(props: CreateUserModalProps): JSXElement {
   const { t } = useLocale()
 
-  const [state, onSubmit, { Form, Field }] =
-    createFormWithSubmit<CreateUserData>({
-      action: createUser,
-      onFinish: () => {
-        props.onClose()
-      },
-    })
+  const {
+    state,
+    onSubmit,
+    components: { Form, Field },
+  } = createFormState<CreateUserData>({
+    action: createUser,
+    onFinish: () => {
+      props.onClose()
+    },
+  })
 
   return (
     <Modal
@@ -251,6 +256,8 @@ function CreateUserModal(props: CreateUserModalProps): JSXElement {
       onClose={() => props.onClose()}
     >
       <div class="space-y-4">
+        <ErrorMessage response={state.response} />
+
         <Form onSubmit={onSubmit} class="w-full">
           <Field
             name="email"
@@ -305,10 +312,6 @@ function CreateUserModal(props: CreateUserModalProps): JSXElement {
             )}
           </Field>
 
-          <Show when={state.response.status === 'error'}>
-            <Alert type="error" message={state.response.message} />
-          </Show>
-
           <div class="modal-action">
             <Button
               label={t('create_user')}
@@ -321,5 +324,20 @@ function CreateUserModal(props: CreateUserModalProps): JSXElement {
         </Form>
       </div>
     </Modal>
+  )
+}
+
+function ErrorMessage(props: {
+  response: Partial<{ message: string; status: string }>
+}): JSXElement {
+  const { t } = useLocale()
+
+  return (
+    <Show when={props.response.status === 'error'}>
+      <Alert
+        type="error"
+        message={t(props.response.message as keyof TranslationKeys)}
+      />
+    </Show>
   )
 }

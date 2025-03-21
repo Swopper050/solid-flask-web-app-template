@@ -1,4 +1,4 @@
-import {  JSXElement, Show } from 'solid-js'
+import { JSXElement, Show } from 'solid-js'
 import { A, useSearchParams } from '@solidjs/router'
 
 import { TopBar } from '../components/TopBar'
@@ -12,27 +12,30 @@ import { required, minLength, pattern } from '@modular-forms/solid'
 import { resetPassword, ResetPasswordData } from '../api'
 import { getSingleParam } from './SearchParams'
 import { Button } from '../components/Button'
-import { createFormWithSubmit } from '../form_helpers'
+import { createFormState } from '../form_helpers'
 import { mustMatch } from '../validators'
-
 
 export function ResetPasswordPage(): JSXElement {
   const { t } = useLocale()
 
   const [searchParams] = useSearchParams()
 
-  const [state, onSubmit, { Form, Field }, setData, getValue] =
-    createFormWithSubmit<ResetPasswordData>({
-      action: resetPassword,
-      formOptions: {
-        initialValues: {
-          email: getSingleParam(searchParams.email),
-          resetToken: getSingleParam(searchParams.resetToken),
-        },
+  const {
+    state,
+    onSubmit,
+    accessor,
+    components: { Form, Field },
+  } = createFormState<ResetPasswordData>({
+    action: resetPassword,
+    formOptions: {
+      initialValues: {
+        email: getSingleParam(searchParams.email),
+        resetToken: getSingleParam(searchParams.resetToken),
       },
-    })
+    },
+  })
 
-  const newPassword = () => getValue('newPassword')
+  const newPassword = () => accessor().newPassword
 
   return (
     <>
@@ -97,7 +100,7 @@ export function ResetPasswordPage(): JSXElement {
                 <Alert
                   type="success"
                   message={t('successfully_reset_password')}
-                  extraClasses="w-96"
+                  class="w-96"
                 />
               </div>
             </Show>
@@ -107,7 +110,7 @@ export function ResetPasswordPage(): JSXElement {
                 <Alert
                   type="error"
                   message={state.response.message}
-                  extraClasses="w-96"
+                  class="w-96"
                 />
               </div>
             </Show>

@@ -17,7 +17,7 @@ import { Alert } from './Alert'
 import { TextInput } from './TextInput'
 import { Modal, ModalBaseProps } from './Modal'
 import { Button } from './Button'
-import { createFormWithSubmit } from '../form_helpers'
+import { createFormState } from '../form_helpers'
 
 export function LoginModal(props: ModalBaseProps): JSXElement {
   const { t } = useLocale()
@@ -28,10 +28,11 @@ export function LoginModal(props: ModalBaseProps): JSXElement {
 
   const navigate = useNavigate()
 
-  const [loginForm, onLoginSubmit, Login] = createFormWithSubmit<
-    PasswordLoginData,
-    UserAttributes
-  >({
+  const {
+    state: loginState,
+    onSubmit: onLoginSubmit,
+    components: Login,
+  } = createFormState<PasswordLoginData, UserAttributes>({
     action: passwordLogin,
     onFinish: (response) => {
       if (response === undefined) {
@@ -41,7 +42,7 @@ export function LoginModal(props: ModalBaseProps): JSXElement {
 
       if (user.twoFactorEnabled) {
         setAt2FAStep(true)
-        setData({ email: user.email })
+        setEmail({ email: user.email })
 
         return
       }
@@ -52,10 +53,12 @@ export function LoginModal(props: ModalBaseProps): JSXElement {
     },
   })
 
-  const [totpForm, onTotpSubmit, Totp, setData] = createFormWithSubmit<
-    TotpLoginData,
-    UserAttributes
-  >({
+  const {
+    state: totpSate,
+    setter: setEmail,
+    onSubmit: onTotpSubmit,
+    components: Totp,
+  } = createFormState<TotpLoginData, UserAttributes>({
     action: totpLogin,
     onFinish: (response) => {
       if (response === undefined) {
@@ -113,8 +116,8 @@ export function LoginModal(props: ModalBaseProps): JSXElement {
             )}
           </Login.Field>
 
-          <Show when={loginForm.response.status === 'error'}>
-            <Alert type="error" message={loginForm.response.message} />
+          <Show when={loginState.response.status === 'error'}>
+            <Alert type="error" message={loginState.response.message} />
           </Show>
 
           <Show when={!at2FAStep()}>
@@ -131,7 +134,7 @@ export function LoginModal(props: ModalBaseProps): JSXElement {
                 type="submit"
                 color="primary"
                 class="w-full"
-                isLoading={loginForm.submitting}
+                isLoading={loginState.submitting}
               />
             </div>
           </Show>
@@ -163,14 +166,14 @@ export function LoginModal(props: ModalBaseProps): JSXElement {
             )}
           </Totp.Field>
 
-          <Show when={loginForm.response.status === 'error'}>
-            <Alert type="error" message={loginForm.response.message} />
+          <Show when={loginState.response.status === 'error'}>
+            <Alert type="error" message={loginState.response.message} />
           </Show>
 
           <div class="modal-action">
             <Button
               label={t('login')}
-              isLoading={totpForm.submitting}
+              isLoading={totpSate.submitting}
               color="primary"
               type="submit"
             />

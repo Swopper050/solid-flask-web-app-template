@@ -16,6 +16,7 @@ import { dict as defaultDict } from '../locales/en'
 export const locales = ['en', 'nl'] as const
 export type Locale = (typeof locales)[number]
 export type TranslationKeys = typeof en.dict
+export type TranslationKey = keyof TranslationKeys
 export type Translations = i18n.Flatten<TranslationKeys>
 
 export async function fetchDictionary(locale: Locale): Promise<Translations> {

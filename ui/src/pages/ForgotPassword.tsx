@@ -10,15 +10,18 @@ import { email, required } from '@modular-forms/solid'
 
 import { forgotPassword, ForgotPasswordData } from '../api'
 import { Button } from '../components/Button'
-import { createFormWithSubmit } from '../form_helpers'
+import { createFormState } from '../form_helpers'
 
 export function ForgotPasswordPage(): JSXElement {
   const { t } = useLocale()
 
-  const [state, onSubmit, { Form, Field }] =
-    createFormWithSubmit<ForgotPasswordData>({
-      action: forgotPassword,
-    })
+  const {
+    state,
+    onSubmit,
+    components: { Form, Field },
+  } = createFormState<ForgotPasswordData>({
+    action: forgotPassword,
+  })
 
   return (
     <>
@@ -56,9 +59,9 @@ export function ForgotPasswordPage(): JSXElement {
               <div class="flex justify-center">
                 <Alert
                   type="success"
-                  message={t(
+                  message={
                     'if_a_user_with_this_email_exists_a_reset_password_mail_has_been_sent'
-                  )}
+                  }
                 />
               </div>
             </Show>
@@ -68,7 +71,7 @@ export function ForgotPasswordPage(): JSXElement {
                 <Alert
                   type="error"
                   message={state.response.message}
-                  extraClasses="w-96"
+                  class="w-96"
                 />
               </div>
             </Show>

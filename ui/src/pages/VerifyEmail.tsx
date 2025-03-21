@@ -29,7 +29,8 @@ export function VerifyEmailPage(): JSXElement {
     )
 
     if (response.status !== 200) {
-      setErrorMsg(t(await getErrorMessage(response)))
+      const data = await response.json()
+      setErrorMsg(t(getErrorMessage(data)))
     } else {
       await fetchUser()
       setSuccess(true)
@@ -54,7 +55,7 @@ export function VerifyEmailPage(): JSXElement {
 
       <Show when={errorMsg()}>
         <div class="flex justify-center">
-          <Alert type="error" message={errorMsg()} extraClasses="w-96" />
+          <Alert type="error" message={errorMsg()} class="w-96" />
         </div>
       </Show>
 
@@ -63,7 +64,7 @@ export function VerifyEmailPage(): JSXElement {
           <Alert
             type="success"
             message={t('successfully_verified_email')}
-            extraClasses="w-96"
+            class="w-96"
           />
         </div>
       </Show>

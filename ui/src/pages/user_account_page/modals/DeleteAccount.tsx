@@ -7,7 +7,7 @@ import { deleteAccount } from '../../../api'
 import { Modal, ModalBaseProps } from '../../../components/Modal'
 import { Alert } from '../../../components/Alert'
 import { Button } from '../../../components/Button'
-import { createFormWithSubmit } from '../../../form_helpers'
+import { createFormState } from '../../../form_helpers'
 
 export function DeleteAccountModal(props: ModalBaseProps): JSXElement {
   const { t } = useLocale()
@@ -15,7 +15,11 @@ export function DeleteAccountModal(props: ModalBaseProps): JSXElement {
 
   const navigate = useNavigate()
 
-  const [state, onSubmit, { Form }] = createFormWithSubmit({
+  const {
+    state,
+    onSubmit,
+    components: { Form },
+  } = createFormState({
     action: deleteAccount,
     onFinish: () => {
       setUser(null)
