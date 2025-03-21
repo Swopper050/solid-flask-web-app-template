@@ -31,5 +31,15 @@
     "typescript-eslint": "^8.26.1",
     "vite": "^6.2.1",
     "vite-plugin-solid": "^2.11.6"
+  },
+  "pnpm": {
+    "ignoredBuiltDependencies": [
+      "cypress",
+      "esbuild"
+    ],
+    "onlyBuiltDependencies": [
+      "cypress",
+      "esbuild"
+    ]
   }
 }

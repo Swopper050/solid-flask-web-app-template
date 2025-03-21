@@ -16,6 +16,7 @@ import { dict as defaultDict } from '../locales/en'
 export const locales = ['en', 'nl'] as const
 export type Locale = (typeof locales)[number]
 export type TranslationKeys = typeof en.dict
+export type TranslationKey = keyof TranslationKeys
 export type Translations = i18n.Flatten<TranslationKeys>
 
 export async function fetchDictionary(locale: Locale): Promise<Translations> {
@@ -42,6 +43,8 @@ export function LocaleProvider(props: { children: JSXElement }) {
     return await fetchDictionary(locale)
   })
 
+  const translationsAccessor = () => translations() ?? defaultDict
+
   const t = i18n.translator(() => translations() ?? {})
 
   const updateLocale = async (newLocale: Locale) => {
@@ -55,7 +58,12 @@ export function LocaleProvider(props: { children: JSXElement }) {
 
   return (
     <LocaleContext.Provider
-      value={{ locale, setLocale: updateLocale, translations, t }}
+      value={{
+        locale,
+        setLocale: updateLocale,
+        translations: translationsAccessor,
+        t,
+      }}
     >
       <Suspense
         fallback={

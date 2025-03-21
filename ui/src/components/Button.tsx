@@ -87,7 +87,7 @@ export function IconButton(props: {
         props.isLoading && 'btn-disabled',
         props.class
       )}
-      onClick={() => props.onClick()}
+      onClick={() => props.onClick?.()}
       disabled={props.disabled}
     >
       <Show

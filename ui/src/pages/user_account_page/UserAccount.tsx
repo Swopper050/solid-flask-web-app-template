@@ -4,10 +4,10 @@ import { useLocale } from '../../context/LocaleProvider'
 
 import { resendVerificationMail } from '../../api'
 
-import { ChangePasswordModal } from './ChangePasswordModal'
-import { Enable2FAModal } from './Enable2FAModal'
-import { Disable2FAModal } from './Disable2FAModal'
-import { DeleteAccountModal } from './DeleteAccountModal'
+import { ChangePasswordModal } from './modals/ChangePassword'
+import { Enable2FAModal } from './modals/Enable2FA'
+import { Disable2FAModal } from './modals/Disable2FA'
+import { DeleteAccountModal } from './modals/DeleteAccount'
 import { createModalState } from '../../components/Modal'
 import { Table, TableRow } from '../../components/Table'
 import { Button, IconButton } from '../../components/Button'
@@ -32,12 +32,12 @@ export function UserAccountPage(): JSXElement {
     'deleteAcount'
   )
 
-  const twoFactorEnabled = () => user().twoFactorEnabled
+  const twoFactorEnabled = () => user()?.twoFactorEnabled
 
   return (
     <>
       <div class="mx-auto">
-        <Show when={user().isAdmin}>
+        <Show when={user()?.isAdmin}>
           <p class="text-lg text-success mr-4 mb-6 col-span-4">
             <i class="fa-solid fa-screwdriver-wrench mr-2" />
             {t('this_user_is_an_admin')}
@@ -48,10 +48,10 @@ export function UserAccountPage(): JSXElement {
           <TableRow
             cells={[
               t('email'),
-              user().email,
+              user()?.email,
               <VerifyEmailButton
                 isSending={sending()}
-                isVerified={user().isVerified}
+                isVerified={user()?.isVerified ?? false}
                 onClick={() => onResendVerificationMail()}
               />,
             ]}
@@ -73,7 +73,7 @@ export function UserAccountPage(): JSXElement {
           <TableRow
             cells={[
               t('enabled_2fa'),
-              <>{user().twoFactorEnabled ? t('yes') : t('no')}</>,
+              <>{user()?.twoFactorEnabled ? t('yes') : t('no')}</>,
               <Tooltip
                 position="left"
                 text={twoFactorEnabled() ? t('disable_2fa') : t('enable_2fa')}
@@ -159,7 +159,9 @@ function VerifyEmailButton(props: {
       }
     >
       <Tooltip position="left" text={t('your_email_has_been_verified')}>
-        <i class="fa-solid fa-check text-success" />
+        <div class="mr-3">
+          <i class="fa-solid fa-check text-success" />
+        </div>
       </Tooltip>
     </Show>
   )

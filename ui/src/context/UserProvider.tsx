@@ -11,7 +11,7 @@ import { whoAmI } from '../api'
 import { User } from '../models/User'
 
 interface UserContextAttributes {
-  user: Accessor<User> | null
+  user: Accessor<User | null>
   setUser: (user: User | null) => void
   fetchUser: () => Promise<void>
   loading: Accessor<boolean>
@@ -40,9 +40,7 @@ export const UserProvider = (props: { children: JSXElement }) => {
   })
 
   return (
-    <UserContext.Provider
-      value={{ user: user, setUser, loading: loading, fetchUser: fetchUser }}
-    >
+    <UserContext.Provider value={{ user, setUser, loading, fetchUser }}>
       {props.children}
     </UserContext.Provider>
   )

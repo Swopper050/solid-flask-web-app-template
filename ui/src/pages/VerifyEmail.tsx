@@ -7,6 +7,7 @@ import { TopBar } from '../components/TopBar'
 import { useUser } from '../context/UserProvider'
 import { useLocale } from '../context/LocaleProvider'
 import { getErrorMessage, verifyEmail } from '../api'
+import { getSingleParam } from './SearchParams'
 
 export function VerifyEmailPage(): JSXElement {
   const { t } = useLocale()
@@ -16,20 +17,20 @@ export function VerifyEmailPage(): JSXElement {
 
   const [loading, setLoading] = createSignal(true)
   const [success, setSuccess] = createSignal(false)
-  const [errorMsg, setErrorMsg] = createSignal<string | null>(null)
+  const [errorMsg, setErrorMsg] = createSignal<string>()
 
   onMount(async () => {
     setLoading(true)
     setSuccess(false)
-    setErrorMsg(null)
 
     const response = await verifyEmail(
-      searchParams.email,
-      searchParams.verification_token
+      getSingleParam(searchParams.email),
+      getSingleParam(searchParams.verification_tokean)
     )
 
     if (response.status !== 200) {
-      setErrorMsg(t(await getErrorMessage(response)))
+      const data = await response.json()
+      setErrorMsg(t(getErrorMessage(data)))
     } else {
       await fetchUser()
       setSuccess(true)
@@ -52,9 +53,9 @@ export function VerifyEmailPage(): JSXElement {
         </div>
       </Show>
 
-      <Show when={errorMsg() !== null}>
+      <Show when={errorMsg()}>
         <div class="flex justify-center">
-          <Alert type="error" message={errorMsg()} extraClasses="w-96" />
+          <Alert type="error" message={errorMsg()} class="w-96" />
         </div>
       </Show>
 
@@ -63,7 +64,7 @@ export function VerifyEmailPage(): JSXElement {
           <Alert
             type="success"
             message={t('successfully_verified_email')}
-            extraClasses="w-96"
+            class="w-96"
           />
         </div>
       </Show>

@@ -15,6 +15,10 @@ if (import.meta.env.DEV && !(root instanceof HTMLElement)) {
   )
 }
 
+if (root === null) {
+  throw new Error('Root element is null')
+}
+
 const RootLayout = (props: ParentProps) => (
   <UserProvider>
     <LocaleProvider>

@@ -4,15 +4,15 @@ import { Navigate } from '@solidjs/router'
 import type { RouteDefinition } from '@solidjs/router'
 
 import { useUser } from './context/UserProvider'
-import { AdminPage } from './pages/admin_page/AdminPage'
-import { LandingPage } from './pages/LandingPage'
+import { AdminPage } from './pages/admin_page/Admin'
+import { LandingPage } from './pages/Landing'
 import { Home } from './pages/Home'
-import { BasePage } from './pages/BasePage'
-import { UserAccountPage } from './pages/user_account_page/UserAccountPage'
-import { ForgotPasswordPage } from './pages/ForgotPasswordPage'
-import { ResetPasswordPage } from './pages/ResetPasswordPage'
-import { VerifyEmailPage } from './pages/VerifyEmailPage'
-import { NotFoundPage } from './pages/NotFoundPage'
+import { BasePage } from './pages/Base'
+import { UserAccountPage } from './pages/user_account_page/UserAccount'
+import { ForgotPasswordPage } from './pages/ForgotPassword'
+import { ResetPasswordPage } from './pages/ResetPassword'
+import { VerifyEmailPage } from './pages/VerifyEmail'
+import { NotFoundPage } from './pages/NotFound'
 
 function ProtectedRoute(props: {
   component: Component
@@ -22,10 +22,10 @@ function ProtectedRoute(props: {
 
   return (
     <Switch fallback={<props.component />}>
-      <Match when={!loading() && user() === null}>
+      <Match when={!loading() && user?.() === null}>
         <Navigate href="/" />
       </Match>
-      <Match when={!loading() && props.adminOnly && !user().isAdmin}>
+      <Match when={!loading() && props.adminOnly && !user()?.isAdmin}>
         <Navigate href="/" />
       </Match>
       <Match when={loading()}>
