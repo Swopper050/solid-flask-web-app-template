@@ -1,7 +1,7 @@
 import { JSXElement, createSignal, Show } from 'solid-js'
 import { useNavigate, A } from '@solidjs/router'
 
-import { pattern, email, required } from '@modular-forms/solid'
+import { pattern, email, required, reset } from '@modular-forms/solid'
 
 import {
   passwordLogin,
@@ -78,6 +78,8 @@ export function LoginModal(props: ModalBaseProps): JSXElement {
       isOpen={props.isOpen && !closed()}
       onClose={() => {
         props.onClose()
+        reset(loginState)
+        reset(totpSate)
       }}
     >
       <Login.Form onSubmit={onLoginSubmit} class="w-full">

@@ -144,11 +144,7 @@ export function UsersAdmin(): JSXElement {
 
       <Show when={users.error}>
         <div class="flex justify-center items-center mt-8 w-full">
-          <Alert
-            type="error"
-            message={t('error_loading_users')}
-            class="w-80"
-          />
+          <Alert type="error" message={t('error_loading_users')} class="w-80" />
         </div>
       </Show>
 
