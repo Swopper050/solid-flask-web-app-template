@@ -1,20 +1,18 @@
 import { JSXElement } from 'solid-js'
 import { clsx } from 'clsx'
-import {
-  TranslationKey,
-  TranslationKeys,
-  useLocale,
-} from '../context/LocaleProvider'
+import { TranslationKey, useLocale } from '../context/LocaleProvider'
 
 interface AlertProps {
   type: 'info' | 'error' | 'success' | 'warning'
-  message?: TranslationKeys | string
+  message?: TranslationKey | string
   class?: string
 }
 
 export function Alert(props: AlertProps): JSXElement {
   const { t } = useLocale()
-  const message = () => t(props.message as TranslationKey) ?? props.message
+
+  const translated = () => t((props.message as TranslationKey) ?? '')
+  const message = () => (translated() ? translated() : props.message)
 
   const types = {
     info: { alert: 'alert-info', icon: 'fa-circle-info' },

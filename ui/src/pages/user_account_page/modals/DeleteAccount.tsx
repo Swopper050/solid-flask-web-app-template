@@ -36,7 +36,7 @@ export function DeleteAccountModal(props: ModalBaseProps): JSXElement {
       <p class="py-4">{t('are_you_sure_you_want_to_delete_your_account')}</p>
       <p>{t('this_action_cannot_be_undone')}</p>
 
-      <Show when={state.response.status !== 'success'}>
+      <Show when={state.response.status === 'error'}>
         <Alert type="error" message={state.response.message} />
       </Show>
 

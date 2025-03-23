@@ -2,9 +2,8 @@ import { createSignal, createEffect, JSXElement } from 'solid-js'
 
 export function ThemeSwitcher(): JSXElement {
   const [isDark, setIsDark] = createSignal<boolean>(
-    JSON.parse(localStorage.getItem('isDark') ?? '') ?? false
+    JSON.parse(localStorage.getItem('isDark') ?? 'false') ?? false
   )
-  console.log(localStorage)
 
   createEffect(() => {
     localStorage.setItem('isDark', JSON.stringify(isDark()))

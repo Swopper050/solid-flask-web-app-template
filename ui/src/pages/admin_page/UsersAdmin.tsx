@@ -182,12 +182,11 @@ function DeleteUserModal(
     onSubmit,
     components: { Form },
   } = createFormState<DeleteUserData>({
-    action: deleteUser,
+    action: () => deleteUser({ userID: user()?.id ?? 0 }),
     onFinish: () => {
       props.onDelete()
       props.onClose()
     },
-    formOptions: { initialValues: { userID: user()?.id ?? 0 } },
   })
 
   return (
@@ -199,11 +198,11 @@ function DeleteUserModal(
       <p class="mt-4">{t('delete_user_confirmation')}</p>
       <p class="mt-2 font-bold">{props.user?.email}</p>
 
-      <Form onSubmit={onSubmit}>
-        <Show when={state.response.status === 'error'}>
-          <Alert type="error" message={state.response.message} />
-        </Show>
+      <Show when={state.response.status === 'error'}>
+        <Alert type="error" message={state.response.message} />
+      </Show>
 
+      <Form onSubmit={onSubmit}>
         <div class="modal-action">
           <Button
             label={t('cancel')}

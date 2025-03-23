@@ -113,7 +113,6 @@ export type Enable2FAData = {
 }
 
 export async function enable2FA(data: Enable2FAData) {
-  console.log(data)
   return post('api/enable_2fa', {
     totp_secret: data.totpSecret,
     totp_code: data.totpCode,
