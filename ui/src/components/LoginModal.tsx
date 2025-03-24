@@ -168,8 +168,8 @@ export function LoginModal(props: ModalBaseProps): JSXElement {
             )}
           </Totp.Field>
 
-          <Show when={loginState.response.status === 'error'}>
-            <Alert type="error" message={loginState.response.message} />
+          <Show when={totpSate.response.status === 'error'}>
+            <Alert type="error" message={totpSate.response.message} />
           </Show>
 
           <div class="modal-action">

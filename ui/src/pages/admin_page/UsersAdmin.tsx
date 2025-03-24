@@ -15,7 +15,7 @@ import { BooleanInput } from '../../components/BooleanInput'
 import { TextInput } from '../../components/TextInput'
 import { createModalState, Modal, ModalBaseProps } from '../../components/Modal'
 
-import { TranslationKeys, useLocale } from '../../context/LocaleProvider'
+import { useLocale } from '../../context/LocaleProvider'
 
 import { pattern, email, minLength, required } from '@modular-forms/solid'
 import { Table, TableRow } from '../../components/Table'
@@ -251,7 +251,9 @@ function CreateUserModal(props: CreateUserModalProps): JSXElement {
       onClose={() => props.onClose()}
     >
       <div class="space-y-4">
-        <ErrorMessage response={state.response} />
+        <Show when={state.response.status === 'error'}>
+          <Alert type="error" message={state.response.message} />
+        </Show>
 
         <Form onSubmit={onSubmit} class="w-full">
           <Field
@@ -319,20 +321,5 @@ function CreateUserModal(props: CreateUserModalProps): JSXElement {
         </Form>
       </div>
     </Modal>
-  )
-}
-
-function ErrorMessage(props: {
-  response: Partial<{ message: string; status: string }>
-}): JSXElement {
-  const { t } = useLocale()
-
-  return (
-    <Show when={props.response.status === 'error'}>
-      <Alert
-        type="error"
-        message={t(props.response.message as keyof TranslationKeys)}
-      />
-    </Show>
   )
 }

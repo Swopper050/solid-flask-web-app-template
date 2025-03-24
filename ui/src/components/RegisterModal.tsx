@@ -3,7 +3,6 @@ import { useNavigate } from '@solidjs/router'
 
 import {
   minLength,
-  getValue,
   pattern,
   email,
   required,
@@ -20,6 +19,7 @@ import { Modal, ModalBaseProps } from './Modal'
 import { Alert } from './Alert'
 import { Button } from './Button'
 import { createFormState } from '../form_helpers'
+import { mustMatch } from '../validators'
 
 export function RegisterModal(props: ModalBaseProps): JSXElement {
   const { t } = useLocale()
@@ -29,6 +29,7 @@ export function RegisterModal(props: ModalBaseProps): JSXElement {
   const {
     state,
     onSubmit,
+    accessor,
     components: { Form, Field },
   } = createFormState<RegisterUserData, UserAttributes>({
     action: register,
@@ -41,22 +42,8 @@ export function RegisterModal(props: ModalBaseProps): JSXElement {
     },
   })
 
-  const newPassword = () => {
-    return getValue(state, 'password', {
-      shouldActive: false,
-      shouldTouched: true,
-      shouldDirty: true,
-      shouldValid: true,
-    })
-  }
+  const newPassword = () => accessor().checkPassword
 
-  const mustMatch = (
-    error: string
-  ): ((value: string | undefined) => string) => {
-    return (value: string | undefined) => {
-      return value !== newPassword() ? error : ''
-    }
-  }
 
   return (
     <Modal
@@ -110,7 +97,7 @@ export function RegisterModal(props: ModalBaseProps): JSXElement {
 
           <Field
             name="checkPassword"
-            validate={[mustMatch(t('passwords_do_not_match'))]}
+            validate={[mustMatch(newPassword)(t('passwords_do_not_match'))]}
           >
             {(field, props) => (
               <TextInput
