@@ -1,12 +1,7 @@
 import { JSXElement, Show } from 'solid-js'
 import { useNavigate } from '@solidjs/router'
 
-import {
-  minLength,
-  pattern,
-  email,
-  required,
-} from '@modular-forms/solid'
+import { minLength, pattern, email, required } from '@modular-forms/solid'
 
 import { register, RegisterUserData } from '../api'
 
@@ -43,7 +38,6 @@ export function RegisterModal(props: ModalBaseProps): JSXElement {
   })
 
   const newPassword = () => accessor().checkPassword
-
 
   return (
     <Modal

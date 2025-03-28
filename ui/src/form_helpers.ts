@@ -31,7 +31,7 @@ import { getErrorMessage } from './api'
  * The form state interface that encapsulates all form-related functionality.
  * It provides access to the form's state, methods to manipulate the form data,
  * and components to build the form UI.
- * 
+ *
  * @template TType The type of values the form handles
  * @template TResponse The type of response data returned after form submission
  */
@@ -40,22 +40,22 @@ interface FormState<TType extends FieldValues, TResponse extends ResponseData> {
    * The form store that provides access to the state of the form's data
    */
   state: FormStore<TType, TResponse>
-  
+
   /**
    * The callback that will be called when the form is submitted by the user
    */
   onSubmit: (values: TType) => void
-  
+
   /**
    * A setter for write access to the form data, bypassing user input
    */
   setter: Setter<Partial<TType | undefined>>
-  
+
   /**
    * An accessor for reading the current form values
    */
   accessor: Accessor<PartialValues<TType>>
-  
+
   /**
    * The form UI components used to build the form
    */
@@ -64,7 +64,7 @@ interface FormState<TType extends FieldValues, TResponse extends ResponseData> {
      * The Form component that wraps the entire form
      */
     Form: (props: Omit<FormProps<TType, TResponse>, 'of'>) => JSXElement
-    
+
     /**
      * The Field component used for individual form fields
      */
@@ -76,7 +76,7 @@ interface FormState<TType extends FieldValues, TResponse extends ResponseData> {
           >
         : Omit<FieldProps<TType, TResponse, TFieldName>, 'of'>
     ) => JSXElement
-    
+
     /**
      * The FieldArray component used for array-type form fields
      */
@@ -88,23 +88,23 @@ interface FormState<TType extends FieldValues, TResponse extends ResponseData> {
 
 /**
  * Creates a form state that encapsulates form functionality
- * 
+ *
  * @param options.action - Function that handles form submission by sending data to the server
  * @param options.onFinish - Optional callback that runs after successful form submission
  * @param options.formOptions - Optional configuration options for the form
  * @returns FormState object with form state, submission handler, and helper components
- * 
+ *
  * @example
  * ```tsx
  * type LoginForm = {
  *   email: string;
  *   password: string;
  * }
- * 
- * const { 
- *   components: { Form, Field }, 
- *   onSubmit, 
- *   state 
+ *
+ * const {
+ *   components: { Form, Field },
+ *   onSubmit,
+ *   state
  * } = createFormState<LoginForm>({
  *   action: async (values) => {
  *     return await fetch('/api/login', {
@@ -119,7 +119,7 @@ interface FormState<TType extends FieldValues, TResponse extends ResponseData> {
  *     }
  *   }
  * });
- * 
+ *
  * return (
  *   <Form onSubmit={onSubmit} class="login-form">
  *     <Field name="email" validate={[required("Email is required")]}>
@@ -133,7 +133,7 @@ interface FormState<TType extends FieldValues, TResponse extends ResponseData> {
  *         />
  *       )}
  *     </Field>
- *     
+ *
  *     <Field name="password">
  *       {(field, props) => (
  *         <TextInput
@@ -145,7 +145,7 @@ interface FormState<TType extends FieldValues, TResponse extends ResponseData> {
  *         />
  *       )}
  *     </Field>
- *     
+ *
  *     <Button type="submit" disabled={state.submitting}>
  *       {state.submitting ? "Logging in..." : "Login"}
  *     </Button>
@@ -189,7 +189,7 @@ export function createFormState<
 
 /**
  * Creates a submit handler function for a form
- * 
+ *
  * @param options.form - The form store that manages form state
  * @param options.action - Function that processes form submission and sends data to server
  * @param options.onFinish - Optional callback to run after successful submission
