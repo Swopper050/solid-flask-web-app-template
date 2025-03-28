@@ -6,42 +6,22 @@ import { TopBar } from '../components/TopBar'
 import { TextInput } from '../components/TextInput'
 import { useLocale } from '../context/LocaleProvider'
 
-import {
-  createForm,
-  email,
-  required,
-  setResponse,
-  SubmitHandler,
-} from '@modular-forms/solid'
+import { email, required } from '@modular-forms/solid'
 
-import { forgotPassword, getErrorMessage } from '../api'
+import { forgotPassword, ForgotPasswordData } from '../api'
 import { Button } from '../components/Button'
-
-type ForgotPasswordFormData = {
-  email: string
-}
+import { createFormState } from '../form_helpers'
 
 export function ForgotPasswordPage(): JSXElement {
   const { t } = useLocale()
 
-  const [forgotPasswordForm, ForgotPassword] =
-    createForm<ForgotPasswordFormData>()
-
-  const onPasswordReset: SubmitHandler<ForgotPasswordFormData> = async (
-    values
-  ) => {
-    const response = await forgotPassword(values.email)
-
-    if (response.status !== 200) {
-      setResponse(forgotPasswordForm, {
-        status: 'error',
-        message: t(await getErrorMessage(response)),
-      })
-      return
-    }
-
-    setResponse(forgotPasswordForm, { status: 'success' })
-  }
+  const {
+    state,
+    onSubmit,
+    components: { Form, Field },
+  } = createFormState<ForgotPasswordData>({
+    action: forgotPassword,
+  })
 
   return (
     <>
@@ -55,8 +35,8 @@ export function ForgotPasswordPage(): JSXElement {
 
       <div class="flex justify-center mt-20">
         <div class="flex flex-col">
-          <ForgotPassword.Form onSubmit={onPasswordReset}>
-            <ForgotPassword.Field
+          <Form onSubmit={onSubmit}>
+            <Field
               name="email"
               validate={[
                 required(t('please_enter_your_email')),
@@ -73,25 +53,25 @@ export function ForgotPasswordPage(): JSXElement {
                   icon={<i class="fa-solid fa-envelope" />}
                 />
               )}
-            </ForgotPassword.Field>
+            </Field>
 
-            <Show when={forgotPasswordForm.response.status === 'success'}>
+            <Show when={state.response.status === 'success'}>
               <div class="flex justify-center">
                 <Alert
                   type="success"
-                  message={t(
+                  message={
                     'if_a_user_with_this_email_exists_a_reset_password_mail_has_been_sent'
-                  )}
+                  }
                 />
               </div>
             </Show>
 
-            <Show when={forgotPasswordForm.response.status === 'error'}>
+            <Show when={state.response.status === 'error'}>
               <div class="flex justify-center">
                 <Alert
                   type="error"
-                  message={forgotPasswordForm.response.message}
-                  extraClasses="w-96"
+                  message={state.response.message}
+                  class="w-96"
                 />
               </div>
             </Show>
@@ -105,10 +85,10 @@ export function ForgotPasswordPage(): JSXElement {
                 label={t('send_reset_email')}
                 color="primary"
                 type="submit"
-                isLoading={forgotPasswordForm.submitting}
+                isLoading={state.submitting}
               />
             </div>
-          </ForgotPassword.Form>
+          </Form>
         </div>
       </div>
     </>

@@ -7,66 +7,35 @@ import { Alert } from '../components/Alert'
 
 import { useLocale } from '../context/LocaleProvider'
 
-import {
-  getValue,
-  createForm,
-  required,
-  minLength,
-  pattern,
-  setResponse,
-  SubmitHandler,
-} from '@modular-forms/solid'
+import { required, minLength, pattern } from '@modular-forms/solid'
 
-import { getErrorMessage, resetPassword } from '../api'
+import { resetPassword, ResetPasswordData } from '../api'
+import { getSingleParam } from './SearchParams'
 import { Button } from '../components/Button'
-
-type PasswordResetFormData = {
-  password: string
-  checkPassword: string
-}
+import { createFormState } from '../form_helpers'
+import { mustMatch } from '../validators'
 
 export function ResetPasswordPage(): JSXElement {
   const { t } = useLocale()
 
   const [searchParams] = useSearchParams()
-  const [resetPasswordForm, ResetPassword] = createForm<PasswordResetFormData>()
 
-  const onResetPassword: SubmitHandler<PasswordResetFormData> = async (
-    values
-  ) => {
-    const response = await resetPassword(
-      searchParams.email,
-      searchParams.reset_token,
-      values.password
-    )
+  const {
+    state,
+    onSubmit,
+    accessor,
+    components: { Form, Field },
+  } = createFormState<ResetPasswordData>({
+    action: resetPassword,
+    formOptions: {
+      initialValues: {
+        email: getSingleParam(searchParams.email),
+        resetToken: getSingleParam(searchParams.resetToken),
+      },
+    },
+  })
 
-    if (response.status !== 200) {
-      setResponse(resetPasswordForm, {
-        status: 'error',
-        message: t(await getErrorMessage(response)),
-      })
-      return
-    }
-
-    setResponse(resetPasswordForm, { status: 'success' })
-  }
-
-  const newPassword = () => {
-    return getValue(resetPasswordForm, 'password', {
-      shouldActive: false,
-      shouldTouched: true,
-      shouldDirty: true,
-      shouldValid: true,
-    })
-  }
-
-  const mustMatch = (
-    error: string
-  ): ((value: string | undefined) => string) => {
-    return (value: string | undefined) => {
-      return value !== newPassword() ? error : ''
-    }
-  }
+  const newPassword = () => accessor().newPassword
 
   return (
     <>
@@ -78,9 +47,9 @@ export function ResetPasswordPage(): JSXElement {
 
       <div class="flex justify-center mt-20">
         <div class="flex flex-col w-80">
-          <ResetPassword.Form onSubmit={onResetPassword}>
-            <ResetPassword.Field
-              name="password"
+          <Form onSubmit={onSubmit}>
+            <Field
+              name="newPassword"
               validate={[
                 required(t('please_enter_a_new_password')),
                 minLength(8, t('your_password_must_have_8_characters_or_more')),
@@ -105,13 +74,13 @@ export function ResetPasswordPage(): JSXElement {
                   icon={<i class="fa-solid fa-key" />}
                 />
               )}
-            </ResetPassword.Field>
+            </Field>
 
-            <ResetPassword.Field
+            <Field
               name="checkPassword"
               validate={[
                 required(t('please_confirm_your_new_password')),
-                mustMatch(t('passwords_do_not_match')),
+                mustMatch(newPassword)(t('passwords_do_not_match')),
               ]}
             >
               {(field, props) => (
@@ -124,24 +93,24 @@ export function ResetPasswordPage(): JSXElement {
                   icon={<i class="fa-solid fa-key" />}
                 />
               )}
-            </ResetPassword.Field>
+            </Field>
 
-            <Show when={resetPasswordForm.response.status === 'success'}>
+            <Show when={state.response.status === 'success'}>
               <div class="flex justify-center">
                 <Alert
                   type="success"
                   message={t('successfully_reset_password')}
-                  extraClasses="w-96"
+                  class="w-96"
                 />
               </div>
             </Show>
 
-            <Show when={resetPasswordForm.response.status === 'error'}>
+            <Show when={state.response.status === 'error'}>
               <div class="flex justify-center">
                 <Alert
                   type="error"
-                  message={resetPasswordForm.response.message}
-                  extraClasses="w-96"
+                  message={state.response.message}
+                  class="w-96"
                 />
               </div>
             </Show>
@@ -152,12 +121,12 @@ export function ResetPasswordPage(): JSXElement {
               </A>
               <Button
                 label={t('reset_password')}
-                isLoading={resetPasswordForm.submitting}
+                isLoading={state.submitting}
                 type="submit"
                 color="primary"
               />
             </div>
-          </ResetPassword.Form>
+          </Form>
         </div>
       </div>
     </>

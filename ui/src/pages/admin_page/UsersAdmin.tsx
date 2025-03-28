@@ -3,7 +3,13 @@ import { createSignal, createResource, JSXElement, Show, For } from 'solid-js'
 import { UserAttributes } from '../../models/User'
 import { Alert } from '../../components/Alert'
 import { Pagination } from '../../components/Pagination'
-import { createUser, getUsers, deleteUser } from '../../api'
+import {
+  createUser,
+  getUsers,
+  deleteUser,
+  CreateUserData,
+  DeleteUserData,
+} from '../../api'
 
 import { BooleanInput } from '../../components/BooleanInput'
 import { TextInput } from '../../components/TextInput'
@@ -11,20 +17,11 @@ import { createModalState, Modal, ModalBaseProps } from '../../components/Modal'
 
 import { useLocale } from '../../context/LocaleProvider'
 
-import {
-  clearResponse,
-  createForm,
-  reset,
-  pattern,
-  email,
-  minLength,
-  required,
-  setResponse,
-  SubmitHandler,
-} from '@modular-forms/solid'
+import { pattern, email, minLength, required } from '@modular-forms/solid'
 import { Table, TableRow } from '../../components/Table'
 import { Tooltip } from '../../components/Tooltip'
 import { Button } from '../../components/Button'
+import { createFormState } from '../../form_helpers'
 
 export function UsersAdmin(): JSXElement {
   const { t } = useLocale()
@@ -120,7 +117,7 @@ export function UsersAdmin(): JSXElement {
         ]}
       >
         <Show when={!users.loading && !users.error}>
-          <For each={users().items}>
+          <For each={users()?.items}>
             {(user) => {
               return (
                 <>
@@ -147,11 +144,7 @@ export function UsersAdmin(): JSXElement {
 
       <Show when={users.error}>
         <div class="flex justify-center items-center mt-8 w-full">
-          <Alert
-            type="error"
-            message={t('error_loading_users')}
-            extraClasses="w-80"
-          />
+          <Alert type="error" message={t('error_loading_users')} class="w-80" />
         </div>
       </Show>
 
@@ -175,31 +168,26 @@ export function UsersAdmin(): JSXElement {
   )
 }
 
-interface DeleteUserModalProps extends ModalBaseProps {
-  user: UserAttributes
-  onDelete: () => void
-}
-
-function DeleteUserModal(props: DeleteUserModalProps): JSXElement {
+function DeleteUserModal(
+  props: {
+    user: UserAttributes | null
+    onDelete: () => void
+  } & ModalBaseProps
+): JSXElement {
   const { t } = useLocale()
+  const user = () => props.user
 
-  const [deleteForm, Delete] = createForm()
-
-  const handleDelete = async () => {
-    const response = await deleteUser(props.user.id)
-
-    if (response.status !== 200) {
-      setResponse(deleteForm, {
-        status: 'error',
-        message: (await response.json()).error_message,
-      })
-      return
-    }
-
-    setResponse(deleteForm, { status: 'success' })
-    props.onClose()
-    props.onDelete()
-  }
+  const {
+    state,
+    onSubmit,
+    components: { Form },
+  } = createFormState<DeleteUserData>({
+    action: () => deleteUser({ userID: user()?.id ?? 0 }),
+    onFinish: () => {
+      props.onDelete()
+      props.onClose()
+    },
+  })
 
   return (
     <Modal
@@ -208,20 +196,20 @@ function DeleteUserModal(props: DeleteUserModalProps): JSXElement {
       onClose={props.onClose}
     >
       <p class="mt-4">{t('delete_user_confirmation')}</p>
-      <p class="mt-2 font-bold">{props.user.email}</p>
+      <p class="mt-2 font-bold">{props.user?.email}</p>
 
-      <Delete.Form onSubmit={handleDelete}>
-        <Show when={deleteForm.response.status === 'error'}>
-          <Alert type="error" message={deleteForm.response.message} />
-        </Show>
+      <Show when={state.response.status === 'error'}>
+        <Alert type="error" message={state.response.message} />
+      </Show>
 
+      <Form onSubmit={onSubmit}>
         <div class="modal-action">
           <Button
             label={t('cancel')}
             class="btn-outline"
-            isLoading={deleteForm.submitting}
+            isLoading={state.submitting}
             onClick={(e) => {
-              e.preventDefault()
+              e?.preventDefault()
               props.onClose()
             }}
           />
@@ -230,10 +218,10 @@ function DeleteUserModal(props: DeleteUserModalProps): JSXElement {
             label={t('delete')}
             type="submit"
             color="error"
-            isLoading={deleteForm.submitting}
+            isLoading={state.submitting}
           />
         </div>
-      </Delete.Form>
+      </Form>
     </Modal>
   )
 }
@@ -242,48 +230,33 @@ interface CreateUserModalProps extends ModalBaseProps {
   onCreate: () => void
 }
 
-type CreateUserFormData = {
-  email: string
-  password: string
-  isAdmin: boolean
-}
-
 function CreateUserModal(props: CreateUserModalProps): JSXElement {
   const { t } = useLocale()
 
-  const [createUserForm, Create] = createForm<CreateUserFormData>()
-
-  const handleCreate: SubmitHandler<CreateUserFormData> = async (values) => {
-    const response = await createUser(
-      values.email,
-      values.password,
-      values.isAdmin
-    )
-
-    if (response.status !== 200) {
-      setResponse(createUserForm, {
-        status: 'error',
-        message: (await response.json()).error_message,
-      })
-      return
-    }
-
-    setResponse(createUserForm, { status: 'success' })
-    onClose()
-    props.onCreate()
-  }
-
-  const onClose = () => {
-    reset(createUserForm)
-    clearResponse(createUserForm)
-    props.onClose()
-  }
+  const {
+    state,
+    onSubmit,
+    components: { Form, Field },
+  } = createFormState<CreateUserData>({
+    action: createUser,
+    onFinish: () => {
+      props.onClose()
+    },
+  })
 
   return (
-    <Modal title={t('create_new_user')} isOpen={props.isOpen} onClose={onClose}>
+    <Modal
+      title={t('create_new_user')}
+      isOpen={props.isOpen}
+      onClose={() => props.onClose()}
+    >
       <div class="space-y-4">
-        <Create.Form onSubmit={handleCreate} class="w-full">
-          <Create.Field
+        <Show when={state.response.status === 'error'}>
+          <Alert type="error" message={state.response.message} />
+        </Show>
+
+        <Form onSubmit={onSubmit} class="w-full">
+          <Field
             name="email"
             validate={[
               required(t('please_enter_your_email')),
@@ -300,9 +273,9 @@ function CreateUserModal(props: CreateUserModalProps): JSXElement {
                 icon={<i class="fa-solid fa-envelope" />}
               />
             )}
-          </Create.Field>
+          </Field>
 
-          <Create.Field
+          <Field
             name="password"
             validate={[
               required(t('please_enter_a_password')),
@@ -322,23 +295,19 @@ function CreateUserModal(props: CreateUserModalProps): JSXElement {
                 icon={<i class="fa-solid fa-key" />}
               />
             )}
-          </Create.Field>
+          </Field>
 
-          <Create.Field name="isAdmin" type="boolean">
+          <Field name="isAdmin" type="boolean">
             {(field, props) => (
               <BooleanInput
                 {...props}
                 type="checkbox"
-                value={field.value}
+                value={field.value ?? false}
                 error={field.error}
                 label={t('make_this_user_an_admin')}
               />
             )}
-          </Create.Field>
-
-          <Show when={createUserForm.response.status === 'error'}>
-            <Alert type="error" message={createUserForm.response.message} />
-          </Show>
+          </Field>
 
           <div class="modal-action">
             <Button
@@ -346,10 +315,10 @@ function CreateUserModal(props: CreateUserModalProps): JSXElement {
               type="submit"
               color="primary"
               class="mt-4 w-full"
-              isLoading={createUserForm.submitting}
+              isLoading={state.submitting}
             />
           </div>
-        </Create.Form>
+        </Form>
       </div>
     </Modal>
   )

@@ -1,115 +1,88 @@
 import { JSXElement, createSignal, Show } from 'solid-js'
 import { useNavigate, A } from '@solidjs/router'
 
+import { pattern, email, required, reset } from '@modular-forms/solid'
+
 import {
-  clearResponse,
-  createForm,
-  reset,
-  pattern,
-  email,
-  required,
-  setResponse,
-  SubmitHandler,
-} from '@modular-forms/solid'
+  passwordLogin,
+  PasswordLoginData,
+  totpLogin,
+  TotpLoginData,
+} from '../api'
 
-import { getErrorMessage, passwordLogin, totpLogin } from '../api'
-
-import { User } from '../models/User'
+import { User, UserAttributes } from '../models/User'
 import { useUser } from '../context/UserProvider'
 import { useLocale } from '../context/LocaleProvider'
 import { Alert } from './Alert'
 import { TextInput } from './TextInput'
 import { Modal, ModalBaseProps } from './Modal'
 import { Button } from './Button'
-
-type LoginFormData = {
-  email: string
-  password: string
-}
-
-type TotpFormData = {
-  totpCode: string
-}
+import { createFormState } from '../form_helpers'
 
 export function LoginModal(props: ModalBaseProps): JSXElement {
   const { t } = useLocale()
   const { setUser } = useUser()
 
-  const [currentEmail, setCurrentEmail] = createSignal<string | null>(null)
-  const [loginForm, Login] = createForm<LoginFormData>()
-  const [totpForm, Totp] = createForm<TotpFormData>()
-
   const [at2FAStep, setAt2FAStep] = createSignal(false)
+  const [closed, setClose] = createSignal()
 
   const navigate = useNavigate()
 
-  let loginModalRef: HTMLDialogElement | undefined
+  const {
+    state: loginState,
+    onSubmit: onLoginSubmit,
+    components: Login,
+  } = createFormState<PasswordLoginData, UserAttributes>({
+    action: passwordLogin,
+    onFinish: (response) => {
+      if (response === undefined) {
+        return
+      }
+      const user = new User(response)
 
-  const onPasswordLogin: SubmitHandler<LoginFormData> = async (values) => {
-    const response = await passwordLogin(values.email, values.password)
+      if (user.twoFactorEnabled) {
+        setAt2FAStep(true)
+        setEmail({ email: user.email })
 
-    if (response.status !== 200) {
-      setResponse(loginForm, {
-        status: 'error',
-        message: t(await getErrorMessage(response)),
-      })
-      return
-    }
+        return
+      }
 
-    const data = await response.json()
-    const user = new User(data)
-    setResponse(loginForm, { status: 'success', data: data })
-    setCurrentEmail(values.email)
-
-    if (user.twoFactorEnabled) {
-      setAt2FAStep(true)
-    } else {
       setUser(user)
-      loginModalRef?.close()
-      onClose()
+      setClose(true)
       navigate('/home')
-    }
-  }
+    },
+  })
 
-  const onTotpLogin: SubmitHandler<TotpFormData> = async (values) => {
-    const response = await totpLogin(currentEmail(), values.totpCode)
+  const {
+    state: totpSate,
+    setter: setEmail,
+    onSubmit: onTotpSubmit,
+    components: Totp,
+  } = createFormState<TotpLoginData, UserAttributes>({
+    action: totpLogin,
+    onFinish: (response) => {
+      if (response === undefined) {
+        return
+      }
+      const user = new User(response)
 
-    if (response.status !== 200) {
-      setResponse(totpForm, {
-        status: 'error',
-        message: (await response.json()).error_message,
-      })
-      return
-    }
-
-    const data = await response.json()
-    const user = new User(data)
-    setResponse(loginForm, { status: 'success', data: data })
-
-    setUser(user)
-    loginModalRef?.close()
-    onClose()
-    navigate('/home')
-  }
-
-  const onClose = () => {
-    clearResponse(loginForm)
-    clearResponse(totpForm)
-    reset(loginForm)
-    reset(totpForm)
-    setAt2FAStep(false)
-  }
+      setUser(user)
+      setClose(true)
+      navigate('/home')
+    },
+  })
 
   return (
     <Modal
       title={t('login')}
-      isOpen={props.isOpen}
+      isOpen={props.isOpen && !closed()}
       onClose={() => {
-        onClose()
         props.onClose()
+        reset(loginState)
+        reset(totpSate)
       }}
     >
-      <Login.Form onSubmit={onPasswordLogin} class="w-full">
+      <Login.Form onSubmit={onLoginSubmit} class="w-full">
         <div class="space-y-4">
           <Login.Field
             name="email"
@@ -145,8 +118,8 @@ export function LoginModal(props: ModalBaseProps): JSXElement {
             )}
           </Login.Field>
 
-          <Show when={loginForm.response.status === 'error'}>
-            <Alert type="error" message={loginForm.response.message} />
+          <Show when={loginState.response.status === 'error'}>
+            <Alert type="error" message={loginState.response.message} />
           </Show>
 
           <Show when={!at2FAStep()}>
@@ -163,7 +136,7 @@ export function LoginModal(props: ModalBaseProps): JSXElement {
                 type="submit"
                 color="primary"
                 class="w-full"
-                isLoading={loginForm.submitting}
+                isLoading={loginState.submitting}
               />
             </div>
           </Show>
@@ -177,7 +150,7 @@ export function LoginModal(props: ModalBaseProps): JSXElement {
           {t('enter_the_6_digit_code_generated_by_your_authenticator_app')}
         </p>
 
-        <Totp.Form onSubmit={onTotpLogin}>
+        <Totp.Form onSubmit={onTotpSubmit}>
           <Totp.Field
             name="totpCode"
             validate={[
@@ -195,14 +168,14 @@ export function LoginModal(props: ModalBaseProps): JSXElement {
             )}
           </Totp.Field>
 
-          <Show when={loginForm.response.status === 'error'}>
-            <Alert type="error" message={loginForm.response.message} />
+          <Show when={totpSate.response.status === 'error'}>
+            <Alert type="error" message={totpSate.response.message} />
           </Show>
 
           <div class="modal-action">
             <Button
               label={t('login')}
-              isLoading={totpForm.submitting}
+              isLoading={totpSate.submitting}
               color="primary"
               type="submit"
             />

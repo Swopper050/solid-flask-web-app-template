@@ -20,6 +20,8 @@ export function Table(props: {
   headers?: (string | JSXElement)[]
   children: (JSXElement | string)[] | JSXElement
 }): JSXElement {
+  const headerLength = () => (props.headers?.length ? props.headers.length : 0)
+
   return (
     <div>
       <table class="table table-fixed">
@@ -28,11 +30,7 @@ export function Table(props: {
             <tr>
               <For each={props.headers}>
                 {(header, index) => (
-                  <th
-                    class={
-                      index() === props.headers.length - 1 ? 'text-end' : ''
-                    }
-                  >
+                  <th class={index() === headerLength() - 1 ? 'text-end' : ''}>
                     {header}
                   </th>
                 )}

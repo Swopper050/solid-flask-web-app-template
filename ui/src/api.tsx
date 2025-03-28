@@ -1,32 +1,36 @@
+import { TranslationKey, TranslationKeys } from './context/LocaleProvider'
 import { PaginationResult } from './models/Base'
 import { UserAttributes } from './models/User'
-import { TranslationKeys } from './context/LocaleProvider'
 
 interface ErrorData {
   error: number
   message: string
 }
 
-export async function getErrorMessage(
-  response: Response
-): Promise<keyof TranslationKeys> {
-  const errorData: ErrorData = await response.json()
-  return errorMessages[errorData.error] || 'an_unknown_error_occurred'
+export function getErrorMessage(response: ErrorData): TranslationKey {
+  return errorMessages[response.error] || 'an_unknown_error_occurred'
 }
 
-export async function changePassword(
-  currentPassword: string,
+export type ChangePasswordData = {
+  currentPassword: string
   newPassword: string
-) {
+  confirmNewPassword: string
+}
+
+export async function changePassword(data: ChangePasswordData) {
   return post('api/change_password', {
-    current_password: currentPassword,
-    new_password: newPassword,
+    current_password: data.currentPassword,
+    new_password: data.newPassword,
   })
 }
 
-export async function forgotPassword(email: string) {
+export type ForgotPasswordData = {
+  email: string
+}
+
+export async function forgotPassword(data: ForgotPasswordData) {
   return post('api/forgot_password', {
-    email: email,
+    email: data.email,
   })
 }
 
@@ -34,33 +38,47 @@ export async function getUsers(
   page: number,
   perPage: number
 ): Promise<PaginationResult<UserAttributes>> {
-  const response = await get(`api/users?page=${page}&per_page=${perPage}`)
-  return response.json()
+  return await get(`api/users?page=${page}&per_page=${perPage}`).then(
+    (response) => response.json()
+  )
 }
 
-export async function resetPassword(
-  email: string,
-  resetToken: string,
+export type ResetPasswordData = {
+  email: string
+  resetToken: string
   newPassword: string
-) {
+  checkPassword: string
+}
+
+export async function resetPassword(data: ResetPasswordData) {
   return post('api/reset_password', {
-    email: email,
-    reset_token: resetToken,
-    new_password: newPassword,
+    email: data.email,
+    reset_token: data.resetToken,
+    new_password: data.newPassword,
   })
 }
 
-export async function passwordLogin(email: string, password: string) {
+export type PasswordLoginData = {
+  email: string
+  password: string
+}
+
+export async function passwordLogin(data: PasswordLoginData) {
   return post('api/login', {
-    email: email,
-    password: password,
+    email: data.email,
+    password: data.password,
   })
 }
 
-export async function totpLogin(email: string, totpCode: string) {
+export type TotpLoginData = {
+  totpCode: string
+  email: string
+}
+
+export async function totpLogin(data: TotpLoginData) {
   return post('api/login_2fa', {
-    email: email,
-    totp_code: totpCode,
+    email: data.email,
+    totp_code: data.totpCode,
   })
 }
 
@@ -72,10 +90,16 @@ export async function deleteAccount() {
   return _delete('api/delete_account')
 }
 
-export async function register(email: string, password: string) {
+export type RegisterUserData = {
+  email: string
+  password: string
+  checkPassword: string
+}
+
+export async function register(data: RegisterUserData) {
   return post('api/register', {
-    email: email,
-    password: password,
+    email: data.email,
+    password: data.password,
   })
 }
 
@@ -83,16 +107,25 @@ export async function generate2FASecret() {
   return get('api/generate_2fa_secret')
 }
 
-export async function enable2FA(totpSecret: string, totpCode: string) {
+export type Enable2FAData = {
+  totpSecret: string
+  totpCode: string
+}
+
+export async function enable2FA(data: Enable2FAData) {
   return post('api/enable_2fa', {
-    totp_secret: totpSecret,
-    totp_code: totpCode,
+    totp_secret: data.totpSecret,
+    totp_code: data.totpCode,
   })
 }
 
-export async function disable2FA(totpCode: string) {
+export type Disable2FAData = {
+  totpCode: string
+}
+
+export async function disable2FA(data: Disable2FAData) {
   return post('api/disable_2fa', {
-    totp_code: totpCode,
+    totp_code: data.totpCode,
   })
 }
 
@@ -111,20 +144,26 @@ export async function whoAmI() {
   return get('api/whoami')
 }
 
-export async function createUser(
-  email: string,
-  password: string,
+export type CreateUserData = {
+  email: string
+  password: string
   isAdmin: boolean
-) {
+}
+
+export async function createUser(data: CreateUserData) {
   return post(`api/users`, {
-    email: email,
-    password: password,
-    is_admin: isAdmin,
+    email: data.email,
+    password: data.password,
+    is_admin: data.isAdmin,
   })
 }
 
-export async function deleteUser(userId: number) {
-  return _delete(`api/user/${userId}`)
+export type DeleteUserData = {
+  userID: number
+}
+
+export async function deleteUser(data: DeleteUserData) {
+  return _delete(`api/user/${data.userID}`)
 }
 
 export async function get(url: string) {
