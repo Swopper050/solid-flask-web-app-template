@@ -36,6 +36,7 @@ export function Button(props: {
   size?: DaisyUIButtonSize
   style?: DaisyUIButtonStyle
   class?: string
+  dataCy?: string
 }): JSXElement {
   return (
     <button
@@ -49,6 +50,7 @@ export function Button(props: {
       )}
       type={props.type ?? 'button'}
       onClick={(event) => props.onClick?.(event)}
+      data-cy={props.dataCy}
     >
       <Show when={props.icon}>
         <i class={props.icon} />
