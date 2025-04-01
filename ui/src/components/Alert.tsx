@@ -1,4 +1,4 @@
-import { JSXElement } from 'solid-js'
+import { JSXElement, JSX } from 'solid-js'
 import { clsx } from 'clsx'
 import { TranslationKey, useLocale } from '../context/LocaleProvider'
 
@@ -8,7 +8,7 @@ interface AlertProps {
   class?: string
 }
 
-export function Alert(props: AlertProps): JSXElement {
+export function Alert(props: AlertProps & JSX.HTMLAttributes<HTMLDivElement>): JSXElement {
   const { t } = useLocale()
 
   const translated = () => t((props.message as TranslationKey) ?? '')
@@ -25,6 +25,7 @@ export function Alert(props: AlertProps): JSXElement {
     <div
       role="alert"
       class={clsx('alert my-4', types[props.type].alert, props?.class)}
+      {...props}
     >
       <i class={clsx('fa-solid mr-2', types[props.type].icon)} />
       <span>{message()}</span>
