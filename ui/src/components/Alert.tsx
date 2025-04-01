@@ -8,7 +8,9 @@ interface AlertProps {
   class?: string
 }
 
-export function Alert(props: AlertProps & JSX.HTMLAttributes<HTMLDivElement>): JSXElement {
+export function Alert(
+  props: AlertProps & JSX.HTMLAttributes<HTMLDivElement>
+): JSXElement {
   const { t } = useLocale()
 
   const translated = () => t((props.message as TranslationKey) ?? '')
