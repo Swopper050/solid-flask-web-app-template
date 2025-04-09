@@ -76,8 +76,10 @@ jobs:
       - name: Check for unmigrated changes
         run: |
           cd api
+          before=$(ls migrations/versions/*.py | wc -l)
           make migrate
-          if grep -q "op\." migrations/versions/$(ls -t migrations/versions/ | head -n 1); then
+          after=$(ls migrations/versions/*.py | wc -l)
+          if [ "$after" -gt "$before" ]; then
             echo "::error::Database model changes detected without corresponding migration. Please use 'make migrate' to create the required migration."
             exit 1
           fi
