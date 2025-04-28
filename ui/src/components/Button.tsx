@@ -42,7 +42,7 @@ export function Button(props: {
       class={clsx(
         'btn',
         props.color ? `btn-${props.color}` : undefined,
-        props.style && !props.color ? `btn-${props.style}` : undefined,
+        props.style ? `btn-${props.style}` : undefined,
         props.size ? `btn-${props.size}` : undefined,
         props.isLoading && 'btn-disabled',
         props.class
