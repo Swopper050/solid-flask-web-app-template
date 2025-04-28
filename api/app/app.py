@@ -3,10 +3,10 @@ from logging.handlers import RotatingFileHandler
 
 from flask import Flask, request
 
+from app.commands import register_commands
 from app.config import DevConfig, ProdConfig, TestConfig
 from app.errors import APIError, APIErrorEnum
 from app.extensions import api, db, login_manager, mail, migrate
-from app.commands import register_commands
 
 
 def create_app(config_object: DevConfig | ProdConfig | TestConfig = ProdConfig()):
