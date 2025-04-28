@@ -22,7 +22,7 @@ def create_admin(email, password):
         user = User(email=email, is_admin=True, is_verified=True)
         user.set_password(password)
         db.session.add(user)
-    
+
     db.session.commit()
     click.echo(f"Admin user {email} created/updated successfully.")
 
