@@ -37,7 +37,7 @@ for (const file of files) {
   )
   let output = ''
 
-  if (file === 'nl.ts') {
+  if (file === 'en.ts') {
     output += 'export const dict = {\n'
   } else {
     output += `import { Translations } from '../context/LocaleProvider'\n\n`

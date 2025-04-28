@@ -26,7 +26,7 @@ ts_check: ## Run the typescript compiler
 ts_watch: ## Run the typescript compiler in watch mode
 	pnpm tsc --watch
 
-formatlint: format lint ## First format code, then run linters
+formatlint: format format_translations lint ## First format code, then run linters
 
 cypress: ## Open cypress for creating and running tests
 	pnpm cypress open

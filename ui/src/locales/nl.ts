@@ -1,4 +1,6 @@
-export const dict = {
+import { Translations } from '../context/LocaleProvider'
+
+export const dict: Translations = {
   a_puppy: 'Een puppy!',
   account: 'Account',
   admin_panel: 'Admin paneel',
