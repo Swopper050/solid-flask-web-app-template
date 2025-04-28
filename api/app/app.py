@@ -3,6 +3,7 @@ from logging.handlers import RotatingFileHandler
 
 from flask import Flask, request
 
+from app.commands import register_commands
 from app.config import DevConfig, ProdConfig, TestConfig
 from app.errors import APIError, APIErrorEnum
 from app.extensions import api, db, login_manager, mail, migrate
@@ -17,6 +18,8 @@ def create_app(config_object: DevConfig | ProdConfig | TestConfig = ProdConfig()
     api.init_app(app)
     migrate.init_app(app, db)
     mail.init_app(app)
+
+    register_commands(app)
 
     @api.errorhandler(APIError)
     def handle_api_error(error):
