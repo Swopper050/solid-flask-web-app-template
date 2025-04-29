@@ -129,6 +129,12 @@ jobs:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
+      redis:
+        image: redis:latest
+        ports:
+          - 6379:6379
+        options: --health-cmd="redis-cli ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
       mail:
         image: maildev/maildev
         env:
@@ -161,6 +167,9 @@ jobs:
 
       - name: Run API server on background 
         run: cd api && source .env/bin/activate && make MY_SOLID_APP_FILE_LOGGING=True server &
+
+      - name: Run tasks server on background 
+        run: cd api && source .env/bin/activate && make worker &
 
       - name: Run Cypress Tests
         uses: cypress-io/github-action@v6
