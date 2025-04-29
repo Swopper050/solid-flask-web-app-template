@@ -20,7 +20,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build docker image
-        run: cd api && make DOCKERHUB_NAMESPACE=${{ secrets.DOCKERHUB_NAMESPACE }} docker_api_latest
+        run: cd api && make DOCKERHUB_NAMESPACE=${{ secrets.DOCKERHUB_NAMESPACE }} docker_build_api_latest
 
       - name: Push docker image
         run: cd api && make DOCKERHUB_NAMESPACE=${{ secrets.DOCKERHUB_NAMESPACE }} docker_push_api_latest
@@ -38,7 +38,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build docker image
-        run: cd api && make DOCKERHUB_NAMESPACE=${{ secrets.DOCKERHUB_NAMESPACE }} docker_tasks_latest
+        run: cd api && make DOCKERHUB_NAMESPACE=${{ secrets.DOCKERHUB_NAMESPACE }} docker_build_tasks_latest
 
       - name: Push docker image
         run: cd api && make DOCKERHUB_NAMESPACE=${{ secrets.DOCKERHUB_NAMESPACE }} docker_push_tasks_latest
