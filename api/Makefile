@@ -48,6 +48,9 @@ test_cov: ## Run tests and show coverage
 server: ## Start development server
 	flask --app server --debug run
 
+worker: ## Start background worker
+	watchmedo auto-restart --directory ./ --patterns="*.py" --recursive -- celery -A server.celery_app worker --loglevel=info
+
 database:  ## Creates an empty database
 	python scripts/empty_database.py
 
@@ -66,18 +69,31 @@ db_downgrade: ## Downgrade database
 db_upgrade: ## Upgrade database
 	flask --app server db upgrade
 
-docker_latest: ## Build a docker container and tag it with 'latest'
-	docker build -t $(DOCKERHUB_NAMESPACE)/my-solid-app-api:latest .
+docker_build_api_latest: ## Build the api docker container and tag it with 'latest'
+	docker build -t $(DOCKERHUB_NAMESPACE)/my-solid-app-api:latest -f Dockerfile.api .
 
-docker_stable: ## Build a docker container and tag it with the current git version tag and 'stable'
-	docker build -t $(DOCKERHUB_NAMESPACE)/my-solid-app-api:$(VERSION) -t $(DOCKERHUB_NAMESPACE)/my-solid-app-api:stable .
+docker_build_tasks_latest: ## Build the tasks docker container and tag it with 'latest'
+	docker build -t $(DOCKERHUB_NAMESPACE)/my-solid-app-tasks:latest -f Dockerfile.tasks .
 
-docker_push_latest: ## Push the docker container with the tag 'latest'
+docker_build_api_stable: ## Build the api docker container and tag it with the current git version tag and 'stable'
+	docker build -t $(DOCKERHUB_NAMESPACE)/my-solid-app-api:$(VERSION) -t $(DOCKERHUB_NAMESPACE)/my-solid-app-api:stable -f Dockerfile.api .
+
+docker_build_tasks_stable: ## Build the tasks docker container and tag it with the current git version tag and 'stable'
+	docker build -t $(DOCKERHUB_NAMESPACE)/my-solid-app-tasks:$(VERSION) -t $(DOCKERHUB_NAMESPACE)/my-solid-app-tasks:stable -f Dockerfile.tasks .
+
+docker_push_api_latest: ## Push the api docker container with the tag 'latest'
 	docker push $(DOCKERHUB_NAMESPACE)/my-solid-app-api:latest
 
-docker_push_stable: ## Push the docker containers with the current git version tag and 'stable'
+docker_push_tasks_latest: ## Push the tasks docker container with the tag 'latest'
+	docker push $(DOCKERHUB_NAMESPACE)/my-solid-app-tasks:latest
+
+docker_push_api_stable: ## Push the api docker containers with the current git version tag and 'stable'
 	docker push $(DOCKERHUB_NAMESPACE)/my-solid-app-api:$(VERSION)
 	docker push $(DOCKERHUB_NAMESPACE)/my-solid-app-api:stable
+
+docker_push_tasks_stable: ## Push the tasks docker container with the current git version tag and 'stable'
+	docker push $(DOCKERHUB_NAMESPACE)/my-solid-app-tasks:$(VERSION)
+	docker push $(DOCKERHUB_NAMESPACE)/my-solid-app-tasks:stable
 
 docker_run_latest: ## Run the api as a docker container
 	docker run \
