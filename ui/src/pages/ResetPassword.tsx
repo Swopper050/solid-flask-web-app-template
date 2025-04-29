@@ -30,9 +30,10 @@ export function ResetPasswordPage(): JSXElement {
     formOptions: {
       initialValues: {
         email: getSingleParam(searchParams.email),
-        resetToken: getSingleParam(searchParams.resetToken),
+        resetToken: getSingleParam(searchParams.reset_token),
       },
     },
+    resetOnFinish: false,
   })
 
   const newPassword = () => accessor().newPassword
@@ -48,6 +49,32 @@ export function ResetPasswordPage(): JSXElement {
       <div class="flex justify-center mt-20">
         <div class="flex flex-col w-80">
           <Form onSubmit={onSubmit}>
+            <Field name="email">
+              {(field, props) => (
+                <TextInput
+                  {...props}
+                  type="email"
+                  value={field.value}
+                  error={field.error}
+                  icon={<i class="fa-solid fa-envelope" />}
+                  disabled={true}
+                />
+              )}
+            </Field>
+
+            <Field name="resetToken">
+              {(field, props) => (
+                <TextInput
+                  {...props}
+                  type="password"
+                  value={field.value}
+                  error={field.error}
+                  icon={<i class="fa-solid fa-key" />}
+                  disabled={true}
+                />
+              )}
+            </Field>
+
             <Field
               name="newPassword"
               validate={[
@@ -72,6 +99,7 @@ export function ResetPasswordPage(): JSXElement {
                   error={field.error}
                   placeholder={t('new_password')}
                   icon={<i class="fa-solid fa-key" />}
+                  disabled={state.response.status === 'success'}
                 />
               )}
             </Field>
@@ -91,6 +119,7 @@ export function ResetPasswordPage(): JSXElement {
                   error={field.error}
                   placeholder={t('confirm_new_password')}
                   icon={<i class="fa-solid fa-key" />}
+                  disabled={state.response.status === 'success'}
                 />
               )}
             </Field>
@@ -124,6 +153,7 @@ export function ResetPasswordPage(): JSXElement {
                 isLoading={state.submitting}
                 type="submit"
                 color="primary"
+                disabled={state.response.status === 'success'}
               />
             </div>
           </Form>

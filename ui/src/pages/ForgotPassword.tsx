@@ -21,6 +21,7 @@ export function ForgotPasswordPage(): JSXElement {
     components: { Form, Field },
   } = createFormState<ForgotPasswordData>({
     action: forgotPassword,
+    resetOnFinish: false,
   })
 
   return (
@@ -34,7 +35,7 @@ export function ForgotPasswordPage(): JSXElement {
       </div>
 
       <div class="flex justify-center mt-20">
-        <div class="flex flex-col">
+        <div class="flex flex-col w-96">
           <Form onSubmit={onSubmit}>
             <Field
               name="email"
@@ -51,6 +52,7 @@ export function ForgotPasswordPage(): JSXElement {
                   error={field.error}
                   placeholder={t('email_placeholder')}
                   icon={<i class="fa-solid fa-envelope" />}
+                  disabled={state.response.status === 'success'}
                 />
               )}
             </Field>
@@ -62,6 +64,7 @@ export function ForgotPasswordPage(): JSXElement {
                   message={
                     'if_a_user_with_this_email_exists_a_reset_password_mail_has_been_sent'
                   }
+                  class="w-96"
                 />
               </div>
             </Show>
@@ -86,6 +89,7 @@ export function ForgotPasswordPage(): JSXElement {
                 color="primary"
                 type="submit"
                 isLoading={state.submitting}
+                disabled={state.response.status === 'success'}
               />
             </div>
           </Form>
