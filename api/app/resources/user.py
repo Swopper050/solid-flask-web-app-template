@@ -6,9 +6,9 @@ from marshmallow import Schema, fields
 from app.db.user import User, UserSchema
 from app.errors import APIError, APIErrorEnum
 from app.extensions import api, db
-from app.mail_utils import send_email_verification_email
 from app.resources.decorators import admin_required, insert_pagination_parameters
 from app.resources.utils import pagination_query
+from app.tasks.mail_tasks import send_email_verification_email
 
 
 class CreateUserSchema(Schema):
@@ -48,7 +48,7 @@ class UsersAPI(Resource):
 
         verification_token = new_user.set_email_verification_token()
 
-        send_email_verification_email(
+        send_email_verification_email.delay(
             receiver=new_user.email, verification_token=verification_token
         )
 

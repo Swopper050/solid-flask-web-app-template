@@ -1,5 +1,7 @@
 from string import Template
 
+from celery import shared_task
+from celery.utils.log import get_task_logger
 from flask_mail import Message
 
 from app.config import (
@@ -8,7 +10,10 @@ from app.config import (
 )
 from app.extensions import mail
 
+logger = get_task_logger(__name__)
 
+
+@shared_task(ignore_result=True)
 def send_forgot_password_email(*, receiver: str, reset_token: str):
     reset_link = (
         f"{MY_SOLID_APP_FRONTEND_URL}/reset-password?"
@@ -32,6 +37,7 @@ def send_forgot_password_email(*, receiver: str, reset_token: str):
     mail.send(message)
 
 
+@shared_task(ignore_result=True)
 def send_email_verification_email(*, receiver: str, verification_token: str):
     verification_link = (
         f"{MY_SOLID_APP_FRONTEND_URL}/verify-email?"

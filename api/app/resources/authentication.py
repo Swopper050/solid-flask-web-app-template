@@ -11,7 +11,10 @@ from app.config import MY_SOLID_APP_PASSWORD_RESET_TOKEN_EXPIRE_HOURS
 from app.db.user import User, UserSchema
 from app.errors import APIError, APIErrorEnum
 from app.extensions import api, db, login_manager
-from app.mail_utils import send_email_verification_email, send_forgot_password_email
+from app.tasks.mail_tasks import (
+    send_email_verification_email,
+    send_forgot_password_email,
+)
 
 
 @login_manager.user_loader
@@ -45,7 +48,7 @@ class Register(Resource):
         login_user(new_user)
 
         verification_token = new_user.set_email_verification_token()
-        send_email_verification_email(
+        send_email_verification_email.delay(
             receiver=new_user.email, verification_token=verification_token
         )
 
@@ -191,7 +194,7 @@ class ForgotPassword(Resource):
         db.session.add(user)
         db.session.commit()
 
-        send_forgot_password_email(receiver=user.email, reset_token=reset_token)
+        send_forgot_password_email.delay(receiver=user.email, reset_token=reset_token)
 
         return {}, 200
 
@@ -275,7 +278,7 @@ class ResendEmailVerification(Resource):
     @login_required
     def post(self):
         verification_token = current_user.set_email_verification_token()
-        send_email_verification_email(
+        send_email_verification_email.delay(
             receiver=current_user.email, verification_token=verification_token
         )
 

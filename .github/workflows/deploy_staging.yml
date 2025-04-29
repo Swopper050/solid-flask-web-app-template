@@ -20,10 +20,28 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build docker image
-        run: cd api && make DOCKERHUB_NAMESPACE=${{ secrets.DOCKERHUB_NAMESPACE }} docker_latest
+        run: cd api && make DOCKERHUB_NAMESPACE=${{ secrets.DOCKERHUB_NAMESPACE }} docker_build_api_latest
 
       - name: Push docker image
-        run: cd api && make DOCKERHUB_NAMESPACE=${{ secrets.DOCKERHUB_NAMESPACE }} docker_push_latest
+        run: cd api && make DOCKERHUB_NAMESPACE=${{ secrets.DOCKERHUB_NAMESPACE }} docker_push_api_latest
+
+  docker-tasks-latest-build-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup
+        uses: actions/checkout@v4
+
+      - name: Login to docker
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build docker image
+        run: cd api && make DOCKERHUB_NAMESPACE=${{ secrets.DOCKERHUB_NAMESPACE }} docker_build_tasks_latest
+
+      - name: Push docker image
+        run: cd api && make DOCKERHUB_NAMESPACE=${{ secrets.DOCKERHUB_NAMESPACE }} docker_push_tasks_latest
 
   docker-ui-latest-build-push:
     runs-on: ubuntu-latest

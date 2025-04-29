@@ -48,6 +48,39 @@ services:
         max-size: '5m'
         max-file: '5'
 
+  tasks:
+    image: $DOCKERHUB_NAMESPACE/my-solid-app-tasks:latest
+    container_name: my-solid-app-tasks-staging
+    environment:
+      MY_SOLID_APP_FRONTEND_URL: https://staging.my-solid-app.nl:8443
+      MY_SOLID_APP_SECRET_KEY: $MY_SOLID_APP_SECRET_KEY
+      MY_SOLID_APP_FERNET_SECRET_KEY: $MY_SOLID_APP_FERNET_SECRET_KEY
+      MY_SOLID_APP_AZURE_OPENAI_API_VERSION: $MY_SOLID_APP_AZURE_OPENAI_API_VERSION
+      MY_SOLID_APP_AZURE_OPENAI_API_ENDPOINT: $MY_SOLID_APP_AZURE_OPENAI_API_ENDPOINT
+      MY_SOLID_APP_AZURE_OPENAI_API_KEY: $MY_SOLID_APP_AZURE_OPENAI_API_KEY
+      MY_SOLID_APP_DB_NAME: $MY_SOLID_APP_DB_NAME
+      MY_SOLID_APP_DB_USER: $MY_SOLID_APP_DB_USER
+      MY_SOLID_APP_DB_PASSWORD: $MY_SOLID_APP_DB_PASSWORD
+      MY_SOLID_APP_DB_HOST: 'db'
+      MY_SOLID_APP_DB_PORT: '3306'
+      MY_SOLID_APP_MAIL_SERVER: $MY_SOLID_APP_MAIL_SERVER
+      MY_SOLID_APP_MAIL_PORT: $MY_SOLID_APP_MAIL_PORT
+      MY_SOLID_APP_MAIL_USE_SSL: 'True'
+      MY_SOLID_APP_MAIL_USERNAME: $MY_SOLID_APP_MAIL_USERNAME
+      MY_SOLID_APP_MAIL_PASSWORD: $MY_SOLID_APP_MAIL_PASSWORD
+      MY_SOLID_APP_MAIL_DEFAULT_SENDER: $MY_SOLID_APP_MAIL_DEFAULT_SENDER
+      MY_SOLID_APP_REDIS_HOST: 'redis'
+    networks:
+      - my-solid-app-network-staging
+    depends_on:
+      - redis
+      - db
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '5m'
+        max-file: '5'
+
   db:
     image: mariadb:latest
     container_name: my-solid-app-mariadb-staging
@@ -67,6 +100,20 @@ services:
         max-size: '5m'
         max-file: '5'
 
+  redis:
+    image: redis:latest
+    container_name: my-solid-app-redis-staging
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data_staging:/data
+    networks:
+      - my-solid-app-network-staging
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '5m'
+        max-file: '5'
+
 
 networks:
   my-solid-app-network-staging:
@@ -75,3 +122,4 @@ networks:
 
 volumes:
   db_data_staging:
+  redis_data_staging:

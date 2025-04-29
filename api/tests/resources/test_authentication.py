@@ -1,5 +1,4 @@
 import datetime as dt
-import re
 from unittest.mock import patch
 
 import pyotp
@@ -9,23 +8,20 @@ from flask_login import current_user
 
 from app.db.user import User, UserSchema
 from app.errors import APIErrorEnum
-from app.extensions import mail
 
 
 class TestRegisterAPI:
     def test_register(self, client, db, user):
         assert User.query.count() == 1
 
-        with mail.record_messages() as outbox:
+        with patch(
+            "app.resources.authentication.send_email_verification_email"
+        ) as mock_email:
             response = client.post(
                 "/register", json={"email": "new@user.com", "password": "white_wolf"}
             )
 
-            assert len(outbox) == 1
-            assert outbox[0].subject == "🛁 MySolidApp - Email verification"
-            assert outbox[0].recipients == ["new@user.com"]
-            assert outbox[0].html is not None
-            token = re.search(r"verification_token=([\w-]+)", outbox[0].html).group(1)
+            mock_email.delay.assert_called_once()
 
         assert response.status_code == 200
 
@@ -40,7 +36,7 @@ class TestRegisterAPI:
         assert not new_user.is_admin
         assert new_user.hashed_password is not None
         assert new_user.is_correct_password("white_wolf")
-        assert new_user.check_email_verification_token(token)
+        assert new_user.email_verification_token is not None
 
     def test_register_email_exists(self, client, user):
         assert User.query.count() == 1
@@ -333,29 +329,33 @@ class TestForgotPasswordAPI:
         assert user.password_reset_token is None
         assert user.password_reset_time is None
 
-        with mail.record_messages() as outbox:
+        with patch(
+            "app.resources.authentication.send_forgot_password_email"
+        ) as mock_email:
             response = client.post(
                 "/forgot_password",
                 json={"email": user.email},
             )
 
-            assert response.status_code == 200
-            assert len(outbox) == 1
-            assert outbox[0].subject == "🛁 MySolidApp - Password reset"
-            assert outbox[0].recipients == [user.email]
+            mock_email.delay.assert_called_once()
+
+        assert response.status_code == 200
 
         assert user.password_reset_token is not None
         assert user.password_reset_time == 12345
 
     def test_forgot_password_user_does_not_exist(self, client, user):
-        with mail.record_messages() as outbox:
+        with patch(
+            "app.resources.authentication.send_forgot_password_email"
+        ) as mock_email:
             response = client.post(
                 "/forgot_password",
                 json={"email": "unknown@email.com"},
             )
 
-            assert response.status_code == 200
-            assert len(outbox) == 0
+            mock_email.delay.assert_not_called()
+
+        assert response.status_code == 200
 
 
 class TestResetPasswordAPI:
@@ -373,19 +373,7 @@ class TestResetPasswordAPI:
         assert user.password_reset_time is None
         assert user.is_correct_password("password123")
 
-        with mail.record_messages() as outbox:
-            response = client.post(
-                "/forgot_password",
-                json={"email": user.email},
-            )
-
-            assert response.status_code == 200
-            assert len(outbox) == 1
-            assert outbox[0].subject == "🛁 MySolidApp - Password reset"
-            assert outbox[0].recipients == [user.email]
-            assert outbox[0].html is not None
-            reset_token = re.search(r"reset_token=([\w-]+)", outbox[0].html).group(1)
-
+        reset_token = user.set_password_reset_token()
         assert user.password_reset_token is not None
         assert user.password_reset_time == int(
             (now - dt.timedelta(minutes=2)).timestamp()
@@ -411,12 +399,7 @@ class TestResetPasswordAPI:
     def test_reset_password_invalid_token(self, time_mock, client, user, now):
         time_mock.time.return_value = int(now.timestamp())
 
-        with mail.record_messages():
-            response = client.post(
-                "/forgot_password",
-                json={"email": user.email},
-            )
-            assert response.status_code == 200
+        user.set_password_reset_token()
 
         response = client.post(
             "/reset_password",
@@ -469,15 +452,7 @@ class TestResetPasswordAPI:
         user_time.time.return_value = int((now - dt.timedelta(hours=2)).timestamp())
         reset_time.time.return_value = int(now.timestamp())
 
-        with mail.record_messages() as outbox:
-            response = client.post(
-                "/forgot_password",
-                json={"email": user.email},
-            )
-            assert response.status_code == 200
-            assert len(outbox) == 1
-            assert outbox[0].html is not None
-            reset_token = re.search(r"reset_token=([\w-]+)", outbox[0].html).group(1)
+        reset_token = user.set_password_reset_token()
 
         response = client.post(
             "/reset_password",
@@ -505,15 +480,7 @@ class TestResetPasswordAPI:
         user_time.time.return_value = int((now - dt.timedelta(minutes=2)).timestamp())
         reset_time.time.return_value = int(now.timestamp())
 
-        with mail.record_messages() as outbox:
-            response = client.post(
-                "/forgot_password",
-                json={"email": user.email},
-            )
-            assert response.status_code == 200
-            assert len(outbox) == 1
-            assert outbox[0].html is not None
-            reset_token = re.search(r"reset_token=([\w-]+)", outbox[0].html).group(1)
+        reset_token = user.set_password_reset_token()
 
         response = client.post(
             "/reset_password",
@@ -609,23 +576,18 @@ class TestResendVerifyEmailAPI:
 
         old_token = logged_in_user.email_verification_token
 
-        with mail.record_messages() as outbox:
+        with patch(
+            "app.resources.authentication.send_email_verification_email"
+        ) as mock_email:
             response = client.post(
                 "/resend_email_verification",
             )
 
-            assert response.status_code == 200
-            assert len(outbox) == 1
-            assert outbox[0].subject == "🛁 MySolidApp - Email verification"
-            assert outbox[0].recipients == [logged_in_user.email]
-            assert outbox[0].html is not None
-            new_token = re.search(r"verification_token=([\w-]+)", outbox[0].html).group(
-                1
-            )
+            mock_email.delay.assert_called_once()
+
+        assert response.status_code == 200
 
         assert logged_in_user.email_verification_token != old_token
-        assert logged_in_user.check_email_verification_token(new_token)
-        assert not logged_in_user.is_verified
 
     def test_resend_email_verification_not_logged_in(self, db, client, user):
         user.set_email_verification_token()
@@ -637,13 +599,10 @@ class TestResendVerifyEmailAPI:
 
         old_token = user.email_verification_token
 
-        with mail.record_messages() as outbox:
-            response = client.post(
-                "/resend_email_verification",
-            )
-
-            assert response.status_code == 401
-            assert len(outbox) == 0
+        response = client.post(
+            "/resend_email_verification",
+        )
+        assert response.status_code == 401
 
         assert not user.is_verified
         assert user.email_verification_token == old_token
