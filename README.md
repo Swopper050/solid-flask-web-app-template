@@ -20,6 +20,10 @@ A full stack template for an app and web application with backend. The repositor
    - 🧪 Running tests
    - 🐳 Building [Docker](https://www.docker.com/) containers
    - 💻 Automated single VPS deployment
+ - 👷 Background tasks with built in [Python](https://www.python.org/) with [Celery](https://docs.celeryq.dev/en/stable/) and [Redis](https://redis.io/):
+   - 📬 Send mails in the background
+   - ⌛ Run slow tasks in a background process
+
 
 ## Landing page
 ![Landing page](./docs/images/landing_page.png "Landing page")
