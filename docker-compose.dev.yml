@@ -12,17 +12,17 @@ services:
 
   redis:
     image: redis:latest
-    container_name: ktg-demo-redis
+    container_name: my-solid-app-redis
     ports:
       - "6379:6379"
     command: redis-server --appendonly yes
 
-  mail: 
+  mail:
     image: maildev/maildev
     container_name: my-solid-app-maildev
-    command: 
+    command:
       - "--incoming-user=mysolidapp@mail.com"
       - "--incoming-pass=12345678"
     ports:
-      - "1080:1080" 
+      - "1080:1080"
       - "1025:1025"
