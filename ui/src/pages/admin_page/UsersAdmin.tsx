@@ -85,6 +85,7 @@ export function UsersAdmin(): JSXElement {
       <button
         class="btn btn-ghost btn-sm mx-1"
         onClick={() => handleDelete(props.user)}
+        data-cy={`delete-user-${props.user.email}`}
       >
         <i class="fa-solid fa-trash text-error" />
       </button>
@@ -110,6 +111,7 @@ export function UsersAdmin(): JSXElement {
           <button
             class="btn btn-primary btn-sm"
             onClick={() => openModal('createUser')}
+            data-cy="create-new-user"
           >
             <i class="fa-solid fa-plus" />
             <p class="hidden md:block">{t('create_new_user')}</p>
@@ -219,6 +221,7 @@ function DeleteUserModal(
             type="submit"
             color="error"
             isLoading={state.submitting}
+            dataCy="delete-user"
           />
         </div>
       </Form>
@@ -271,6 +274,7 @@ function CreateUserModal(props: CreateUserModalProps): JSXElement {
                 error={field.error}
                 placeholder={t('email_placeholder')}
                 icon={<i class="fa-solid fa-envelope" />}
+                data-cy="new-user-email"
               />
             )}
           </Field>
@@ -293,6 +297,7 @@ function CreateUserModal(props: CreateUserModalProps): JSXElement {
                 error={field.error}
                 placeholder={t('password')}
                 icon={<i class="fa-solid fa-key" />}
+                data-cy="new-user-password"
               />
             )}
           </Field>
@@ -305,6 +310,7 @@ function CreateUserModal(props: CreateUserModalProps): JSXElement {
                 value={field.value ?? false}
                 error={field.error}
                 label={t('make_this_user_an_admin')}
+                data-cy="new-user-admin"
               />
             )}
           </Field>
@@ -316,6 +322,7 @@ function CreateUserModal(props: CreateUserModalProps): JSXElement {
               color="primary"
               class="mt-4 w-full"
               isLoading={state.submitting}
+              dataCy="submit-new-user"
             />
           </div>
         </Form>

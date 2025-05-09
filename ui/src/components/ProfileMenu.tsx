@@ -34,14 +34,18 @@ export function ProfileMenu(): JSXElement {
 
   return (
     <details class="dropdown dropdown-end">
-      <summary class="btn btn-ghost">
+      <summary class="btn btn-ghost" data-cy="toggle-profile-menu-dropdown">
         <span class="text">{user()?.email}</span>
         <i class="fa-solid fa-ellipsis" />
       </summary>
 
       <ul class="menu dropdown-content bg-base-200 w-40 rounded-box z-100">
         <li>
-          <A class="btn btn-ghost justify-start" href="/account">
+          <A
+            class="btn btn-ghost justify-start"
+            href="/account"
+            data-cy="user-account"
+          >
             <i class="fa-regular fa-address-card" />
             {t('account')}
           </A>
@@ -49,7 +53,11 @@ export function ProfileMenu(): JSXElement {
 
         <Show when={user()?.isAdmin}>
           <li>
-            <A class="btn btn-ghost justify-start" href="/admin-panel">
+            <A
+              class="btn btn-ghost justify-start"
+              href="/admin-panel"
+              data-cy="admin-panel"
+            >
               <i class="fa-solid fa-screwdriver-wrench text-success" />
               <p class="text-success">{t('admin_panel')}</p>
             </A>
@@ -65,6 +73,7 @@ export function ProfileMenu(): JSXElement {
               loggingOut() && 'btn-disabled'
             )}
             onClick={onLogout}
+            data-cy="logout"
           >
             <Show
               when={loggingOut()}
