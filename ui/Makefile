@@ -35,19 +35,19 @@ server: ## Start the development server
 	pnpm run dev
 
 find_unused_translations: ## Finds translation keys in the 'en' locale that are not used in the application
-	python scripts/find_unused_translations.py
+	node scripts/find_unused_translations.js
 
 add_missing_translations: ## Adds missing translation keys to all locales, based on the default 'en' locale
-	python scripts/add_missing_translations.py
+	node scripts/add_missing_translations.js
 
 format_translations:  ## Formats translations in all locales and sorts them alphabetically
 	node scripts/format-translations.js
 	
 check_unused_translations: ## Checks for unused translations and fails if any are found (for CI)
-	python scripts/find_unused_translations.py --ci
+	node scripts/find_unused_translations.js --ci
 
 check_missing_translations: ## Checks for missing translations and fails if any are found (for CI)
-	python scripts/add_missing_translations.py --ci
+	node scripts/add_missing_translations.js --ci
 
 check_format_translations: ## Check if translations are formatted
 	node scripts/format-translations.js --check
