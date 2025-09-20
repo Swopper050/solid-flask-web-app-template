@@ -1,6 +1,5 @@
 name:
 
-
 on:
   push:
     branches:
@@ -63,22 +62,27 @@ jobs:
 
   deploy-staging:
     runs-on: ubuntu-latest
-    needs: [docker-ui-latest-build-push, docker-api-latest-build-push]
+    needs:
+      [
+        docker-ui-latest-build-push,
+        docker-api-latest-build-push,
+        docker-tasks-latest-build-push,
+      ]
     steps:
       - name: Setup
         uses: actions/checkout@v4
 
-      - name: SCP new docker compose file 
+      - name: SCP new docker compose file
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.MY_SOLID_APP_STAGING_VPS_HOST }}
           username: ${{ secrets.MY_SOLID_APP_STAGING_VPS_USER }}
           port: ${{ secrets.MY_SOLID_APP_STAGING_VPS_PORT }}
           key: ${{ secrets.MY_SOLID_APP_STAGING_VPS_SSH_KEY }}
-          source: 'docker-compose.staging.yml, nginx.staging.conf'
-          target: '~/'
+          source: "docker-compose.staging.yml, nginx.staging.conf"
+          target: "~/"
 
-      - name: Deploy new docker containers 
+      - name: Deploy new docker containers
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.MY_SOLID_APP_STAGING_VPS_HOST }}
