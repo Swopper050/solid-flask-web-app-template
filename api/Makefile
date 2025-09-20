@@ -60,7 +60,7 @@ fixtures: ## Adds initial fixtures to the database
 create_admin: ## Create initial admin user (usage: make create_admin EMAIL=admin@example.com PASSWORD=secretpassword)
 	flask --app server create-admin --email=$(EMAIL) --password=$(PASSWORD)
 
-migrate: database db_upgrade ## Create database migration
+db_migrate: database db_upgrade ## Create database migration
 	flask --app server db migrate
 
 db_downgrade: ## Downgrade database
