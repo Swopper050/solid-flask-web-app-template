@@ -18,7 +18,7 @@ export type ChangePasswordData = {
 }
 
 export async function changePassword(data: ChangePasswordData) {
-  return post('api/change_password', {
+  return post('/api/change_password', {
     current_password: data.currentPassword,
     new_password: data.newPassword,
   })
@@ -29,7 +29,7 @@ export type ForgotPasswordData = {
 }
 
 export async function forgotPassword(data: ForgotPasswordData) {
-  return post('api/forgot_password', {
+  return post('/api/forgot_password', {
     email: data.email,
   })
 }
@@ -38,7 +38,7 @@ export async function getUsers(
   page: number,
   perPage: number
 ): Promise<PaginationResult<UserAttributes>> {
-  return await get(`api/users?page=${page}&per_page=${perPage}`).then(
+  return await get(`/api/users?page=${page}&per_page=${perPage}`).then(
     (response) => response.json()
   )
 }
@@ -51,7 +51,7 @@ export type ResetPasswordData = {
 }
 
 export async function resetPassword(data: ResetPasswordData) {
-  return post('api/reset_password', {
+  return post('/api/reset_password', {
     email: data.email,
     reset_token: data.resetToken,
     new_password: data.newPassword,
@@ -64,7 +64,7 @@ export type PasswordLoginData = {
 }
 
 export async function passwordLogin(data: PasswordLoginData) {
-  return post('api/login', {
+  return post('/api/login', {
     email: data.email,
     password: data.password,
   })
@@ -76,18 +76,18 @@ export type TotpLoginData = {
 }
 
 export async function totpLogin(data: TotpLoginData) {
-  return post('api/login_2fa', {
+  return post('/api/login_2fa', {
     email: data.email,
     totp_code: data.totpCode,
   })
 }
 
 export async function logout() {
-  return post('api/logout', {})
+  return post('/api/logout', {})
 }
 
 export async function deleteAccount() {
-  return _delete('api/delete_account')
+  return _delete('/api/delete_account')
 }
 
 export type RegisterUserData = {
@@ -97,14 +97,14 @@ export type RegisterUserData = {
 }
 
 export async function register(data: RegisterUserData) {
-  return post('api/register', {
+  return post('/api/register', {
     email: data.email,
     password: data.password,
   })
 }
 
 export async function generate2FASecret() {
-  return get('api/generate_2fa_secret')
+  return get('/api/generate_2fa_secret')
 }
 
 export type Enable2FAData = {
@@ -113,7 +113,7 @@ export type Enable2FAData = {
 }
 
 export async function enable2FA(data: Enable2FAData) {
-  return post('api/enable_2fa', {
+  return post('/api/enable_2fa', {
     totp_secret: data.totpSecret,
     totp_code: data.totpCode,
   })
@@ -124,24 +124,24 @@ export type Disable2FAData = {
 }
 
 export async function disable2FA(data: Disable2FAData) {
-  return post('api/disable_2fa', {
+  return post('/api/disable_2fa', {
     totp_code: data.totpCode,
   })
 }
 
 export async function verifyEmail(email: string, verificationToken: string) {
-  return post('api/verify_email', {
+  return post('/api/verify_email', {
     email: email,
     verification_token: verificationToken,
   })
 }
 
 export async function resendVerificationMail() {
-  return post('api/resend_email_verification', {})
+  return post('/api/resend_email_verification', {})
 }
 
 export async function whoAmI() {
-  return get('api/whoami')
+  return get('/api/whoami')
 }
 
 export type CreateUserData = {
@@ -151,7 +151,7 @@ export type CreateUserData = {
 }
 
 export async function createUser(data: CreateUserData) {
-  return post(`api/users`, {
+  return post(`/api/users`, {
     email: data.email,
     password: data.password,
     is_admin: data.isAdmin,
@@ -163,7 +163,7 @@ export type DeleteUserData = {
 }
 
 export async function deleteUser(data: DeleteUserData) {
-  return _delete(`api/user/${data.userID}`)
+  return _delete(`/api/user/${data.userID}`)
 }
 
 export async function get(url: string) {
