@@ -7,3 +7,4 @@ print(get_debug_flag())
 CONFIG = DevConfig() if get_debug_flag() else ProdConfig()
 
 app = create_app(config_object=CONFIG)
+celery_app = app.extensions["celery"]

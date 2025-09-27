@@ -37,7 +37,7 @@ export function RegisterModal(props: ModalBaseProps): JSXElement {
     },
   })
 
-  const newPassword = () => accessor().checkPassword
+  const newPassword = () => accessor().password
 
   return (
     <Modal

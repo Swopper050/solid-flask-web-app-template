@@ -4,55 +4,54 @@ export const dict: Translations = {
   a_puppy: 'Een puppy!',
   account: 'Account',
   admin_panel: 'Admin paneel',
-  an_account_with_this_email_already_exists:
-    'Een account met dit e-mailadres bestaat al',
+  an_account_with_this_email_already_exists: 'Een account met dit e-mailadres bestaat al',
   an_unknown_error_occurred: 'Er is een onbekende fout opgetreden',
-  are_you_sure_you_want_to_delete_your_account:
-    'Weet je zeker dat je je account wilt verwijderen?',
+  are_you_sure_you_want_to_delete_your_account: 'Weet je zeker dat je je account wilt verwijderen?',
   back_to_home: 'Terug naar home',
   build: 'Je kan bouwen wat je maar wilt.',
   cancel: 'Annuleren',
   change_password: 'Wachtwoord veranderen',
   confirm_new_password: 'Herhaal nieuw wachtwoord',
   confirm_password: 'Bevestig wachtwoord',
-  could_not_log_out_please_try_again_later:
-    'Kon niet uitloggen, probeer het later opnieuw',
-  could_not_login_with_the_given_email_and_password:
-    'Kon niet inloggen met dit e-mailadres en wachtwoord',
-  could_not_reset_password_with_the_given_token:
-    'Kon wachtwoord niet opnieuw instellen met dit token',
-  could_not_verify_email_with_the_given_token:
-    'Kon e-mail niet verifiëren met dit token',
+  could_not_log_out_please_try_again_later: 'Kon niet uitloggen, probeer het later opnieuw',
+  could_not_login_with_the_given_email_and_password: `
+    Kon niet inloggen met dit e-mailadres en wachtwoord
+  `,
+  could_not_reset_password_with_the_given_token: `
+    Kon wachtwoord niet opnieuw instellen met dit token
+  `,
+  could_not_verify_email_with_the_given_token: 'Kon e-mail niet verifiëren met dit token',
   create_new_user: 'Nieuwe gebruiker aanmaken',
   create_user: 'Gebruiker aanmaken',
   current_password: 'Huidig wachtwoord',
   delete: 'Verwijderen',
   delete_account: 'Account verwijderen',
   delete_user: 'Gebruiker verwijderen',
-  delete_user_confirmation:
-    'Weet je zeker dat je deze gebruiker wilt verwijderen?',
+  delete_user_confirmation: 'Weet je zeker dat je deze gebruiker wilt verwijderen?',
   disable_2fa: '2FA uitschakelen',
   email: 'E-mail',
   email_placeholder: 'je@email.nl',
   enable_2fa: '2FA inschakelen',
   enabled_2fa: '2FA ingeschakeld',
-  enter_the_6_digit_code_generated_by_your_authenticator_app:
-    'Voer de 6-cijferige code in die is gegenereerd door je authenticator-app',
+  enter_the_6_digit_code_generated_by_your_authenticator_app: `
+    Voer de 6-cijferige code in die is gegenereerd door je authenticator-app
+  `,
   error_loading_users: 'Fout bij het laden van gebruikers',
   forgot_password: 'Wachtwoord vergeten?',
   here_is_a_picture_of_a: 'Hier is een foto van een ',
   home: 'Home',
   id: 'ID',
-  if_a_user_with_this_email_exists_a_reset_password_mail_has_been_sent:
-    'Als een gebruiker met dit e-mailadres bestaat, is er een e-mail voor het opnieuw instellen van het wachtwoord verzonden',
+  if_a_user_with_this_email_exists_a_reset_password_mail_has_been_sent: `
+    Als een gebruiker met dit e-mailadres bestaat, is er een e-mail voor het opnieuw instellen van het
+    wachtwoord verzonden
+  `,
   incorrect_2fa_code_try_again: 'Onjuiste code, probeer het opnieuw',
   login: 'Login',
   logout: 'Logout',
   make_this_user_an_admin: 'Maak deze gebruiker een admin',
   my_solid_app: 'My solid app',
   new_password: 'Nieuw wachtwoord',
-  new_password_does_not_match_conditions:
-    'Nieuw wachtwoord voldoet niet aan de voorwaarden',
+  new_password_does_not_match_conditions: 'Nieuw wachtwoord voldoet niet aan de voorwaarden',
   no: 'Nee',
   of: 'van',
   password: 'Wachtwoord',
@@ -72,10 +71,12 @@ export const dict: Translations = {
   reset_password: 'Wachtwoord opnieuw instellen',
   send_reset_email: 'Stuur e-mail voor wachtwoord reset',
   someone_might_like_it: 'Iemand vindt het misschien leuk!',
-  step_1_scan_qr_code_with_your_authenticator_app:
-    'Stap 1: Scan de QR-code met je authenticator-app',
-  step_2_verify_the_setup_by_filling_in_the_2fa_code:
-    'Stap 2: Bevestig door de 2FA-code in te vullen',
+  step_1_scan_qr_code_with_your_authenticator_app: `
+    Stap 1: Scan de QR-code met je authenticator-app
+  `,
+  step_2_verify_the_setup_by_filling_in_the_2fa_code: `
+    Stap 2: Bevestig door de 2FA-code in te vullen
+  `,
   successfully_reset_password: 'Wachtwoord succesvol opnieuw ingesteld',
   successfully_verified_email: 'E-mail succesvol geverifieerd',
   this_action_cannot_be_undone: 'Deze actie kan niet ongedaan worden gemaakt',
@@ -84,8 +85,7 @@ export const dict: Translations = {
   this_requires_you_to_be_an_admin: 'Dit vereist dat je een admin bent',
   this_token_has_expired: 'Het token is verlopen',
   this_user_has_been_verified: 'Deze gebruiker is geverifieerd',
-  this_user_has_not_been_verified_yet:
-    'Deze gebruiker is nog niet geverifieerd',
+  this_user_has_not_been_verified_yet: 'Deze gebruiker is nog niet geverifieerd',
   this_user_is_an_admin: 'Deze gebruiker is een admin',
   to_the_app: 'Naar de applicatie',
   twofa_is_already_disabled: '2FA is al uitgeschakeld',
@@ -94,7 +94,7 @@ export const dict: Translations = {
   users: 'Gebruikers',
   verified: 'Geverifieerd',
   verifying_email: 'E-mail verifiëren',
-  want_to_show_puppies: "Wil je puppy's laten zien?",
+  want_to_show_puppies: 'Wil je puppy\'s laten zien?',
   want_to_show_rocks: 'Wil je stenen laten zien?',
   web_application: 'web applicatie.',
   woops_i_forgot_my_password: 'Oeps, ik ben mijn wachtwoord vergeten',
@@ -106,10 +106,7 @@ export const dict: Translations = {
   your_email_has_been_verified: 'Je e-mail is geverifieerd',
   your_email_is_not_verified_yet: 'Je e-mail is nog niet geverifieerd',
   your_password_must_have_1_digit: 'Je wachtwoord moet 1 cijfer bevatten',
-  your_password_must_have_1_lowercase_letter:
-    'Je wachtwoord moet 1 kleine letter bevatten',
-  your_password_must_have_1_uppercase_letter:
-    'Je wachtwoord moet 1 hoofdletter bevatten',
-  your_password_must_have_8_characters_or_more:
-    'Je wachtwoord moet 8 tekens of meer bevatten',
-}
+  your_password_must_have_1_lowercase_letter: 'Je wachtwoord moet 1 kleine letter bevatten',
+  your_password_must_have_1_uppercase_letter: 'Je wachtwoord moet 1 hoofdletter bevatten',
+  your_password_must_have_8_characters_or_more: 'Je wachtwoord moet 8 tekens of meer bevatten',
+};

@@ -160,6 +160,7 @@ export function createFormState<
   action: (values: TType) => Promise<Response>
   onFinish?: (respone?: TResponse) => void | Promise<void>
   formOptions?: FormOptions<TType>
+  resetOnFinish?: boolean
 }): FormState<TType, TResponse> {
   const [state, { Form, Field, FieldArray }] = createForm<TType, TResponse>(
     options.formOptions
@@ -176,6 +177,8 @@ export function createFormState<
     action: options.action,
     onFinish: options.onFinish,
     additionalData: data,
+    resetOnFinish:
+      options.resetOnFinish === undefined ? true : options.resetOnFinish,
   })
 
   return {
@@ -204,6 +207,7 @@ export function createSubmitHandler<
   action: (values: TType) => Promise<Response>
   onFinish?: (response: TResponse | undefined) => void | Promise<void>
   additionalData?: Accessor<Partial<TType | undefined>>
+  resetOnFinish?: boolean
 }): (values: TType) => void {
   return async (values: TType) => {
     let merged = values
@@ -226,7 +230,10 @@ export function createSubmitHandler<
     setResponse(options.form, { status: 'success', data: data })
 
     await options.onFinish?.(options.form.response.data)
-    clearResponse(options.form)
-    reset(options.form)
+
+    if (options.resetOnFinish) {
+      clearResponse(options.form)
+      reset(options.form)
+    }
   }
 }

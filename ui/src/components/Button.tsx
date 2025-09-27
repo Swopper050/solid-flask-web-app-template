@@ -31,6 +31,7 @@ export function Button(props: {
   icon?: string
   onClick?: (event?: MouseEvent) => void
   isLoading?: boolean
+  disabled?: boolean
   type?: 'submit' | 'button' | 'reset'
   color?: DaisyUIButtonColor
   size?: DaisyUIButtonSize
@@ -43,9 +44,9 @@ export function Button(props: {
       class={clsx(
         'btn',
         props.color ? `btn-${props.color}` : undefined,
-        props.style && !props.color ? `btn-${props.style}` : undefined,
+        props.style ? `btn-${props.style}` : undefined,
         props.size ? `btn-${props.size}` : undefined,
-        props.isLoading && 'btn-disabled',
+        (props.isLoading || props.disabled) && 'btn-disabled',
         props.class
       )}
       type={props.type ?? 'button'}

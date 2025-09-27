@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 from flask_login import current_user
 
 from app.db.user import User
@@ -48,15 +50,18 @@ class TestUsersAPI:
     def test_create_user_as_admin(self, client, db, logged_in_admin):
         assert User.query.count() == 1
 
-        # Create a new user
-        response = client.post(
-            "/users",
-            json={
-                "email": "newuser@test.com",
-                "password": "newpassword123",
-                "is_admin": False,
-            },
-        )
+        with patch("app.resources.user.send_email_verification_email") as mock_email:
+            # Create a new user
+            response = client.post(
+                "/users",
+                json={
+                    "email": "newuser@test.com",
+                    "password": "newpassword123",
+                    "is_admin": False,
+                },
+            )
+
+            mock_email.delay.assert_called_once()
 
         assert response.status_code == 200
         assert User.query.count() == 2
@@ -77,15 +82,18 @@ class TestUsersAPI:
         # Login as admin
         client.post("/login", json={"email": admin.email, "password": "password321"})
 
-        # Create the first user
-        client.post(
-            "/users",
-            json={
-                "email": "duplicate@test.com",
-                "password": "password123",
-                "is_admin": False,
-            },
-        )
+        with patch("app.resources.user.send_email_verification_email") as mock_email:
+            # Create the first user
+            client.post(
+                "/users",
+                json={
+                    "email": "duplicate@test.com",
+                    "password": "password123",
+                    "is_admin": False,
+                },
+            )
+
+            mock_email.delay.assert_called_once()
 
         # Try to create a duplicate user
         response = client.post(

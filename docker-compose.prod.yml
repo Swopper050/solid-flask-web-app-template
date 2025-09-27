@@ -23,24 +23,55 @@ services:
     image: $DOCKERHUB_NAMESPACE/my-solid-app-api:stable
     container_name: my-solid-app-api
     environment:
+      MY_SOLID_APP_FRONTEND_URL: https://my-solid-app.nl
+      MY_SOLID_APP_SECRET_KEY: $MY_SOLID_APP_SECRET_KEY
+      MY_SOLID_APP_FERNET_SECRET_KEY: $MY_SOLID_APP_FERNET_SECRET_KEY
       MY_SOLID_APP_DB_NAME: $MY_SOLID_APP_DB_NAME
       MY_SOLID_APP_DB_USER: $MY_SOLID_APP_DB_USER
       MY_SOLID_APP_DB_PASSWORD: $MY_SOLID_APP_DB_PASSWORD
       MY_SOLID_APP_DB_HOST: 'db'
       MY_SOLID_APP_DB_PORT: '3306'
-      MY_SOLID_APP_FRONTEND_URL: https://my-solid-app.nl
-      MY_SOLID_APP_PASSWORD_RESET_TOKEN_EXPIRE_HOURS: 1
-      MY_SOLID_APP_SECRET_KEY: $MY_SOLID_APP_SECRET_KEY
+      MY_SOLID_APP_REDIS_HOST: 'redis'
       MY_SOLID_APP_MAIL_SERVER: $MY_SOLID_APP_MAIL_SERVER
       MY_SOLID_APP_MAIL_PORT: $MY_SOLID_APP_MAIL_PORT
       MY_SOLID_APP_MAIL_USE_SSL: 'True'
       MY_SOLID_APP_MAIL_USERNAME: $MY_SOLID_APP_MAIL_USERNAME
       MY_SOLID_APP_MAIL_PASSWORD: $MY_SOLID_APP_MAIL_PASSWORD
       MY_SOLID_APP_MAIL_DEFAULT_SENDER: $MY_SOLID_APP_MAIL_DEFAULT_SENDER
-      MY_SOLID_APP_FERNET_SECRET_KEY: $MY_SOLID_APP_FERNET_SECRET_KEY
+      MY_SOLID_APP_PASSWORD_RESET_TOKEN_EXPIRE_HOURS: 1
     networks:
       - my-solid-app-network
     depends_on:
+      - db
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '5m'
+        max-file: '5'
+
+  tasks:
+    image: $DOCKERHUB_NAMESPACE/my-solid-app-tasks:stable
+    container_name: my-solid-app-tasks
+    environment:
+      MY_SOLID_APP_FRONTEND_URL: https://my-solid-app.nl
+      MY_SOLID_APP_SECRET_KEY: $MY_SOLID_APP_SECRET_KEY
+      MY_SOLID_APP_FERNET_SECRET_KEY: $MY_SOLID_APP_FERNET_SECRET_KEY
+      MY_SOLID_APP_DB_NAME: $MY_SOLID_APP_DB_NAME
+      MY_SOLID_APP_DB_USER: $MY_SOLID_APP_DB_USER
+      MY_SOLID_APP_DB_PASSWORD: $MY_SOLID_APP_DB_PASSWORD
+      MY_SOLID_APP_DB_HOST: 'db'
+      MY_SOLID_APP_DB_PORT: '3306'
+      MY_SOLID_APP_REDIS_HOST: 'redis'
+      MY_SOLID_APP_MAIL_SERVER: $MY_SOLID_APP_MAIL_SERVER
+      MY_SOLID_APP_MAIL_PORT: $MY_SOLID_APP_MAIL_PORT
+      MY_SOLID_APP_MAIL_USE_SSL: 'True'
+      MY_SOLID_APP_MAIL_USERNAME: $MY_SOLID_APP_MAIL_USERNAME
+      MY_SOLID_APP_MAIL_PASSWORD: $MY_SOLID_APP_MAIL_PASSWORD
+      MY_SOLID_APP_MAIL_DEFAULT_SENDER: $MY_SOLID_APP_MAIL_DEFAULT_SENDER
+    networks:
+      - my-solid-app-network
+    depends_on:
+      - redis
       - db
     logging:
       driver: 'json-file'
@@ -67,6 +98,20 @@ services:
         max-size: '5m'
         max-file: '5'
 
+  redis:
+    image: redis:latest
+    container_name: my-solid-app-redis
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data_prod:/data
+    networks:
+      - my-solid-app-network
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '5m'
+        max-file: '5'
+
   certbot:
     image: certbot/certbot:latest
     container_name: my-solid-app-certbot
@@ -83,6 +128,7 @@ services:
         max-size: '1m'
         max-file: '3'
 
+
 networks:
   my-solid-app-network:
     driver: bridge
@@ -90,3 +136,4 @@ networks:
 
 volumes:
   db_data_prod:
+  redis_data_prod:

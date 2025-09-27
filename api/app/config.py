@@ -21,6 +21,8 @@ MY_SOLID_APP_FERNET_SECRET_KEY = os.environ.get(
 )
 """ Key used for encrypting. The default key is used for development purposes only. """
 
+MY_SOLID_APP_REDIS_HOST = os.environ.get("MY_SOLID_APP_REDIS_HOST", "localhost")
+
 
 class BaseConfig:
     SECRET_KEY = os.environ.get("MY_SOLID_APP_SECRET_KEY", "secret_oohhhhhh")
@@ -40,6 +42,12 @@ class BaseConfig:
         "MY_SOLID_APP_MAIL_DEFAULT_SENDER", "mysolidapp@mail.com"
     )
     FILE_LOGGING = os.environ.get("MY_SOLID_APP_FILE_LOGGING", "False") == "True"
+
+    CELERY = {
+        "broker_url": f"redis://{MY_SOLID_APP_REDIS_HOST}",
+        "result_backend": f"redis://{MY_SOLID_APP_REDIS_HOST}",
+        "task_ignore_result": True,
+    }
 
 
 class ProdConfig(BaseConfig):

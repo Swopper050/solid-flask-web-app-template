@@ -6,21 +6,6 @@ PYTEST_COV=--cov=app/ --cov-report=term-missing
 VERSION = $(shell git describe --tags --always)
 DOCKERHUB_NAMESPACE=test
 
-DB_ROOT_PASSWORD=my_solid_app_db_root_password
-DB_USER=my_solid_app_user
-DB_PASSWORD=my_solid_app_password
-DB_NAME=my_solid_app_db
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_URL=mysql://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)
-
-DEV_ENV=MY_SOLID_APP_DB_NAME=$(DB_NAME) \
-  MY_SOLID_APP_DB_USER=$(DB_USER) \
-  MY_SOLID_APP_DB_PASSWORD=$(DB_PASSWORD) \
-  MY_SOLID_APP_DB_HOST=$(DB_HOST) \
-  MY_SOLID_APP_DB_PORT=$(DB_PORT)
-
-
 ##@ Utility
 help:  ## Display this help
 	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m\033[0m\n"} /^[a-zA-Z_-]+:.*?##/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
@@ -61,7 +46,10 @@ test_cov: ## Run tests and show coverage
 	$(PYTEST) $(PYTEST_COV)
 
 server: ## Start development server
-	$(DEV_ENV) flask --app server --debug run
+	flask --app server --debug run
+
+worker: ## Start background worker
+	watchmedo auto-restart --directory ./ --patterns="*.py" --recursive -- celery -A server.celery_app worker --loglevel=info
 
 database:  ## Creates an empty database
 	python scripts/empty_database.py
@@ -69,7 +57,10 @@ database:  ## Creates an empty database
 fixtures: ## Adds initial fixtures to the database
 	python scripts/add_fixtures.py
 
-migrate: database db_upgrade ## Create database migration
+create_admin: ## Create initial admin user (usage: make create_admin EMAIL=admin@example.com PASSWORD=secretpassword)
+	flask --app server create-admin --email=$(EMAIL) --password=$(PASSWORD)
+
+db_migrate: database db_upgrade ## Create database migration
 	flask --app server db migrate
 
 db_downgrade: ## Downgrade database
@@ -78,18 +69,31 @@ db_downgrade: ## Downgrade database
 db_upgrade: ## Upgrade database
 	flask --app server db upgrade
 
-docker_latest: ## Build a docker container and tag it with 'latest'
-	docker build -t $(DOCKERHUB_NAMESPACE)/my-solid-app-api:latest .
+docker_build_api_latest: ## Build the api docker container and tag it with 'latest'
+	docker build -t $(DOCKERHUB_NAMESPACE)/my-solid-app-api:latest -f Dockerfile.api .
 
-docker_stable: ## Build a docker container and tag it with the current git version tag and 'stable'
-	docker build -t $(DOCKERHUB_NAMESPACE)/my-solid-app-api:$(VERSION) -t $(DOCKERHUB_NAMESPACE)/my-solid-app-api:stable .
+docker_build_tasks_latest: ## Build the tasks docker container and tag it with 'latest'
+	docker build -t $(DOCKERHUB_NAMESPACE)/my-solid-app-tasks:latest -f Dockerfile.tasks .
 
-docker_push_latest: ## Push the docker container with the tag 'latest'
+docker_build_api_stable: ## Build the api docker container and tag it with the current git version tag and 'stable'
+	docker build -t $(DOCKERHUB_NAMESPACE)/my-solid-app-api:$(VERSION) -t $(DOCKERHUB_NAMESPACE)/my-solid-app-api:stable -f Dockerfile.api .
+
+docker_build_tasks_stable: ## Build the tasks docker container and tag it with the current git version tag and 'stable'
+	docker build -t $(DOCKERHUB_NAMESPACE)/my-solid-app-tasks:$(VERSION) -t $(DOCKERHUB_NAMESPACE)/my-solid-app-tasks:stable -f Dockerfile.tasks .
+
+docker_push_api_latest: ## Push the api docker container with the tag 'latest'
 	docker push $(DOCKERHUB_NAMESPACE)/my-solid-app-api:latest
 
-docker_push_stable: ## Push the docker containers with the current git version tag and 'stable'
+docker_push_tasks_latest: ## Push the tasks docker container with the tag 'latest'
+	docker push $(DOCKERHUB_NAMESPACE)/my-solid-app-tasks:latest
+
+docker_push_api_stable: ## Push the api docker containers with the current git version tag and 'stable'
 	docker push $(DOCKERHUB_NAMESPACE)/my-solid-app-api:$(VERSION)
 	docker push $(DOCKERHUB_NAMESPACE)/my-solid-app-api:stable
+
+docker_push_tasks_stable: ## Push the tasks docker container with the current git version tag and 'stable'
+	docker push $(DOCKERHUB_NAMESPACE)/my-solid-app-tasks:$(VERSION)
+	docker push $(DOCKERHUB_NAMESPACE)/my-solid-app-tasks:stable
 
 docker_run_latest: ## Run the api as a docker container
 	docker run \

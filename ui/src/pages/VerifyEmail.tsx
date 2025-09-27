@@ -25,7 +25,7 @@ export function VerifyEmailPage(): JSXElement {
 
     const response = await verifyEmail(
       getSingleParam(searchParams.email),
-      getSingleParam(searchParams.verification_tokean)
+      getSingleParam(searchParams.verification_token)
     )
 
     if (response.status !== 200) {
