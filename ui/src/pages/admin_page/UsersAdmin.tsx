@@ -283,6 +283,7 @@ function CreateUserModal(props: CreateUserModalProps): JSXElement {
               pattern(/[A-Z]/, t('your_password_must_have_1_uppercase_letter')),
               pattern(/[a-z]/, t('your_password_must_have_1_lowercase_letter')),
               pattern(/[0-9]/, t('your_password_must_have_1_digit')),
+              pattern(/[\W]/, t('your_password_must_have_1_special_character'))
             ]}
           >
             {(field, props) => (

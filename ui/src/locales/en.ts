@@ -104,4 +104,5 @@ export const dict = {
   your_password_must_have_1_lowercase_letter: 'Your password must have 1 lowercase letter',
   your_password_must_have_1_uppercase_letter: 'Your password must have 1 uppercase letter',
   your_password_must_have_8_characters_or_more: 'Your password must have 8 characters or more',
+  your_password_must_have_1_special_character: 'Your password must have 1 special character',
 };
