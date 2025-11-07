@@ -107,7 +107,7 @@ export const dict: Translations = {
   your_email_is_not_verified_yet: 'Je e-mail is nog niet geverifieerd',
   your_password_must_have_1_digit: 'Je wachtwoord moet 1 cijfer bevatten',
   your_password_must_have_1_lowercase_letter: 'Je wachtwoord moet 1 kleine letter bevatten',
+  your_password_must_have_1_special_character: 'Je wachtwoord moet 1 speciaal teken bevatten',
   your_password_must_have_1_uppercase_letter: 'Je wachtwoord moet 1 hoofdletter bevatten',
   your_password_must_have_8_characters_or_more: 'Je wachtwoord moet 8 tekens of meer bevatten',
-  your_password_must_have_1_special_character: 'Je wachtwoord moet 1 speciaal teken bevatten',
 };
