@@ -23,9 +23,9 @@ describe('authentication', () => {
     cy.get('.modal-open > .modal-box > form.w-full > .space-y-4 > :nth-child(1) > .input > #email').clear('b');
     cy.get('.modal-open > .modal-box > form.w-full > .space-y-4 > :nth-child(1) > .input > #email').type('test@test.nl');
     cy.get('.modal-open > .modal-box > form.w-full > .space-y-4 > :nth-child(2) > .input > #password').clear();
-    cy.get('.modal-open > .modal-box > form.w-full > .space-y-4 > :nth-child(2) > .input > #password').type('Testing1');
+    cy.get('.modal-open > .modal-box > form.w-full > .space-y-4 > :nth-child(2) > .input > #password').type('Testing1!');
     cy.get('#checkPassword').clear();
-    cy.get('#checkPassword').type('Testing1');
+    cy.get('#checkPassword').type('Testing1!');
     cy.get('.modal-open > .modal-box > form.w-full > .space-y-4 > .modal-action > .btn').click();
 
     cy.url().should('include', '/home')
@@ -76,9 +76,9 @@ describe('authentication', () => {
     cy.get('.modal-open > .modal-box > form.w-full > .space-y-4 > :nth-child(1) > .input > #email').clear('ad');
     cy.get('.modal-open > .modal-box > form.w-full > .space-y-4 > :nth-child(1) > .input > #email').type('admin@test.nl');
     cy.get('.modal-open > .modal-box > form.w-full > .space-y-4 > :nth-child(2) > .input > #password').clear();
-    cy.get('.modal-open > .modal-box > form.w-full > .space-y-4 > :nth-child(2) > .input > #password').type('Testing1');
+    cy.get('.modal-open > .modal-box > form.w-full > .space-y-4 > :nth-child(2) > .input > #password').type('Testing1!');
     cy.get('#checkPassword').clear();
-    cy.get('#checkPassword').type('Testing1{enter}');
+    cy.get('#checkPassword').type('Testing1!{enter}');
     cy.get('.modal-open > .modal-box > form.w-full > .space-y-4 > .modal-action > .btn').click();
 
     cy.get('.alert span').should('contain.text', 'An account with this email already exists');
@@ -102,9 +102,9 @@ describe('authentication', () => {
     cy.get('#currentPassword').clear('ad');
     cy.get('#currentPassword').type('admin');
     cy.get('#newPassword').clear();
-    cy.get('#newPassword').type('Testing1');
+    cy.get('#newPassword').type('Testing1@');
     cy.get('#confirmNewPassword').clear();
-    cy.get('#confirmNewPassword').type('Testing1{enter}');
+    cy.get('#confirmNewPassword').type('Testing1@{enter}');
 
     cy.get('.text').click();
     cy.get('.menu > :nth-child(3) > .btn').click();
@@ -113,7 +113,7 @@ describe('authentication', () => {
     cy.get('.modal-open > .modal-box > form.w-full > .space-y-4 > :nth-child(1) > .input > #email').clear('ad');
     cy.get('.modal-open > .modal-box > form.w-full > .space-y-4 > :nth-child(1) > .input > #email').type('admin@test.nl');
     cy.get('.modal-open > .modal-box > form.w-full > .space-y-4 > :nth-child(2) > .input > #password').clear();
-    cy.get('.modal-open > .modal-box > form.w-full > .space-y-4 > :nth-child(2) > .input > #password').type('Testing1');
+    cy.get('.modal-open > .modal-box > form.w-full > .space-y-4 > :nth-child(2) > .input > #password').type('Testing1@');
     cy.get('.modal-open > .modal-box > form.w-full > .space-y-4 > .modal-action > .btn').click();
 
     cy.url().should('include', '/home')
@@ -125,9 +125,9 @@ describe('authentication', () => {
     cy.get('.modal-open > .modal-box > form.w-full > .space-y-4 > :nth-child(1) > .input > #email').clear('te');
     cy.get('.modal-open > .modal-box > form.w-full > .space-y-4 > :nth-child(1) > .input > #email').type('test@test.nl');
     cy.get('.modal-open > .modal-box > form.w-full > .space-y-4 > :nth-child(2) > .input > #password').clear();
-    cy.get('.modal-open > .modal-box > form.w-full > .space-y-4 > :nth-child(2) > .input > #password').type('Testing1');
+    cy.get('.modal-open > .modal-box > form.w-full > .space-y-4 > :nth-child(2) > .input > #password').type('Testing1!');
     cy.get('#checkPassword').clear();
-    cy.get('#checkPassword').type('Testing1');
+    cy.get('#checkPassword').type('Testing1!');
     cy.get('.modal-open > .modal-box > form.w-full > .space-y-4 > .modal-action > .btn').click();
 
     cy.url().should('include', '/home')
@@ -140,7 +140,7 @@ describe('authentication', () => {
     cy.get('.modal-open > .modal-box > form.w-full > .space-y-4 > :nth-child(1) > .input > #email').clear('te');
     cy.get('.modal-open > .modal-box > form.w-full > .space-y-4 > :nth-child(1) > .input > #email').type('test@test.nl');
     cy.get('.modal-open > .modal-box > form.w-full > .space-y-4 > :nth-child(2) > .input > #password').clear();
-    cy.get('.modal-open > .modal-box > form.w-full > .space-y-4 > :nth-child(2) > .input > #password').type('Testing1{enter}');
+    cy.get('.modal-open > .modal-box > form.w-full > .space-y-4 > :nth-child(2) > .input > #password').type('Testing1!{enter}');
     cy.get('.modal-open > .modal-box > form.w-full > .space-y-4 > .modal-action > .btn').click();
 
     cy.get('.alert span').should('contain.text', 'Could not login with the given email and password');
