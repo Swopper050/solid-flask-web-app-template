@@ -144,7 +144,7 @@ export function AudioPlayer(props: AudioPlayerProps): JSXElement {
           <IconButton
             icon={playing() ? 'fa-solid fa-pause' : 'fa-solid fa-play'}
             color={props.color ?? 'primary'}
-            style="ghost"
+            variant="ghost"
             onClick={toggle}
             disabled={!ready()}
             class="w-8"
@@ -198,7 +198,7 @@ export function AudioPlayer(props: AudioPlayerProps): JSXElement {
           <IconButton
             icon={playing() ? 'fa-solid fa-pause' : 'fa-solid fa-play'}
             color={props.color ?? 'primary'}
-            style="circle"
+            variant="circle"
             onClick={toggle}
             disabled={!ready()}
             size="lg"
@@ -251,4 +251,3 @@ function RateDropdown(props: {
     </div>
   )
 }
-

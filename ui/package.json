@@ -13,6 +13,7 @@
     "@solid-primitives/i18n": "^2.2.1",
     "@solidjs/router": "^0.15.3",
     "clsx": "^2.1.1",
+    "hls.js": "^1.6.15",
     "install": "^0.13.0",
     "solid-js": "^1.9.9"
   },
