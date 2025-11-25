@@ -18,6 +18,7 @@ type DaisyUIButtonStyle =
   | 'ghost'
   | 'link'
   | 'outline'
+  | 'circle'
 
 type DaisyUIButtonSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl'
 
