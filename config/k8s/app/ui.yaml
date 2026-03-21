@@ -16,7 +16,7 @@ spec:
         - name: my-solid-app-dockerhub
       containers:
         - name: my-solid-app-ui
-          image: <dockerhub-namespace>/my-solid-app-ui
+          image: bramdewit/my-solid-app-ui
           ports:
             - containerPort: 80
           resources:

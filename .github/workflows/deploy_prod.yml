@@ -85,9 +85,9 @@ jobs:
           envsubst < kustomization.yaml > kustomization.tmp.yaml
           mv kustomization.tmp.yaml kustomization.yaml
 
-          kustomize edit set image <dockerhub-namespace>/my-solid-app-api=<dockerhub-namespace>/my-solid-app-api:${{ env.TAG }}
-          kustomize edit set image <dockerhub-namespace>/my-solid-app-tasks=<dockerhub-namespace>/my-solid-app-tasks:${{ env.TAG }}
-          kustomize edit set image <dockerhub-namespace>/my-solid-app-ui=<dockerhub-namespace>/my-solid-app-ui:${{ env.TAG }}
+          kustomize edit set image bramdewit/my-solid-app-api=bramdewit/my-solid-app-api:${{ env.TAG }}
+          kustomize edit set image bramdewit/my-solid-app-tasks=bramdewit/my-solid-app-tasks:${{ env.TAG }}
+          kustomize edit set image bramdewit/my-solid-app-ui=bramdewit/my-solid-app-ui:${{ env.TAG }}
 
           kubectl apply -k .
 

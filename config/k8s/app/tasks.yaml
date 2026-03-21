@@ -16,7 +16,7 @@ spec:
         - name: my-solid-app-dockerhub
       containers:
         - name: my-solid-app-tasks
-          image: <dockerhub-namespace>/my-solid-app-tasks
+          image: bramdewit/my-solid-app-tasks
           envFrom:
             - configMapRef:
                 name: my-solid-app-backend-config
