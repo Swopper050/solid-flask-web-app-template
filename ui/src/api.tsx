@@ -91,6 +91,7 @@ export async function deleteAccount() {
 }
 
 export type RegisterUserData = {
+  name: string
   email: string
   password: string
   checkPassword: string
@@ -98,6 +99,7 @@ export type RegisterUserData = {
 
 export async function register(data: RegisterUserData) {
   return post('/api/register', {
+    name: data.name,
     email: data.email,
     password: data.password,
   })

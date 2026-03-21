@@ -1,11 +1,11 @@
-import { JSXElement, Switch, Match, type Component } from 'solid-js'
-
-import { Navigate } from '@solidjs/router'
-import type { RouteDefinition } from '@solidjs/router'
+import { JSXElement, Switch, Match, Show, type Component } from 'solid-js'
+import { Navigate, Route } from '@solidjs/router'
+import type { RouteSectionProps } from '@solidjs/router'
 
 import { useUser } from './context/UserProvider'
 import { AdminPage } from './pages/admin_page/Admin'
-import { LandingPage } from './pages/Landing'
+import { LoginPage } from './pages/Login'
+import { RegisterPage } from './pages/Register'
 import { Home } from './pages/Home'
 import { BasePage } from './pages/Base'
 import { UserAccountPage } from './pages/user_account_page/UserAccount'
@@ -14,74 +14,82 @@ import { ResetPasswordPage } from './pages/ResetPassword'
 import { VerifyEmailPage } from './pages/VerifyEmail'
 import { NotFoundPage } from './pages/NotFound'
 
-function ProtectedRoute(props: {
-  component: Component
-  adminOnly?: boolean
-}): JSXElement {
+function FullscreenLoader(): JSXElement {
+  return (
+    <div class="flex flex-col justify-center items-center h-screen w-screen">
+      <div class="loading loading-ball text-neutral loading-lg mb-3" />
+      <div class="text-lg text-neutral font-bold">Loading...</div>
+    </div>
+  )
+}
+
+function RootRedirect(): JSXElement {
   const { user, loading } = useUser()
 
   return (
-    <Switch fallback={<props.component />}>
-      <Match when={!loading() && user?.() === null}>
-        <Navigate href="/" />
-      </Match>
-      <Match when={!loading() && props.adminOnly && !user()?.isAdmin}>
-        <Navigate href="/" />
-      </Match>
+    <Switch>
       <Match when={loading()}>
-        <div class="flex flex-col justify-center items-center h-screen w-screen">
-          <div class="loading loading-ball text-neutral loading-lg mb-3" />
-          <div class="text-lg text-neutral font-bold">Loading...</div>
-        </div>
+        <FullscreenLoader />
+      </Match>
+      <Match when={!loading() && user() !== null}>
+        <Navigate href="/home" />
+      </Match>
+      <Match when={!loading() && user() === null}>
+        <Navigate href="/login" />
       </Match>
     </Switch>
   )
 }
 
-export default ProtectedRoute
+function AppRoute(props: RouteSectionProps): JSXElement {
+  const { user, loading } = useUser()
 
-export const routes: RouteDefinition[] = [
-  {
-    path: '/',
-    component: () => <LandingPage />,
-  },
-  {
-    path: '/home',
-    component: () => (
-      <ProtectedRoute component={() => <BasePage mainComponent={Home} />} />
-    ),
-  },
-  {
-    path: '/account',
-    component: () => (
-      <ProtectedRoute
-        component={() => <BasePage mainComponent={UserAccountPage} />}
-      />
-    ),
-  },
-  {
-    path: '/admin-panel',
-    component: () => (
-      <ProtectedRoute
-        adminOnly={true}
-        component={() => <BasePage mainComponent={AdminPage} />}
-      />
-    ),
-  },
-  {
-    path: '/forgot-password',
-    component: () => <ForgotPasswordPage />,
-  },
-  {
-    path: '/reset-password',
-    component: () => <ResetPasswordPage />,
-  },
-  {
-    path: '/verify-email',
-    component: () => <VerifyEmailPage />,
-  },
-  {
-    path: '**',
-    component: () => <NotFoundPage />,
-  },
-]
+  return (
+    <Switch>
+      <Match when={loading()}>
+        <FullscreenLoader />
+      </Match>
+      <Match when={!loading() && !user()}>
+        <Navigate href="/login" />
+      </Match>
+      <Match when={user()}>
+        <BasePage>{props.children}</BasePage>
+      </Match>
+    </Switch>
+  )
+}
+
+function adminOnly<T extends RouteSectionProps>(
+  Comp: Component<T>
+): Component<T> {
+  return (props: T) => {
+    const { user } = useUser()
+
+    return (
+      <Show when={user()?.isAdmin} fallback={<Navigate href="/home" />}>
+        <Comp {...props} />
+      </Show>
+    )
+  }
+}
+
+export function RouteTree(): JSXElement {
+  return (
+    <>
+      <Route path="/" component={RootRedirect} />
+      <Route path="/login" component={LoginPage} />
+      <Route path="/register" component={RegisterPage} />
+      <Route path="/forgot-password" component={ForgotPasswordPage} />
+      <Route path="/reset-password" component={ResetPasswordPage} />
+      <Route path="/verify-email" component={VerifyEmailPage} />
+
+      <Route path="" component={AppRoute}>
+        <Route path="/home" component={Home} />
+        <Route path="/account" component={UserAccountPage} />
+        <Route path="/admin-panel" component={adminOnly(AdminPage)} />
+      </Route>
+
+      <Route path="**" component={NotFoundPage} />
+    </>
+  )
+}

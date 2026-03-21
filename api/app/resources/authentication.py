@@ -25,6 +25,7 @@ def load_user(user_id):
 class RegisterSchema(Schema):
     email = fields.String(required=True)
     password = fields.String(required=True)
+    name = fields.String(load_default=None)
 
 
 @api.route("/register")
@@ -39,7 +40,7 @@ class Register(Resource):
                 409,
             )
 
-        new_user = User(email=data.get("email"))
+        new_user = User(email=data.get("email"), name=data.get("name"))
         new_user.set_password(data.get("password"))
 
         db.session.add(new_user)

@@ -1,5 +1,5 @@
-describe('LandingPage', () => {
-  it('Visit LandingPage', () => {
-    cy.visit('/')
+describe('LoginPage', () => {
+  it('Visit LoginPage', () => {
+    cy.visit('/login')
   })
 })

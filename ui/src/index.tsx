@@ -1,9 +1,9 @@
 import './index.css'
 
-import { Suspense, type ParentProps, For } from 'solid-js'
+import { Suspense, type ParentProps } from 'solid-js'
 import { render } from 'solid-js/web'
-import { Router, Route } from '@solidjs/router'
-import { routes } from './routes'
+import { Router } from '@solidjs/router'
+import { RouteTree } from './routes'
 import { UserProvider } from './context/UserProvider'
 import { LocaleProvider } from './context/LocaleProvider'
 
@@ -30,9 +30,7 @@ const RootLayout = (props: ParentProps) => (
 render(
   () => (
     <Router root={RootLayout}>
-      <For each={routes}>
-        {(route) => <Route path={route.path} component={route.component} />}
-      </For>
+      <RouteTree />
     </Router>
   ),
   root

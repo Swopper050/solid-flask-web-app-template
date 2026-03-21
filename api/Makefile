@@ -57,6 +57,7 @@ database:  ## Creates an empty database
 
 fixtures: ## Adds initial fixtures to the database
 	python scripts/add_fixtures.py
+	flask --app server db stamp
 
 create_admin: ## Create initial admin user (usage: make create_admin EMAIL=admin@example.com PASSWORD=secretpassword)
 	flask --app server create-admin --email=$(EMAIL) --password=$(PASSWORD)
