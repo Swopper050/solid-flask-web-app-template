@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: my-solid-app-backend-config
+data:
+  MY_SOLID_APP_DB_PORT: "3306"
+  MY_SOLID_APP_REDIS_HOST: "my-solid-app-redis"
+  MY_SOLID_APP_REDIS_PORT: "6379"
+  MY_SOLID_APP_MAIL_PORT: "465"
+  MY_SOLID_APP_MAIL_USE_SSL: "True"
+  MY_SOLID_APP_PASSWORD_RESET_TOKEN_EXPIRE_HOURS: "1"
+  PROMETHEUS_MULTIPROC_DIR: "/tmp"

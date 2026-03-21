@@ -1,0 +1,8 @@
+controller:
+  service:
+    annotations:
+      service.beta.kubernetes.io/transip-loadbalancer-protocol: "proxy"
+    externalTrafficPolicy: Local
+  config:
+    use-proxy-protocol: "true"
+    proxy-real-ip-cidr: "<loadbalancer-cidr>"

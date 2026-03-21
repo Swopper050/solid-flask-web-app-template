@@ -166,15 +166,24 @@ export async function deleteUser(data: DeleteUserData) {
   return _delete(`/api/user/${data.userID}`)
 }
 
+const API_BASE = import.meta.env.VITE_API_BASE_URL ?? ''
+
+function resolveUrl(url: string): string {
+  if (API_BASE) {
+    return API_BASE + url.replace(/^\/api/, '')
+  }
+  return url
+}
+
 export async function get(url: string) {
-  return fetch(url, {
+  return fetch(resolveUrl(url), {
     method: 'GET',
     headers: new Headers({ 'Content-Type': 'application/json' }),
   })
 }
 
 export async function post(url: string, data: object) {
-  return fetch(url, {
+  return fetch(resolveUrl(url), {
     method: 'POST',
     body: JSON.stringify({
       ...data,
@@ -184,7 +193,7 @@ export async function post(url: string, data: object) {
 }
 
 export async function _delete(url: string) {
-  return fetch(url, {
+  return fetch(resolveUrl(url), {
     method: 'DELETE',
     headers: new Headers({ 'Content-Type': 'application/json' }),
   })

@@ -1,5 +1,6 @@
 LINT_FILES=src/**
 DOCKERHUB_NAMESPACE=test
+IMAGE_TAG=latest
 VERSION = $(shell git describe --tags --always)
 
 
@@ -54,17 +55,14 @@ check_format_translations: ## Check if translations are formatted
 	
 check_translations: check_unused_translations check_missing_translations check_format_translations ## Runs all translation checks for CI
 
-docker_latest: ## Build a docker container and tag it with 'latest'
-	docker build -t $(DOCKERHUB_NAMESPACE)/my-solid-app-ui:latest .
+docker_build: ## Build a docker container and tag it
+	docker build \
+		--build-arg VITE_APP_VERSION=$(VITE_APP_VERSION) \
+		--build-arg VITE_API_BASE_URL=$(VITE_API_BASE_URL) \
+		-t $(DOCKERHUB_NAMESPACE)/my-solid-app-ui:$(IMAGE_TAG) \
+		.
 
-docker_stable: ## Build a docker container and tag it with the current git version tag and 'stable'
-	docker build -t $(DOCKERHUB_NAMESPACE)/my-solid-app-ui:$(VERSION) -t $(DOCKERHUB_NAMESPACE)/my-solid-app-ui:stable .
-
-docker_push_latest: ## Push the odcker container with the tag 'latest'
-	docker push $(DOCKERHUB_NAMESPACE)/my-solid-app-ui:latest
-
-docker_push_stable: ## Push the odcker containers with the current git version tag and 'stable'
-	docker push $(DOCKERHUB_NAMESPACE)/my-solid-app-ui:$(VERSION)
-	docker push $(DOCKERHUB_NAMESPACE)/my-solid-app-ui:stable
+docker_push: ## Push the docker container with the specified tag
+	docker push $(DOCKERHUB_NAMESPACE)/my-solid-app-ui:$(IMAGE_TAG)
 
 .PHONY: cypress

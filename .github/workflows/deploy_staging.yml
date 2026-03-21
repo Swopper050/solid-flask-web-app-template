@@ -1,4 +1,4 @@
-name:
+name: Deploy staging
 
 on:
   push:
@@ -6,111 +6,97 @@ on:
       - develop
 
 jobs:
-  docker-api-latest-build-push:
+  docker-build-and-push:
     runs-on: ubuntu-latest
+    outputs:
+      sha_short: ${{ steps.vars.outputs.sha_short }}
     steps:
       - name: Setup
         uses: actions/checkout@v4
 
-      - name: Login to docker
+      - name: Set SHA output
+        id: vars
+        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
+      - name: Login to DockerHub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build docker image
-        run: cd api && make DOCKERHUB_NAMESPACE=${{ secrets.DOCKERHUB_NAMESPACE }} docker_build_api_latest
+      - name: Build & Push UI
+        run: |
+          cd ui && make \
+            DOCKERHUB_NAMESPACE=${{ secrets.DOCKERHUB_NAMESPACE }} \
+            IMAGE_TAG=${{ steps.vars.outputs.sha_short }} \
+            VITE_APP_VERSION=${{ steps.vars.outputs.sha_short }} \
+            VITE_API_BASE_URL=https://staging.api.my-solid-app.com \
+            docker_build docker_push
 
-      - name: Push docker image
-        run: cd api && make DOCKERHUB_NAMESPACE=${{ secrets.DOCKERHUB_NAMESPACE }} docker_push_api_latest
-
-  docker-tasks-latest-build-push:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Setup
-        uses: actions/checkout@v4
-
-      - name: Login to docker
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Build docker image
-        run: cd api && make DOCKERHUB_NAMESPACE=${{ secrets.DOCKERHUB_NAMESPACE }} docker_build_tasks_latest
-
-      - name: Push docker image
-        run: cd api && make DOCKERHUB_NAMESPACE=${{ secrets.DOCKERHUB_NAMESPACE }} docker_push_tasks_latest
-
-  docker-ui-latest-build-push:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Setup
-        uses: actions/checkout@v4
-
-      - name: Login to docker
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Build docker image
-        run: cd ui && make DOCKERHUB_NAMESPACE=${{ secrets.DOCKERHUB_USERNAME }} docker_latest
-
-      - name: Push docker image
-        run: cd ui && make DOCKERHUB_NAMESPACE=${{ secrets.DOCKERHUB_NAMESPACE }} docker_push_latest
+      - name: Build & Push API/Tasks
+        run: |
+          cd api && make \
+            DOCKERHUB_NAMESPACE=${{ secrets.DOCKERHUB_NAMESPACE }} \
+            IMAGE_TAG=${{ steps.vars.outputs.sha_short }} \
+            docker_build_api docker_push_api \
+            docker_build_tasks docker_push_tasks
 
   deploy-staging:
     runs-on: ubuntu-latest
-    needs:
-      [
-        docker-ui-latest-build-push,
-        docker-api-latest-build-push,
-        docker-tasks-latest-build-push,
-      ]
+    needs: docker-build-and-push
+    env:
+      NAMESPACE: my-solid-app-staging
+      SHA: ${{ needs.docker-build-and-push.outputs.sha_short }}
     steps:
       - name: Setup
         uses: actions/checkout@v4
 
-      - name: SCP new docker compose file
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.MY_SOLID_APP_STAGING_VPS_HOST }}
-          username: ${{ secrets.MY_SOLID_APP_STAGING_VPS_USER }}
-          port: ${{ secrets.MY_SOLID_APP_STAGING_VPS_PORT }}
-          key: ${{ secrets.MY_SOLID_APP_STAGING_VPS_SSH_KEY }}
-          source: "docker-compose.staging.yml, nginx.staging.conf"
-          target: "~/"
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v4
 
-      - name: Deploy new docker containers
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.MY_SOLID_APP_STAGING_VPS_HOST }}
-          username: ${{ secrets.MY_SOLID_APP_STAGING_VPS_USER }}
-          port: ${{ secrets.MY_SOLID_APP_STAGING_VPS_PORT }}
-          key: ${{ secrets.MY_SOLID_APP_STAGING_VPS_SSH_KEY }}
-          script: |
-            export MY_SOLID_APP_SERVER_USER=${{ secrets.MY_SOLID_APP_STAGING_VPS_USER }}
-            export DOCKERHUB_NAMESPACE=${{ secrets.DOCKERHUB_NAMESPACE }}
-            export MY_SOLID_APP_DB_NAME=${{ secrets.MY_SOLID_APP_STAGING_DB_NAME }}
-            export MY_SOLID_APP_DB_USER=${{ secrets.MY_SOLID_APP_STAGING_DB_USER }}
-            export MY_SOLID_APP_DB_PASSWORD=${{ secrets.MY_SOLID_APP_STAGING_DB_PASSWORD }}
-            export MY_SOLID_APP_SECRET_KEY=${{ secrets.MY_SOLID_APP_STAGING_SECRET_KEY }}
-            export MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD_STAGING }}
-            export MYSQL_DATABASE=${{ secrets.MY_SOLID_APP_STAGING_DB_NAME }}
-            export MYSQL_USER=${{ secrets.MY_SOLID_APP_STAGING_DB_USER }}
-            export MYSQL_PASSWORD=${{ secrets.MY_SOLID_APP_STAGING_DB_PASSWORD }}
-            export MY_SOLID_APP_MAIL_SERVER=${{ secrets.MY_SOLID_APP_STAGING_MAIL_SERVER }}
-            export MY_SOLID_APP_MAIL_PORT=${{ secrets.MY_SOLID_APP_STAGING_MAIL_PORT }}
-            export MY_SOLID_APP_MAIL_USERNAME=${{ secrets.MY_SOLID_APP_STAGING_MAIL_USERNAME }}
-            export MY_SOLID_APP_MAIL_PASSWORD=${{ secrets.MY_SOLID_APP_STAGING_MAIL_PASSWORD }}
-            export MY_SOLID_APP_MAIL_DEFAULT_SENDER=${{ secrets.MY_SOLID_APP_STAGING_MAIL_DEFAULT_SENDER }}
-            export MY_SOLID_APP_FERNET_SECRET_KEY=${{ secrets.MY_SOLID_APP_STAGING_FERNET_SECRET_KEY }}
+      - name: Configure kubeconfig
+        run: |
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBECONFIG_STAGING }}" > ~/.kube/config
+          chmod 600 ~/.kube/config
 
-            docker compose -f docker-compose.staging.yml down
-            docker compose -f docker-compose.staging.yml pull
-            docker compose -f docker-compose.staging.yml up -d --remove-orphans
-            sleep 10
-            docker compose -f docker-compose.staging.yml run api make db_upgrade
-            sleep 5
-            docker image prune -af
+      - name: Create Dockerhub Secret
+        run: |
+          kubectl create secret docker-registry my-solid-app-dockerhub \
+            --docker-username=${{ secrets.DOCKERHUB_USERNAME }} \
+            --docker-password=${{ secrets.DOCKERHUB_TOKEN }} \
+            --docker-email="<your-email>" \
+            -n ${NAMESPACE} \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: Deploy to staging
+        env:
+          MY_SOLID_APP_SECRET_KEY: ${{ secrets.MY_SOLID_APP_STAGING_SECRET_KEY }}
+          MY_SOLID_APP_FERNET_SECRET_KEY: ${{ secrets.MY_SOLID_APP_STAGING_FERNET_SECRET_KEY }}
+          MY_SOLID_APP_DB_USER: ${{ secrets.MY_SOLID_APP_STAGING_DB_USER }}
+          MY_SOLID_APP_DB_PASSWORD: ${{ secrets.MY_SOLID_APP_STAGING_DB_PASSWORD }}
+          MY_SOLID_APP_MAIL_SERVER: ${{ secrets.MY_SOLID_APP_STAGING_MAIL_SERVER }}
+          MY_SOLID_APP_MAIL_USERNAME: ${{ secrets.MY_SOLID_APP_STAGING_MAIL_USERNAME }}
+          MY_SOLID_APP_MAIL_PASSWORD: ${{ secrets.MY_SOLID_APP_STAGING_MAIL_PASSWORD }}
+          MY_SOLID_APP_MAIL_DEFAULT_SENDER: ${{ secrets.MY_SOLID_APP_STAGING_MAIL_DEFAULT_SENDER }}
+        run: |
+          cd config/k8s/overlays/staging
+
+          envsubst < kustomization.yaml > kustomization.tmp.yaml
+          mv kustomization.tmp.yaml kustomization.yaml
+
+          kustomize edit set image <dockerhub-namespace>/my-solid-app-api=<dockerhub-namespace>/my-solid-app-api:${{ env.SHA }}
+          kustomize edit set image <dockerhub-namespace>/my-solid-app-tasks=<dockerhub-namespace>/my-solid-app-tasks:${{ env.SHA }}
+          kustomize edit set image <dockerhub-namespace>/my-solid-app-ui=<dockerhub-namespace>/my-solid-app-ui:${{ env.SHA }}
+
+          kubectl apply -k .
+
+      - name: Verify rollouts
+        run: |
+          kubectl rollout status deployment/my-solid-app-ui -n ${NAMESPACE}
+          kubectl rollout status deployment/my-solid-app-api -n ${NAMESPACE}
+          kubectl rollout status deployment/my-solid-app-tasks -n ${NAMESPACE}
+
+      - name: Run DB migrations
+        run: |
+          kubectl exec deploy/my-solid-app-api -n ${NAMESPACE} -- make db_upgrade

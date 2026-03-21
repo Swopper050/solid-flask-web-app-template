@@ -2,6 +2,7 @@ LINT_FILES=server.py app/ tests/ scripts/
 TEST_PATH=tests
 PYTEST=pytest -k $(TEST_FILTER) $(TEST_PATH) --pythonwarnings=once
 PYTEST_COV=--cov=app/ --cov-report=term-missing
+IMAGE_TAG=latest
 
 VERSION = $(shell git describe --tags --always)
 DOCKERHUB_NAMESPACE=test
@@ -69,31 +70,17 @@ db_downgrade: ## Downgrade database
 db_upgrade: ## Upgrade database
 	flask --app server db upgrade
 
-docker_build_api_latest: ## Build the api docker container and tag it with 'latest'
-	docker build -t $(DOCKERHUB_NAMESPACE)/my-solid-app-api:latest -f Dockerfile.api .
+docker_build_api: ## Build the api docker container and tag it
+	docker build -t $(DOCKERHUB_NAMESPACE)/my-solid-app-api:${IMAGE_TAG} -f Dockerfile.api .
 
-docker_build_tasks_latest: ## Build the tasks docker container and tag it with 'latest'
-	docker build -t $(DOCKERHUB_NAMESPACE)/my-solid-app-tasks:latest -f Dockerfile.tasks .
+docker_build_tasks: ## Build the tasks docker container and tag it
+	docker build -t $(DOCKERHUB_NAMESPACE)/my-solid-app-tasks:${IMAGE_TAG} -f Dockerfile.tasks .
 
-docker_build_api_stable: ## Build the api docker container and tag it with the current git version tag and 'stable'
-	docker build -t $(DOCKERHUB_NAMESPACE)/my-solid-app-api:$(VERSION) -t $(DOCKERHUB_NAMESPACE)/my-solid-app-api:stable -f Dockerfile.api .
+docker_push_api: ## Push the api docker container with the specified tag
+	docker push $(DOCKERHUB_NAMESPACE)/my-solid-app-api:${IMAGE_TAG}
 
-docker_build_tasks_stable: ## Build the tasks docker container and tag it with the current git version tag and 'stable'
-	docker build -t $(DOCKERHUB_NAMESPACE)/my-solid-app-tasks:$(VERSION) -t $(DOCKERHUB_NAMESPACE)/my-solid-app-tasks:stable -f Dockerfile.tasks .
-
-docker_push_api_latest: ## Push the api docker container with the tag 'latest'
-	docker push $(DOCKERHUB_NAMESPACE)/my-solid-app-api:latest
-
-docker_push_tasks_latest: ## Push the tasks docker container with the tag 'latest'
-	docker push $(DOCKERHUB_NAMESPACE)/my-solid-app-tasks:latest
-
-docker_push_api_stable: ## Push the api docker containers with the current git version tag and 'stable'
-	docker push $(DOCKERHUB_NAMESPACE)/my-solid-app-api:$(VERSION)
-	docker push $(DOCKERHUB_NAMESPACE)/my-solid-app-api:stable
-
-docker_push_tasks_stable: ## Push the tasks docker container with the current git version tag and 'stable'
-	docker push $(DOCKERHUB_NAMESPACE)/my-solid-app-tasks:$(VERSION)
-	docker push $(DOCKERHUB_NAMESPACE)/my-solid-app-tasks:stable
+docker_push_tasks: ## Push the tasks docker container with the specified tag
+	docker push $(DOCKERHUB_NAMESPACE)/my-solid-app-tasks:${IMAGE_TAG}
 
 docker_run_latest: ## Run the api as a docker container
 	docker run \
