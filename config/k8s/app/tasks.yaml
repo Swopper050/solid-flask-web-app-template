@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-solid-app-tasks
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: my-solid-app-tasks
+  template:
+    metadata:
+      labels:
+        app: my-solid-app-tasks
+    spec:
+      imagePullSecrets:
+        - name: my-solid-app-dockerhub
+      containers:
+        - name: my-solid-app-tasks
+          image: bramdewit/my-solid-app-tasks
+          envFrom:
+            - configMapRef:
+                name: my-solid-app-backend-config
+            - secretRef:
+                name: my-solid-app-backend-secrets
+          resources:
+            requests:
+              cpu: "150m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"

@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-solid-app-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: my-solid-app-api
+  template:
+    metadata:
+      labels:
+        app: my-solid-app-api
+    spec:
+      imagePullSecrets:
+        - name: my-solid-app-dockerhub
+      containers:
+        - name: my-solid-app-api
+          image: bramdewit/my-solid-app-api
+          ports:
+            - containerPort: 5000
+          envFrom:
+            - configMapRef:
+                name: my-solid-app-backend-config
+            - secretRef:
+                name: my-solid-app-backend-secrets
+          resources:
+            requests:
+              cpu: "150m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-solid-app-api
+spec:
+  type: ClusterIP
+  selector:
+    app: my-solid-app-api
+  ports:
+    - port: 5000
+      targetPort: 5000
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: my-solid-app-api
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-http01
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - HOST_PLACEHOLDER
+      secretName: my-solid-app-api-tls
+  rules:
+    - host: HOST_PLACEHOLDER
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: my-solid-app-api
+                port:
+                  number: 5000

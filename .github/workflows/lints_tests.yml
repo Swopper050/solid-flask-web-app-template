@@ -205,7 +205,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Build docker image
-        run: cd api && make docker_build_api_latest
+        run: cd api && make docker_build_api
 
   docker-tasks-build-test:
     runs-on: ubuntu-latest
@@ -215,7 +215,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Build docker image
-        run: cd api && make docker_build_tasks_latest
+        run: cd api && make docker_build_tasks
 
   docker-ui-build-test:
     runs-on: ubuntu-latest
@@ -225,4 +225,4 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Build docker image
-        run: cd ui && make docker_latest
+        run: cd ui && make docker_build
