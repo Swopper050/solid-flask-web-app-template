@@ -54,6 +54,7 @@ export function TopBar(): JSXElement {
             <button
               class="btn btn-ghost"
               onClick={() => setOpenLoginModal(true)}
+              data-cy="open-login-modal"
             >
               {t('login')}
             </button>
@@ -61,6 +62,7 @@ export function TopBar(): JSXElement {
             <button
               class="btn btn-ghost"
               onClick={() => setOpenRegisterModal(true)}
+              data-cy="open-register-modal"
             >
               {t('register')}
             </button>
@@ -108,6 +110,7 @@ export function TopBar(): JSXElement {
                     setOpenLoginModal(true)
                     setSidebarOpen(false)
                   }}
+                  data-cy="open-login-modal-mobile"
                 >
                   <i class="fa-solid fa-sign-in-alt mr-2" />
                   {t('login')}
@@ -119,6 +122,7 @@ export function TopBar(): JSXElement {
                     setOpenRegisterModal(true)
                     setSidebarOpen(false)
                   }}
+                  data-cy="open-login-modal-mobile"
                 >
                   <i class="fa-solid fa-user-plus mr-2" />
                   {t('register')}

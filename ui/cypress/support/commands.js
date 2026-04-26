@@ -23,3 +23,33 @@
 //
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
+
+Cypress.Commands.addAll({
+  login(email, password) {
+    cy.get('[data-cy="open-login-modal"]').click();
+    cy.get('[data-cy="login-email"]').type(email);
+    cy.get('[data-cy="login-password"]').type(password);
+    cy.get('[data-cy="login-button"]').click();
+  },
+  logout() {
+    cy.get('[data-cy="toggle-profile-menu-dropdown"').click();
+    cy.get('[data-cy="logout"]').click();
+  },
+  navigateToAdminPanel() {
+    cy.get('[data-cy="toggle-profile-menu-dropdown"').click();
+    cy.get('[data-cy="admin-panel"]').click();
+  },
+  createUser(email, password, isAdmin) {
+    cy.get('[data-cy="create-new-user"]').click();
+    cy.get('[data-cy="new-user-email"]').type(email);
+    cy.get('[data-cy="new-user-password"]').type(password);
+    if (isAdmin) {
+      cy.get('[data-cy="new-user-admin"]').check();
+    }
+    cy.get('[data-cy="submit-new-user"]').click();
+  },
+  deleteUser(email) {
+    cy.get(`[data-cy="delete-user-${email}"]`).click();
+    cy.get(`[data-cy="delete-user"]`).click();
+  }
+})
