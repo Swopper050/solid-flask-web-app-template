@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-solid-app-tasks-beat
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: my-solid-app-tasks-beat
+  template:
+    metadata:
+      labels:
+        app: my-solid-app-tasks-beat
+    spec:
+      imagePullSecrets:
+        - name: my-solid-app-dockerhub
+      containers:
+        - name: my-solid-app-tasks-beat
+          image: <dockerhub_namespace>/my-solid-app-tasks
+          command: ["celery"]
+          args:
+            [
+              "-A",
+              "server.celery_app",
+              "beat",
+              "--loglevel=info",
+              "--schedule=/var/run/celery/celerybeat-schedule",
+            ]
+          envFrom:
+            - configMapRef:
+                name: my-solid-app-backend-config
+            - secretRef:
+                name: my-solid-app-backend-secrets
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "128Mi"
+            limits:
+              cpu: "250m"
+              memory: "256Mi"
+          volumeMounts:
+            - name: celerybeat-schedule
+              mountPath: /var/run/celery
+      volumes:
+        - name: celerybeat-schedule
+          emptyDir: {}

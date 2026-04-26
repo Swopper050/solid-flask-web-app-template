@@ -1,8 +1,18 @@
 import { TranslationKey, TranslationKeys } from './context/LocaleProvider'
 import { PaginationResult } from './models/Base'
 import { UserAttributes } from './models/User'
+import {
+  WorkspaceAttributes,
+  WorkspaceInvitationAttributes,
+  WorkspaceListItemAttributes,
+} from './models/Workspace'
+import {
+  BillingStatusAttributes,
+  PaginatedInvoices,
+  PaymentMethodAttributes,
+} from './models/Billing'
 
-interface ErrorData {
+export interface ErrorData {
   error: number
   message: string
 }
@@ -91,15 +101,19 @@ export async function deleteAccount() {
 }
 
 export type RegisterUserData = {
+  name: string
   email: string
   password: string
   checkPassword: string
+  invitationToken?: string
 }
 
 export async function register(data: RegisterUserData) {
   return post('/api/register', {
+    name: data.name,
     email: data.email,
     password: data.password,
+    ...(data.invitationToken && { invitation_token: data.invitationToken }),
   })
 }
 
@@ -166,37 +180,232 @@ export async function deleteUser(data: DeleteUserData) {
   return _delete(`/api/user/${data.userID}`)
 }
 
+// Workspaces
+
+export async function getWorkspaces(): Promise<WorkspaceListItemAttributes[]> {
+  return get('/api/workspaces').then((r) => r.json())
+}
+
+export type CreateWorkspaceData = { name: string }
+
+export async function createWorkspace(data: CreateWorkspaceData) {
+  return post('/api/workspaces', { name: data.name })
+}
+
+export async function getWorkspace(id: number): Promise<WorkspaceAttributes> {
+  return get(`/api/workspaces/${id}`).then((r) => r.json())
+}
+
+export async function updateWorkspace(
+  id: number,
+  data: {
+    name?: string
+    color?: string | null
+    context?: string | null
+    language?: string
+  }
+) {
+  return put(`/api/workspaces/${id}`, data)
+}
+
+export async function deleteWorkspace(id: number) {
+  return _delete(`/api/workspaces/${id}`)
+}
+
+export async function inviteMember(workspaceId: number, email: string) {
+  return post(`/api/workspaces/${workspaceId}/invitations`, { email })
+}
+
+export async function getInvitations(
+  workspaceId: number
+): Promise<WorkspaceInvitationAttributes[]> {
+  return get(`/api/workspaces/${workspaceId}/invitations`).then((r) => r.json())
+}
+
+export async function cancelInvitation(
+  workspaceId: number,
+  invitationId: number
+) {
+  return _delete(`/api/workspaces/${workspaceId}/invitations/${invitationId}`)
+}
+
+export async function removeMember(workspaceId: number, userId: number) {
+  return _delete(`/api/workspaces/${workspaceId}/members/${userId}`)
+}
+
+export async function updateMemberRole(
+  workspaceId: number,
+  userId: number,
+  role: string
+) {
+  return patch(`/api/workspaces/${workspaceId}/members/${userId}`, { role })
+}
+
+export async function acceptInvitation(token: string) {
+  return post('/api/invitations/accept', { token })
+}
+
+export interface InvitationLookupResult {
+  email: string
+  workspace_name: string
+}
+
+export async function lookupInvitation(
+  token: string
+): Promise<InvitationLookupResult | null> {
+  const r = await post('/api/invitations/lookup', { token })
+  if (!r.ok) return null
+  return r.json()
+}
+
+// Billing
+
+export async function getBillingStatus(
+  workspaceId: number
+): Promise<BillingStatusAttributes> {
+  return get(`/api/workspaces/${workspaceId}/billing`).then((r) => r.json())
+}
+
+export async function startBillingCheckout(
+  workspaceId: number
+): Promise<{ checkout_url: string }> {
+  const r = await post(`/api/workspaces/${workspaceId}/billing/checkout`, {})
+  const data = await r.json()
+  if (!r.ok) throw data
+  return data
+}
+
+export async function updatePaymentMethod(
+  workspaceId: number
+): Promise<{ checkout_url: string }> {
+  const r = await post(
+    `/api/workspaces/${workspaceId}/billing/update-payment-method`,
+    {}
+  )
+  const data = await r.json()
+  if (!r.ok) throw data
+  return data
+}
+
+export async function updateBillingSeats(
+  workspaceId: number,
+  seats: number
+): Promise<BillingStatusAttributes> {
+  const r = await patch(`/api/workspaces/${workspaceId}/billing/seats`, {
+    seats,
+  })
+  const data = await r.json()
+  if (!r.ok) throw data
+  return data
+}
+
+export async function cancelCheckout(workspaceId: number) {
+  const r = await _delete(`/api/workspaces/${workspaceId}/billing/checkout`)
+  const data = await r.json()
+  if (!r.ok) throw data
+  return data
+}
+
+export async function cancelSubscription(workspaceId: number) {
+  return _delete(`/api/workspaces/${workspaceId}/billing/subscription`)
+}
+
+export async function getInvoices(
+  workspaceId: number,
+  limit = 5,
+  offset = 0
+): Promise<PaginatedInvoices> {
+  return get(
+    `/api/workspaces/${workspaceId}/billing/invoices?limit=${limit}&offset=${offset}`
+  ).then((r) => r.json())
+}
+
+export async function getPaymentMethod(
+  workspaceId: number
+): Promise<PaymentMethodAttributes> {
+  return get(`/api/workspaces/${workspaceId}/billing/payment-method`).then(
+    (r) => r.json()
+  )
+}
+
+export function getInvoiceDownloadUrl(
+  workspaceId: number,
+  invoiceId: number
+): string {
+  return resolveUrl(
+    `/api/workspaces/${workspaceId}/billing/invoices/${invoiceId}/download`
+  )
+}
+
+// HTTP helpers
+
 const API_BASE = import.meta.env.VITE_API_BASE_URL ?? ''
 
-function resolveUrl(url: string): string {
+export function resolveUrl(url: string): string {
   if (API_BASE) {
     return API_BASE + url.replace(/^\/api/, '')
   }
   return url
 }
 
+async function checkFrozenResponse(response: Response): Promise<Response> {
+  if (response.status === 403) {
+    try {
+      const cloned = response.clone()
+      const json = await cloned.json()
+      handleFrozenError(json)
+    } catch {
+      // ignore parse errors
+    }
+  }
+  return response
+}
+
 export async function get(url: string) {
   return fetch(resolveUrl(url), {
     method: 'GET',
+    credentials: 'include',
     headers: new Headers({ 'Content-Type': 'application/json' }),
   })
 }
 
 export async function post(url: string, data: object) {
-  return fetch(resolveUrl(url), {
+  const response = await fetch(resolveUrl(url), {
     method: 'POST',
-    body: JSON.stringify({
-      ...data,
-    }),
+    credentials: 'include',
+    body: JSON.stringify({ ...data }),
     headers: new Headers({ 'Content-Type': 'application/json' }),
   })
+  return checkFrozenResponse(response)
+}
+
+export async function put(url: string, data: object) {
+  const response = await fetch(resolveUrl(url), {
+    method: 'PUT',
+    credentials: 'include',
+    body: JSON.stringify({ ...data }),
+    headers: new Headers({ 'Content-Type': 'application/json' }),
+  })
+  return checkFrozenResponse(response)
+}
+
+export async function patch(url: string, data: object) {
+  const response = await fetch(resolveUrl(url), {
+    method: 'PATCH',
+    credentials: 'include',
+    body: JSON.stringify({ ...data }),
+    headers: new Headers({ 'Content-Type': 'application/json' }),
+  })
+  return checkFrozenResponse(response)
 }
 
 export async function _delete(url: string) {
-  return fetch(resolveUrl(url), {
+  const response = await fetch(resolveUrl(url), {
     method: 'DELETE',
+    credentials: 'include',
     headers: new Headers({ 'Content-Type': 'application/json' }),
   })
+  return checkFrozenResponse(response)
 }
 
 const errorMessages: Record<number, keyof TranslationKeys> = {
@@ -214,4 +423,31 @@ const errorMessages: Record<number, keyof TranslationKeys> = {
   11: 'twofa_is_already_disabled',
   12: 'user_not_found',
   13: 'an_unknown_error_occurred',
+  14: 'workspace_not_found',
+  15: 'not_a_workspace_member',
+  16: 'not_workspace_owner_or_admin',
+  17: 'already_a_workspace_member',
+  18: 'invitation_not_found',
+  19: 'cannot_remove_workspace_owner',
+  26: 'subscription_not_found',
+  27: 'billing_error',
+  28: 'invoice_not_found',
+  29: 'seat_limit_reached',
+  30: 'cannot_leave_last_owner',
+  33: 'workspace_frozen',
+  35: 'upgrade_disabled',
+}
+
+const WORKSPACE_FROZEN_ERROR = 33
+
+export function dispatchFrozenEvent(): void {
+  window.dispatchEvent(new CustomEvent('workspace-frozen'))
+}
+
+export function handleFrozenError(errorData: ErrorData): boolean {
+  if (errorData.error === WORKSPACE_FROZEN_ERROR) {
+    dispatchFrozenEvent()
+    return true
+  }
+  return false
 }

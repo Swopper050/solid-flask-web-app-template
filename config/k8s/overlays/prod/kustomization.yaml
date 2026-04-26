@@ -46,8 +46,13 @@ configMapGenerator:
     behavior: merge
     literals:
       - MY_SOLID_APP_FRONTEND_URL="https://app.my-solid-app.com"
+      - MY_SOLID_APP_API_URL="https://api.my-solid-app.com"
       - MY_SOLID_APP_DB_NAME="my_solid_app_db"
       - MY_SOLID_APP_DB_HOST="<vps_ip>"
+      - MY_SOLID_APP_MINIO_HOST="<object-storage-host>"
+      - MY_SOLID_APP_MINIO_PORT=""
+      - MY_SOLID_APP_MINIO_BUCKET="my-solid-app"
+      - MY_SOLID_APP_MINIO_SECURE="True"
 
 secretGenerator:
   - name: my-solid-app-backend-secrets
@@ -60,3 +65,6 @@ secretGenerator:
       - MY_SOLID_APP_MAIL_USERNAME=${MY_SOLID_APP_MAIL_USERNAME}
       - MY_SOLID_APP_MAIL_PASSWORD=${MY_SOLID_APP_MAIL_PASSWORD}
       - MY_SOLID_APP_MAIL_DEFAULT_SENDER=${MY_SOLID_APP_MAIL_DEFAULT_SENDER}
+      - MY_SOLID_APP_MOLLIE_API_KEY=${MY_SOLID_APP_MOLLIE_API_KEY}
+      - MY_SOLID_APP_MINIO_USER=${MY_SOLID_APP_MINIO_USER}
+      - MY_SOLID_APP_MINIO_PASSWORD=${MY_SOLID_APP_MINIO_PASSWORD}

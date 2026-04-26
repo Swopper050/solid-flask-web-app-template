@@ -1,11 +1,14 @@
-import { JSXElement, createSignal } from 'solid-js'
+import { JSXElement, createSignal, onCleanup, onMount } from 'solid-js'
 import { A } from '@solidjs/router'
 
+import { FrozenWorkspaceModal } from '../components/FrozenWorkspaceModal'
 import { ProfileMenu } from '../components/ProfileMenu'
 import { ThemeSwitcher } from '../components/ThemeSwitcher'
 import { LanguageSelector } from '../components/LanguageSelector'
+import { WorkspaceSwitcher } from '../components/WorkspaceSwitcher'
 
 import { useLocale } from '../context/LocaleProvider'
+import { useWorkspace } from '../context/WorkspaceProvider'
 
 interface BasePageProps {
   mainComponent: () => JSXElement
@@ -13,7 +16,15 @@ interface BasePageProps {
 
 export function BasePage(props: BasePageProps): JSXElement {
   const { t } = useLocale()
+  const { frozenReason, frozenModalOpen, openFrozenModal, closeFrozenModal } =
+    useWorkspace()
   const [drawerOpen, setDrawerOpen] = createSignal(false)
+
+  const handleFrozenEvent = () => openFrozenModal()
+  onMount(() => window.addEventListener('workspace-frozen', handleFrozenEvent))
+  onCleanup(() =>
+    window.removeEventListener('workspace-frozen', handleFrozenEvent)
+  )
 
   return (
     <div class="drawer lg:drawer-open">
@@ -26,7 +37,7 @@ export function BasePage(props: BasePageProps): JSXElement {
       />
 
       <div class="drawer-content flex flex-col m-0 p-0 w-full overflow-x-hidden">
-        <div class="navbar bg-base-100">
+        <div class="navbar bg-base-100 border-b border-base-300">
           <div class="flex-1">
             <label
               for="main-sidebar"
@@ -51,12 +62,12 @@ export function BasePage(props: BasePageProps): JSXElement {
           class="drawer-overlay"
           onClick={() => setDrawerOpen(false)}
         />
-        <div class="flex flex-col h-full bg-base-200 min-h-full w-64 sm:w-72">
-          <div class="p-4">
+        <div class="flex flex-col h-full bg-base-100 border-r border-base-300 min-h-full w-64 sm:w-72">
+          <div class="p-4 pb-2">
             <div class="flex justify-between items-center">
               <A
                 class="btn btn-ghost text-xl justify-start"
-                href="/"
+                href="/home"
                 onClick={() => setDrawerOpen(false)}
               >
                 {t('my_solid_app')}
@@ -69,7 +80,10 @@ export function BasePage(props: BasePageProps): JSXElement {
               </button>
             </div>
           </div>
-          <ul class="menu text-base-content p-4 w-full flex-1 overflow-y-auto">
+
+          <WorkspaceSwitcher />
+
+          <ul class="menu text-base-content px-4 w-full flex-1 overflow-y-auto">
             <li class="mb-1 font-bold">
               <A href="/home" onClick={() => setDrawerOpen(false)}>
                 <i class="fa-solid fa-home mr-2" />
@@ -79,6 +93,12 @@ export function BasePage(props: BasePageProps): JSXElement {
           </ul>
         </div>
       </div>
+
+      <FrozenWorkspaceModal
+        isOpen={frozenModalOpen()}
+        onClose={closeFrozenModal}
+        frozenReason={frozenReason()}
+      />
     </div>
   )
 }
