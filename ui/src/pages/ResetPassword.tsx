@@ -1,6 +1,6 @@
 import { JSXElement, Show } from 'solid-js'
 import { A, useSearchParams } from '@solidjs/router'
-import { required, minLength, pattern } from '@modular-forms/solid'
+import { required } from '@modular-forms/solid'
 
 import { AuthCard } from '../components/AuthCard'
 import { TextInput } from '../components/TextInput'
@@ -10,7 +10,7 @@ import { useLocale } from '../context/LocaleProvider'
 import { resetPassword, ResetPasswordData } from '../api'
 import { getSingleParam } from './SearchParams'
 import { createFormState } from '../form_helpers'
-import { mustMatch } from '../validators'
+import { mustMatch, passwordRules } from '../validators'
 
 export function ResetPasswordPage(): JSXElement {
   const { t } = useLocale()
@@ -71,10 +71,7 @@ export function ResetPasswordPage(): JSXElement {
             name="newPassword"
             validate={[
               required(t('please_enter_a_new_password')),
-              minLength(8, t('your_password_must_have_8_characters_or_more')),
-              pattern(/[A-Z]/, t('your_password_must_have_1_uppercase_letter')),
-              pattern(/[a-z]/, t('your_password_must_have_1_lowercase_letter')),
-              pattern(/[0-9]/, t('your_password_must_have_1_digit')),
+              ...passwordRules(t, { requireSpecialChar: false }),
             ]}
           >
             {(field, props) => (

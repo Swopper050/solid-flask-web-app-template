@@ -6,6 +6,7 @@ import { useUser } from '../context/UserProvider'
 import { useWorkspace } from '../context/WorkspaceProvider'
 import { acceptInvitation } from '../api'
 import { Button } from '../components/Button'
+import { Spinner } from '../components/Spinner'
 
 type AcceptState = 'idle' | 'loading' | 'error'
 
@@ -60,7 +61,7 @@ export function AcceptInvitationPage(): JSXElement {
       <Switch>
         <Match when={acceptState() === 'loading' || userLoading()}>
           <div class="flex flex-col items-center gap-3">
-            <span class="loading loading-spinner loading-lg" />
+            <Spinner variant="spinner" size="lg" />
           </div>
         </Match>
 

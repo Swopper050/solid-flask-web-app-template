@@ -21,7 +21,7 @@ import {
 } from '../../api'
 import { useLocale } from '../../context/LocaleProvider'
 import { Button } from '../../components/Button'
-import { Modal } from '../../components/Modal'
+import { ConfirmModal } from '../../components/ConfirmModal'
 import { InvoiceAttributes } from '../../models/Billing'
 
 export function BillingTabContent(props: {
@@ -496,29 +496,20 @@ export function BillingTabContent(props: {
         </Show>
       </Show>
 
-      {/* Cancel subscription modal */}
-      <Modal
+      <ConfirmModal
         isOpen={cancelModalOpen()}
         onClose={() => setCancelModalOpen(false)}
         title={t('cancel_subscription')}
-      >
-        <p class="text-sm text-base-content/70 mb-4">
-          {t('cancel_subscription_confirmation')}
-        </p>
-        <div class="flex gap-2 justify-end">
-          <Button
-            label={t('cancel')}
-            onClick={() => setCancelModalOpen(false)}
-            variant="ghost"
-          />
-          <Button
-            label={t('yes_cancel_subscription')}
-            color="error"
-            onClick={handleCancelConfirm}
-            isLoading={cancelling()}
-          />
-        </div>
-      </Modal>
+        message={
+          <span class="text-sm text-base-content/70">
+            {t('cancel_subscription_confirmation')}
+          </span>
+        }
+        confirmLabel={t('yes_cancel_subscription')}
+        confirmColor="error"
+        isLoading={cancelling()}
+        onConfirm={handleCancelConfirm}
+      />
     </div>
   )
 }

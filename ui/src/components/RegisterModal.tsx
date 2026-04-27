@@ -1,7 +1,7 @@
 import { JSXElement, Show } from 'solid-js'
 import { useNavigate } from '@solidjs/router'
 
-import { minLength, pattern, email, required } from '@modular-forms/solid'
+import { email, required } from '@modular-forms/solid'
 
 import { register, RegisterUserData } from '../api'
 
@@ -14,7 +14,7 @@ import { Modal, ModalBaseProps } from './Modal'
 import { Alert } from './Alert'
 import { Button } from './Button'
 import { createFormState } from '../form_helpers'
-import { mustMatch } from '../validators'
+import { mustMatch, passwordRules } from '../validators'
 
 export function RegisterModal(props: ModalBaseProps): JSXElement {
   const { t } = useLocale()
@@ -68,16 +68,7 @@ export function RegisterModal(props: ModalBaseProps): JSXElement {
             )}
           </Field>
 
-          <Field
-            name="password"
-            validate={[
-              minLength(8, t('your_password_must_have_8_characters_or_more')),
-              pattern(/[A-Z]/, t('your_password_must_have_1_uppercase_letter')),
-              pattern(/[a-z]/, t('your_password_must_have_1_lowercase_letter')),
-              pattern(/[0-9]/, t('your_password_must_have_1_digit')),
-              pattern(/[\W]/, t('your_password_must_have_1_special_character')),
-            ]}
-          >
+          <Field name="password" validate={passwordRules(t)}>
             {(field, props) => (
               <TextInput
                 {...props}

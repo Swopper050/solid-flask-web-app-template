@@ -3,6 +3,7 @@ import { A, useSearchParams } from '@solidjs/router'
 
 import { Alert } from '../components/Alert'
 import { AuthCard } from '../components/AuthCard'
+import { CenteredSpinner } from '../components/Spinner'
 import { useUser } from '../context/UserProvider'
 import { useLocale } from '../context/LocaleProvider'
 import { getErrorMessage, verifyEmail } from '../api'
@@ -40,9 +41,7 @@ export function VerifyEmailPage(): JSXElement {
   return (
     <AuthCard title={t('verifying_email')} subtitle="">
       <Show when={loading()}>
-        <div class="flex justify-center py-4">
-          <span class="loading loading-ball text-primary loading-lg" />
-        </div>
+        <CenteredSpinner size="lg" color="primary" class="py-4" />
       </Show>
 
       <Show when={errorMsg()}>
