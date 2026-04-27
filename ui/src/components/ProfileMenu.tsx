@@ -68,7 +68,9 @@ export function ProfileMenu(): JSXElement {
           <Button
             variant="ghost"
             class="justify-start"
-            icon={loggingOut() ? undefined : 'fa-solid fa-arrow-right-from-bracket'}
+            icon={
+              loggingOut() ? undefined : 'fa-solid fa-arrow-right-from-bracket'
+            }
             isLoading={loggingOut()}
             onClick={onLogout}
             dataCy="logout"

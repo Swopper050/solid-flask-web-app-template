@@ -115,7 +115,9 @@ export function IconButton(
     >
       <Show
         when={props.isLoading}
-        fallback={<i class={clsx(props.icon, props.color && `text-${props.color}`)} />}
+        fallback={
+          <i class={clsx(props.icon, props.color && `text-${props.color}`)} />
+        }
       >
         <span class="loading loading-ball loading-xs" />
       </Show>
