@@ -28,8 +28,7 @@ const AVATAR_DARK = [
 ]
 
 function avatarColor(name: string): { bg: string; text: string } {
-  const isDark =
-    document.documentElement.getAttribute('data-theme') === 'dark'
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark'
   const palette = isDark ? AVATAR_DARK : AVATAR_LIGHT
   let hash = 0
   for (let i = 0; i < name.length; i++) hash += name.charCodeAt(i)
