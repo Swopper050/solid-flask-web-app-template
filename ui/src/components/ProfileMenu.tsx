@@ -1,10 +1,12 @@
 import { createSignal, JSXElement, Show } from 'solid-js'
 import { A, useNavigate } from '@solidjs/router'
+import { clsx } from 'clsx'
 
 import { useUser } from '../context/UserProvider'
 import { useLocale } from '../context/LocaleProvider'
-import { Button } from './Button'
 import { Toast } from './Toast'
+import { DropdownPanel } from './DropdownPanel'
+import { Avatar } from './Avatar'
 
 import { logout } from '../api'
 
@@ -16,6 +18,7 @@ export function ProfileMenu(): JSXElement {
 
   const [loggingOut, setLoggingOut] = createSignal(false)
   const [showLogoutFailed, setShowLogoutFailed] = createSignal(false)
+  const [open, setOpen] = createSignal(false)
 
   const onLogout = async () => {
     setLoggingOut(true)
@@ -23,9 +26,9 @@ export function ProfileMenu(): JSXElement {
     const response = await logout()
 
     if (response.status === 200) {
-      setUser(null)
-      setLoggingOut(false)
       navigate('/')
+      setUser(null)
+      return
     }
 
     setShowLogoutFailed(true)
@@ -33,51 +36,71 @@ export function ProfileMenu(): JSXElement {
   }
 
   return (
-    <details class="dropdown dropdown-end">
-      <summary class="btn btn-ghost" data-cy="toggle-profile-menu-dropdown">
-        <span class="text">{user()?.email}</span>
-        <i class="fa-solid fa-ellipsis" />
-      </summary>
-
-      <ul class="menu dropdown-content bg-base-200 w-40 rounded-box z-100">
-        <li>
-          <A
-            class="btn btn-ghost justify-start"
-            href="/account"
-            data-cy="user-account"
+    <>
+      <DropdownPanel
+        open={open}
+        setOpen={setOpen}
+        class="min-w-[220px] py-1.5"
+        trigger={
+          <button
+            class="rounded-full cursor-pointer hover:brightness-90 transition-all"
+            data-cy="toggle-profile-menu-dropdown"
+            onClick={(e) => {
+              e.stopPropagation()
+              setOpen(!open())
+            }}
           >
-            <i class="fa-regular fa-address-card" />
-            {t('account')}
-          </A>
-        </li>
-
+            <Avatar
+              name={user()?.name}
+              email={user()?.email}
+              class="w-9 h-9 text-xs"
+            />
+          </button>
+        }
+      >
+        <div class="px-4 py-2 text-xs text-base-content/50">
+          {user()?.email}
+        </div>
+        <div class="h-px bg-base-300 my-0.5" />
+        <A
+          class="flex items-center gap-2 px-4 py-2.5 text-xs hover:bg-base-200 cursor-pointer"
+          href="/account"
+          data-cy="user-account"
+          onClick={() => setOpen(false)}
+        >
+          <i class="fa-solid fa-gear text-base-content/50 text-sm w-4" />
+          {t('account')}
+        </A>
         <Show when={user()?.isAdmin}>
-          <li>
-            <A
-              class="btn btn-ghost justify-start"
-              href="/admin-panel"
-              data-cy="admin-panel"
-            >
-              <i class="fa-solid fa-screwdriver-wrench text-success" />
-              <p class="text-success">{t('admin_panel')}</p>
-            </A>
-          </li>
+          <A
+            class="flex items-center gap-2 px-4 py-2.5 text-xs hover:bg-base-200 cursor-pointer"
+            href="/admin-panel"
+            data-cy="admin-panel"
+            onClick={() => setOpen(false)}
+          >
+            <i class="fa-solid fa-screwdriver-wrench text-success text-sm w-4" />
+            <span class="text-success">{t('admin_panel')}</span>
+          </A>
         </Show>
-
-        <li>
-          <Button
-            variant="ghost"
-            class="justify-start"
-            icon={
-              loggingOut() ? undefined : 'fa-solid fa-arrow-right-from-bracket'
+        <button
+          class={clsx(
+            'flex items-center gap-2 px-4 py-2.5 text-xs hover:bg-base-200 cursor-pointer w-full text-left',
+            loggingOut() && 'opacity-50 pointer-events-none'
+          )}
+          data-cy="logout"
+          onClick={onLogout}
+        >
+          <Show
+            when={loggingOut()}
+            fallback={
+              <i class="fa-solid fa-arrow-right-from-bracket text-base-content/50 text-sm w-4" />
             }
-            isLoading={loggingOut()}
-            onClick={onLogout}
-            dataCy="logout"
-            label={t('logout')}
-          />
-        </li>
-      </ul>
+          >
+            <span class="loading loading-ball text-neutral loading-sm" />
+          </Show>
+          {t('logout')}
+        </button>
+      </DropdownPanel>
 
       <Show when={showLogoutFailed()}>
         <Toast
@@ -87,6 +110,6 @@ export function ProfileMenu(): JSXElement {
           onClear={() => setShowLogoutFailed(false)}
         />
       </Show>
-    </details>
+    </>
   )
 }

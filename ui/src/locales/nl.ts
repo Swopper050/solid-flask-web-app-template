@@ -3,6 +3,9 @@ import { Translations } from '../context/LocaleProvider'
 export const dict: Translations = {
   account: 'Account',
   admin_panel: 'Admin paneel',
+  all_data_permanently_deleted: `
+    Alle gegevens worden permanent verwijderd en kunnen niet worden hersteld.
+  `,
   already_a_workspace_member: 'Deze gebruiker is al lid van deze werkruimte',
   already_have_an_account: 'Heb je al een account?',
   an_account_with_this_email_already_exists: 'Een account met dit e-mailadres bestaat al',
@@ -149,6 +152,7 @@ export const dict: Translations = {
   `,
   invited: 'Uitgenodigd',
   invoice_not_found: 'Factuur niet gevonden',
+  language: 'Taal',
   later: 'Later',
   leave_workspace: 'Werkruimte verlaten',
   leave_workspace_confirmation: `
@@ -167,7 +171,9 @@ export const dict: Translations = {
   `,
   logout: 'Logout',
   make_this_user_an_admin: 'Maak deze gebruiker een admin',
+  manage_personal_data_and_preferences: 'Beheer je persoonlijke gegevens en voorkeuren.',
   members: 'Leden',
+  my_account: 'Mijn account',
   my_solid_app: 'My solid app',
   name: 'Naam',
   name_placeholder: 'Je naam',
@@ -190,6 +196,8 @@ export const dict: Translations = {
   please_enter_a_workspace_name: 'Voer een naam voor de werkruimte in',
   please_enter_your_email: 'Voer je e-mailadres in',
   please_enter_your_name: 'Vul je naam in',
+  preferences: 'Voorkeuren',
+  profile_information: 'Profielinformatie',
   puppy: 'puppy',
   regenerate_qr_code: 'Genereer QR-code opnieuw',
   register: 'Registreer',
@@ -222,6 +230,8 @@ export const dict: Translations = {
   seat_limit_reached: `
     Alle plekken zijn bezet. Verhoog het aantal plekken op de factureringspagina.
   `,
+  security: 'Beveiliging',
+  select_your_preferred_language: 'Selecteer je voorkeurstaal',
   send_reset_email: 'Stuur e-mail voor wachtwoord reset',
   sign_in: 'Inloggen',
   sign_up: 'Aanmelden',
@@ -234,7 +244,10 @@ export const dict: Translations = {
   subscription_not_found: 'Geen actief abonnement gevonden',
   successfully_reset_password: 'Wachtwoord succesvol opnieuw ingesteld',
   successfully_verified_email: 'E-mail succesvol geverifieerd',
+  switch_between_light_and_dark: 'Wissel tussen licht en donker thema',
   switch_workspace: 'Wissel werkruimte',
+  theme: 'Thema',
+  theme_and_language: 'Thema en taal',
   this_action_cannot_be_undone: 'Deze actie kan niet ongedaan worden gemaakt',
   this_is_the_home_page: 'Dit is de home pagina',
   this_requires_you_to_be_an_admin: 'Dit vereist dat je een admin bent',
@@ -281,8 +294,7 @@ export const dict: Translations = {
   yes_delete: 'Ja, verwijderen',
   you: 'jij',
   you_have_unsaved_changes: 'Je hebt niet-opgeslagen wijzigingen',
-  your_email_has_been_verified: 'Je e-mail is geverifieerd',
-  your_email_is_not_verified_yet: 'Je e-mail is nog niet geverifieerd',
+  your_account_details: 'Jouw accountgegevens',
   your_password_must_have_1_digit: 'Je wachtwoord moet 1 cijfer bevatten',
   your_password_must_have_1_lowercase_letter: 'Je wachtwoord moet 1 kleine letter bevatten',
   your_password_must_have_1_special_character: 'Je wachtwoord moet 1 speciaal teken bevatten',
