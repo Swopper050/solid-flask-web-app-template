@@ -1,6 +1,7 @@
 import {
   Accessor,
   createContext,
+  createEffect,
   createMemo,
   createSignal,
   JSXElement,
@@ -10,6 +11,7 @@ import {
 import { getWorkspaces } from '../api'
 import { WorkspaceListItemAttributes } from '../models/Workspace'
 import type { FrozenReason } from '../models/Workspace'
+import { useUser } from './UserProvider'
 
 interface WorkspaceContextAttributes {
   workspaces: Accessor<WorkspaceListItemAttributes[]>
@@ -27,6 +29,7 @@ interface WorkspaceContextAttributes {
 const WorkspaceContext = createContext<WorkspaceContextAttributes | null>(null)
 
 export const WorkspaceProvider = (props: { children: JSXElement }) => {
+  const { user } = useUser()
   const [workspaces, setWorkspaces] = createSignal<
     WorkspaceListItemAttributes[]
   >([])
@@ -77,6 +80,18 @@ export const WorkspaceProvider = (props: { children: JSXElement }) => {
     setCurrentWorkspace(workspace)
     localStorage.setItem('currentWorkspaceId', String(workspace.id))
   }
+
+  // Keep workspaces in sync with the authenticated user so any entry point
+  // (login, page refresh, deep link) ends up with a populated dropdown and
+  // a selected workspace without each page having to fetch on its own.
+  createEffect(() => {
+    if (user()) {
+      void fetchWorkspaces()
+    } else {
+      setWorkspaces([])
+      setCurrentWorkspace(null)
+    }
+  })
 
   return (
     <WorkspaceContext.Provider
