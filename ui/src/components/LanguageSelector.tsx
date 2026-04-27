@@ -1,5 +1,6 @@
 import { createEffect, JSXElement, For } from 'solid-js'
 
+import { Button } from './Button'
 import { useLocale, locales } from '../context/LocaleProvider'
 
 export function LanguageSelector(): JSXElement {
@@ -23,19 +24,20 @@ export function LanguageSelector(): JSXElement {
         <For each={locales}>
           {(language) => (
             <li>
-              <button
-                class="btn btn-ghost"
-                data-cy={`language-${language}`}
+              <Button
+                variant="ghost"
+                dataCy={`language-${language}`}
                 onClick={() => {
                   setLocale(language)
                   detailsRef?.removeAttribute('open')
                 }}
-              >
-                <div class="flex gap-2 mr-2">
-                  <CountryFlag countryCode={language} />
-                  <span>{language}</span>
-                </div>
-              </button>
+                label={
+                  <div class="flex gap-2 mr-2">
+                    <CountryFlag countryCode={language} />
+                    <span>{language}</span>
+                  </div>
+                }
+              />
             </li>
           )}
         </For>

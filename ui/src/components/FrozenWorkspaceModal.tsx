@@ -2,6 +2,7 @@ import { JSXElement, Show } from 'solid-js'
 import { Portal } from 'solid-js/web'
 import clsx from 'clsx'
 
+import { Button } from './Button'
 import { useLocale } from '../context/LocaleProvider'
 import type { FrozenReason } from '../models/Workspace'
 
@@ -81,26 +82,31 @@ export function FrozenWorkspaceModal(props: Props): JSXElement {
 
           {/* Actions */}
           <div class="flex justify-end gap-3">
-            <button
-              class="btn btn-ghost btn-sm h-10 px-6 text-sm font-semibold"
+            <Button
+              variant="ghost"
+              size="sm"
+              class="h-10 px-6 text-sm font-semibold"
               onClick={() => props.onClose()}
-            >
-              <Show when={isTrialExpired()} fallback={t('close')}>
-                {t('later')}
-              </Show>
-            </button>
-            <button
-              class="btn btn-sm h-10 px-6 text-sm font-semibold border-0 text-white btn-disabled"
+              label={
+                <Show when={isTrialExpired()} fallback={t('close')}>
+                  {t('later')}
+                </Show>
+              }
+            />
+            <Button
+              size="sm"
+              class="h-10 px-6 text-sm font-semibold border-0 text-white"
               style={{ background: '#95a5a6' }}
               disabled={true}
-            >
-              <Show
-                when={isTrialExpired()}
-                fallback={t('frozen_subscribe_button')}
-              >
-                {t('frozen_upgrade_button')}
-              </Show>
-            </button>
+              label={
+                <Show
+                  when={isTrialExpired()}
+                  fallback={t('frozen_subscribe_button')}
+                >
+                  {t('frozen_upgrade_button')}
+                </Show>
+              }
+            />
           </div>
           <p class="text-xs text-base-content/50 mt-2 text-right">
             {t('upgrade_available_soon')}
