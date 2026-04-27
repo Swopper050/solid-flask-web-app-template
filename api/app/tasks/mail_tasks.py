@@ -1,3 +1,4 @@
+import urllib.parse
 from string import Template
 
 from celery import shared_task
@@ -57,4 +58,56 @@ def send_email_verification_email(*, receiver: str, verification_token: str):
         html=html_content,
     )
     message.html
+    mail.send(message)
+
+
+@shared_task(ignore_result=True)
+def send_workspace_invitation_email(
+    *,
+    receiver: str,
+    workspace_id: int,
+    workspace_name: str,
+    inviter_name: str,
+    invitation_token: str,
+):
+    invitation_link = (
+        f"{MY_SOLID_APP_FRONTEND_URL}/accept-invitation?"
+        f"invitation_token={urllib.parse.quote(invitation_token)}"
+    )
+
+    message = Message(
+        subject=f"{inviter_name} invited you to {workspace_name}",
+        recipients=[receiver],
+        html=f"""
+        <p>Hi,</p>
+        <p>{inviter_name} has invited you to join <strong>{workspace_name}</strong>.</p>
+        <p><a href="{invitation_link}">Accept invitation</a></p>
+        """,
+    )
+    mail.send(message)
+
+
+@shared_task(ignore_result=True)
+def send_workspace_invitation_new_user_email(
+    *,
+    receiver: str,
+    workspace_id: int,
+    workspace_name: str,
+    inviter_name: str,
+    invitation_token: str,
+):
+    register_link = (
+        f"{MY_SOLID_APP_FRONTEND_URL}/register?"
+        f"invitation_token={urllib.parse.quote(invitation_token)}"
+    )
+
+    message = Message(
+        subject=f"{inviter_name} invited you to {workspace_name}",
+        recipients=[receiver],
+        html=f"""
+        <p>Hi,</p>
+        <p>{inviter_name} has invited you to join <strong>{workspace_name}</strong>.</p>
+        <p><a href="{register_link}">Create account &amp; accept invitation</a></p>
+        """,
+    )
     mail.send(message)

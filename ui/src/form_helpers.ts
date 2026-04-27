@@ -115,7 +115,7 @@ interface FormState<TType extends FieldValues, TResponse extends ResponseData> {
  *   },
  *   onFinish: (response) => {
  *     if (response) {
- *       navigate('/dashboard');
+ *       navigate('/home');
  *     }
  *   }
  * });

@@ -16,6 +16,19 @@ class APIErrorEnum(IntEnum):
     already_2fa_disabled = 11
     user_not_found = 12
     unknown_error = 13
+    workspace_not_found = 14
+    not_workspace_member = 15
+    not_workspace_owner_or_admin = 16
+    already_workspace_member = 17
+    invitation_not_found = 18
+    cannot_remove_owner = 19
+    subscription_not_found = 26
+    billing_error = 27
+    invoice_not_found = 28
+    seat_limit_reached = 29
+    cannot_leave_last_owner = 30
+    workspace_frozen = 33
+    upgrade_disabled = 35
 
 
 class APIError(Exception):

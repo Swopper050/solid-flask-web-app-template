@@ -2,8 +2,7 @@ import { createSignal, JSXElement, Show, onMount } from 'solid-js'
 import { A, useSearchParams } from '@solidjs/router'
 
 import { Alert } from '../components/Alert'
-import { TopBar } from '../components/TopBar'
-
+import { AuthCard } from '../components/AuthCard'
 import { useUser } from '../context/UserProvider'
 import { useLocale } from '../context/LocaleProvider'
 import { getErrorMessage, verifyEmail } from '../api'
@@ -11,7 +10,6 @@ import { getSingleParam } from './SearchParams'
 
 export function VerifyEmailPage(): JSXElement {
   const { t } = useLocale()
-
   const [searchParams] = useSearchParams()
   const { fetchUser } = useUser()
 
@@ -40,42 +38,28 @@ export function VerifyEmailPage(): JSXElement {
   })
 
   return (
-    <>
-      <TopBar />
-
-      <div class="flex justify-center items-center mt-40">
-        <h1 class="text-4xl text-center font-bold">{t('verifying_email')}</h1>
-      </div>
-
+    <AuthCard title={t('verifying_email')} subtitle="">
       <Show when={loading()}>
-        <div class="flex justify-center items-center mt-10">
-          <span class="loading loading-ball text-neutral loading-lg" />
+        <div class="flex justify-center py-4">
+          <span class="loading loading-ball text-primary loading-lg" />
         </div>
       </Show>
 
       <Show when={errorMsg()}>
-        <div class="flex justify-center">
-          <Alert type="error" message={errorMsg()} class="w-96" />
-        </div>
+        <Alert type="error" message={errorMsg()} />
       </Show>
 
       <Show when={success()}>
-        <div class="flex justify-center">
-          <Alert
-            type="success"
-            message={t('successfully_verified_email')}
-            class="w-96"
-          />
-        </div>
+        <Alert type="success" message={t('successfully_verified_email')} />
       </Show>
 
       <Show when={!loading()}>
-        <div class="flex justify-center mt-10">
-          <A class="btn btn-primary btn-outline" href="/home">
+        <div class="mt-4 text-center">
+          <A class="btn btn-primary btn-sm" href="/home">
             {t('back_to_home')}
           </A>
         </div>
       </Show>
-    </>
+    </AuthCard>
   )
 }

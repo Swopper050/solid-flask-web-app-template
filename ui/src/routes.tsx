@@ -1,11 +1,13 @@
-import { JSXElement, Switch, Match, type Component } from 'solid-js'
+import { JSXElement, Show } from 'solid-js'
 
 import { Navigate } from '@solidjs/router'
 import type { RouteDefinition } from '@solidjs/router'
+import type { Component } from 'solid-js'
 
 import { useUser } from './context/UserProvider'
 import { AdminPage } from './pages/admin_page/Admin'
-import { LandingPage } from './pages/Landing'
+import { LoginPage } from './pages/Login'
+import { RegisterPage } from './pages/Register'
 import { Home } from './pages/Home'
 import { BasePage } from './pages/Base'
 import { UserAccountPage } from './pages/user_account_page/UserAccount'
@@ -13,6 +15,9 @@ import { ForgotPasswordPage } from './pages/ForgotPassword'
 import { ResetPasswordPage } from './pages/ResetPassword'
 import { VerifyEmailPage } from './pages/VerifyEmail'
 import { NotFoundPage } from './pages/NotFound'
+import { AcceptInvitationPage } from './pages/AcceptInvitation'
+import { BillingRedirect } from './pages/billing/BillingRedirect'
+import { BillingCheckoutPage } from './pages/billing/BillingCheckoutPage'
 
 function ProtectedRoute(props: {
   component: Component
@@ -20,21 +25,31 @@ function ProtectedRoute(props: {
 }): JSXElement {
   const { user, loading } = useUser()
 
+  const redirectHref = () =>
+    `/login?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`
+
   return (
-    <Switch fallback={<props.component />}>
-      <Match when={!loading() && user?.() === null}>
-        <Navigate href="/" />
-      </Match>
-      <Match when={!loading() && props.adminOnly && !user()?.isAdmin}>
-        <Navigate href="/" />
-      </Match>
-      <Match when={loading()}>
+    <Show
+      when={!loading()}
+      fallback={
         <div class="flex flex-col justify-center items-center h-screen w-screen">
           <div class="loading loading-ball text-neutral loading-lg mb-3" />
           <div class="text-lg text-neutral font-bold">Loading...</div>
         </div>
-      </Match>
-    </Switch>
+      }
+    >
+      <Show
+        when={user?.() !== null}
+        fallback={<Navigate href={redirectHref()} />}
+      >
+        <Show
+          when={!props.adminOnly || user()?.isAdmin}
+          fallback={<Navigate href="/home" />}
+        >
+          <props.component />
+        </Show>
+      </Show>
+    </Show>
   )
 }
 
@@ -43,7 +58,15 @@ export default ProtectedRoute
 export const routes: RouteDefinition[] = [
   {
     path: '/',
-    component: () => <LandingPage />,
+    component: () => <Navigate href="/login" />,
+  },
+  {
+    path: '/login',
+    component: () => <LoginPage />,
+  },
+  {
+    path: '/register',
+    component: () => <RegisterPage />,
   },
   {
     path: '/home',
@@ -66,6 +89,20 @@ export const routes: RouteDefinition[] = [
         adminOnly={true}
         component={() => <BasePage mainComponent={AdminPage} />}
       />
+    ),
+  },
+  {
+    path: '/accept-invitation',
+    component: () => <AcceptInvitationPage />,
+  },
+  {
+    path: '/billing',
+    component: () => <BillingRedirect />,
+  },
+  {
+    path: '/billing/checkout',
+    component: () => (
+      <ProtectedRoute component={() => <BillingCheckoutPage />} />
     ),
   },
   {

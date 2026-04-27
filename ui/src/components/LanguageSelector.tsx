@@ -13,7 +13,7 @@ export function LanguageSelector(): JSXElement {
 
   return (
     <details ref={detailsRef} class="dropdown dropdown-end">
-      <summary class="btn btn-sm btn-ghost">
+      <summary class="btn btn-sm btn-ghost" data-cy="language-selector">
         <div class="flex gap-2">
           <CountryFlag countryCode={locale()} />
         </div>
@@ -25,6 +25,7 @@ export function LanguageSelector(): JSXElement {
             <li>
               <button
                 class="btn btn-ghost"
+                data-cy={`language-${language}`}
                 onClick={() => {
                   setLocale(language)
                   detailsRef?.removeAttribute('open')

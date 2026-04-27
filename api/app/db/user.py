@@ -17,6 +17,7 @@ class User(db.Model, UserMixin):
     id: Mapped[int] = mapped_column(primary_key=True)
 
     email: Mapped[str] = mapped_column(String(100), unique=True, index=True)
+    name: Mapped[str] = mapped_column(String(100), default="")
     is_admin: Mapped[bool] = mapped_column(default=False)
     hashed_password: Mapped[str] = mapped_column(String(256))
 
@@ -86,6 +87,7 @@ class User(db.Model, UserMixin):
 class UserSchema(Schema):
     id = fields.Integer()
     email = fields.String(validate=validate.Length(max=100))
+    name = fields.String(validate=validate.Length(max=100))
     is_admin = fields.Boolean()
     is_verified = fields.Boolean(dump_only=True)
     two_factor_enabled = fields.Boolean(dump_only=True)

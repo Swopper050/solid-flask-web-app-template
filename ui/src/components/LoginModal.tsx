@@ -100,6 +100,7 @@ export function LoginModal(props: ModalBaseProps): JSXElement {
                 placeholder={t('email_placeholder')}
                 icon={<i class="fa-solid fa-envelope" />}
                 disabled={at2FAStep()}
+                data-cy="login-email"
               />
             )}
           </Login.Field>
@@ -114,12 +115,17 @@ export function LoginModal(props: ModalBaseProps): JSXElement {
                 placeholder={t('password')}
                 icon={<i class="fa-solid fa-key" />}
                 disabled={at2FAStep()}
+                data-cy="login-password"
               />
             )}
           </Login.Field>
 
           <Show when={loginState.response.status === 'error'}>
-            <Alert type="error" message={loginState.response.message} />
+            <Alert
+              type="error"
+              message={loginState.response.message}
+              data-cy="login-error"
+            />
           </Show>
 
           <Show when={!at2FAStep()}>
@@ -137,6 +143,7 @@ export function LoginModal(props: ModalBaseProps): JSXElement {
                 color="primary"
                 class="w-full"
                 isLoading={loginState.submitting}
+                dataCy="login-button"
               />
             </div>
           </Show>

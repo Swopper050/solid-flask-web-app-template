@@ -11,6 +11,8 @@ type TextInputProps = {
   icon?: JSXElement
   required?: boolean
   disabled?: boolean
+  autocomplete?: string
+  'data-cy'?: string
   ref: (element: HTMLInputElement) => void
   onInput: JSX.EventHandler<HTMLInputElement, InputEvent>
   onChange: JSX.EventHandler<HTMLInputElement, Event>
@@ -21,14 +23,18 @@ export function TextInput(props: TextInputProps) {
   const [, inputProps] = splitProps(props, ['value', 'label', 'error'])
   return (
     <div>
+      {props.label && (
+        <label for={props.name} class="label label-text mb-1">
+          {props.label}
+          {props.required && <span class="text-error ml-0.5">*</span>}
+        </label>
+      )}
       <label
-        for={props.name}
         class={clsx(
-          'input input-bordered flex items-center mt-4 w-full',
+          'input input-bordered flex items-center w-full',
           props.error !== '' && 'input-error'
         )}
       >
-        {props.label} {props.required && <span>*</span>}
         {props.icon}
         <input
           class="grow ml-2"

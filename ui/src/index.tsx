@@ -5,6 +5,7 @@ import { render } from 'solid-js/web'
 import { Router, Route } from '@solidjs/router'
 import { routes } from './routes'
 import { UserProvider } from './context/UserProvider'
+import { WorkspaceProvider } from './context/WorkspaceProvider'
 import { LocaleProvider } from './context/LocaleProvider'
 
 const root = document.getElementById('root')
@@ -21,9 +22,11 @@ if (root === null) {
 
 const RootLayout = (props: ParentProps) => (
   <UserProvider>
-    <LocaleProvider>
-      <Suspense>{props.children}</Suspense>
-    </LocaleProvider>
+    <WorkspaceProvider>
+      <LocaleProvider>
+        <Suspense>{props.children}</Suspense>
+      </LocaleProvider>
+    </WorkspaceProvider>
   </UserProvider>
 )
 

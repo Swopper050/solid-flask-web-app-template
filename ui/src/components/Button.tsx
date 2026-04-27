@@ -11,13 +11,7 @@ type DaisyUIButtonColor =
   | 'warning'
   | 'error'
 
-type DaisyUIButtonStyle =
-  | 'outline'
-  | 'dash'
-  | 'soft'
-  | 'ghost'
-  | 'link'
-  | 'outline'
+type DaisyUIButtonVariant = 'outline' | 'dash' | 'soft' | 'ghost' | 'link'
 
 type DaisyUIButtonSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl'
 
@@ -35,21 +29,23 @@ export function Button(props: {
   type?: 'submit' | 'button' | 'reset'
   color?: DaisyUIButtonColor
   size?: DaisyUIButtonSize
-  style?: DaisyUIButtonStyle
+  variant?: DaisyUIButtonVariant
   class?: string
+  dataCy?: string
 }): JSXElement {
   return (
     <button
       class={clsx(
         'btn',
         props.color ? `btn-${props.color}` : undefined,
-        props.style ? `btn-${props.style}` : undefined,
+        props.variant ? `btn-${props.variant}` : undefined,
         props.size ? `btn-${props.size}` : undefined,
         (props.isLoading || props.disabled) && 'btn-disabled',
         props.class
       )}
       type={props.type ?? 'button'}
       onClick={(event) => props.onClick?.(event)}
+      data-cy={props.dataCy}
     >
       <Show when={props.icon}>
         <i class={props.icon} />
@@ -76,20 +72,22 @@ export function IconButton(props: {
   disabled?: boolean
   color?: DaisyUIButtonColor
   size?: DaisyUIButtonSize
-  style?: DaisyUIButtonStyle
+  variant?: DaisyUIButtonVariant
   class?: string
+  dataCy?: string
 }): JSXElement {
   return (
     <button
       class={clsx(
         'btn',
-        props.style ? `btn-${props.style}` : 'btn-ghost',
+        props.variant ? `btn-${props.variant}` : 'btn-ghost',
         props.size ? `btn-${props.size}` : 'btn-sm',
         props.isLoading && 'btn-disabled',
         props.class
       )}
       onClick={() => props.onClick?.()}
       disabled={props.disabled}
+      data-cy={props.dataCy}
     >
       <Show
         when={props.isLoading}

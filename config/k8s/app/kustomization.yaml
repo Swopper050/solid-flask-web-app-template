@@ -4,5 +4,6 @@ resources:
   - api.yaml
   - ui.yaml
   - tasks.yaml
+  - tasks-beat.yaml
   - redis.yaml
   - backend-configmap.yaml
