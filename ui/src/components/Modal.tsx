@@ -2,6 +2,8 @@ import clsx from 'clsx'
 import { createSignal, JSXElement } from 'solid-js'
 import { Portal } from 'solid-js/web'
 
+import { Button } from './Button'
+
 /**
  * Creates a modal state that can be used to open and close modals
  * the keys passed in are used as identifiers for identifying differnent modals.
@@ -43,12 +45,14 @@ export function Modal(props: {
         class={clsx('modal z-1000', isOpen() ? 'modal-open' : 'modal-close')}
       >
         <div class="modal-box w-90vw max-w-sm sm:max-w-md">
-          <button
-            class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4"
+          <Button
+            variant="ghost"
+            shape="circle"
+            size="sm"
+            class="absolute right-4 top-4"
             onClick={() => props.onClose()}
-          >
-            ✕
-          </button>
+            label="✕"
+          />
           <h3 class="font-bold text-lg">{props.title}</h3>
           {props.children}
         </div>

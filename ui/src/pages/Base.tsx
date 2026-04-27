@@ -2,6 +2,7 @@ import { JSXElement, createSignal, onCleanup, onMount } from 'solid-js'
 import { A } from '@solidjs/router'
 
 import { FrozenWorkspaceModal } from '../components/FrozenWorkspaceModal'
+import { IconButton } from '../components/Button'
 import { ProfileMenu } from '../components/ProfileMenu'
 import { ThemeSwitcher } from '../components/ThemeSwitcher'
 import { LanguageSelector } from '../components/LanguageSelector'
@@ -72,12 +73,13 @@ export function BasePage(props: BasePageProps): JSXElement {
               >
                 {t('my_solid_app')}
               </A>
-              <button
-                class="btn btn-square btn-ghost lg:hidden"
+              <IconButton
+                icon="fa-solid fa-xmark"
+                shape="square"
+                size="md"
+                class="lg:hidden"
                 onClick={() => setDrawerOpen(false)}
-              >
-                <i class="fa-solid fa-xmark" />
-              </button>
+              />
             </div>
           </div>
 

@@ -12,6 +12,7 @@ import { User, UserAttributes } from '../models/User'
 import { useUser } from '../context/UserProvider'
 import { useLocale } from '../context/LocaleProvider'
 import { Alert } from '../components/Alert'
+import { Button } from '../components/Button'
 import { createFormState } from '../form_helpers'
 
 export function LoginPage(): JSXElement {
@@ -238,32 +239,30 @@ function LoginForm(): JSXElement {
                     />
                   </Show>
 
-                  <button
-                    data-cy="login-button"
+                  <Button
+                    dataCy="login-button"
                     class="register-btn-submit"
                     type="submit"
-                    disabled={loginState.submitting}
-                  >
-                    <Show
-                      when={!loginState.submitting}
-                      fallback={<div class="register-spinner" />}
-                    >
-                      {t('login')}
-                      <svg
-                        width="15"
-                        height="15"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2.5"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      >
-                        <line x1="5" y1="12" x2="19" y2="12" />
-                        <polyline points="12 5 19 12 12 19" />
-                      </svg>
-                    </Show>
-                  </button>
+                    isLoading={loginState.submitting}
+                    label={
+                      <Show when={!loginState.submitting}>
+                        {t('login')}
+                        <svg
+                          width="15"
+                          height="15"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2.5"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        >
+                          <line x1="5" y1="12" x2="19" y2="12" />
+                          <polyline points="12 5 19 12 12 19" />
+                        </svg>
+                      </Show>
+                    }
+                  />
                 </div>
               </Login.Form>
 
@@ -330,43 +329,39 @@ function LoginForm(): JSXElement {
                     <Alert type="error" message={totpState.response.message} />
                   </Show>
 
-                  <button
+                  <Button
                     class="register-btn-submit"
                     type="submit"
-                    disabled={totpState.submitting}
-                  >
-                    <Show
-                      when={!totpState.submitting}
-                      fallback={<div class="register-spinner" />}
-                    >
-                      {t('login')}
-                      <svg
-                        width="15"
-                        height="15"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2.5"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      >
-                        <line x1="5" y1="12" x2="19" y2="12" />
-                        <polyline points="12 5 19 12 12 19" />
-                      </svg>
-                    </Show>
-                  </button>
+                    isLoading={totpState.submitting}
+                    label={
+                      <Show when={!totpState.submitting}>
+                        {t('login')}
+                        <svg
+                          width="15"
+                          height="15"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2.5"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        >
+                          <line x1="5" y1="12" x2="19" y2="12" />
+                          <polyline points="12 5 19 12 12 19" />
+                        </svg>
+                      </Show>
+                    }
+                  />
 
-                  <button
-                    type="button"
+                  <Button
                     class="login-back-btn"
                     onClick={() => {
                       setAt2FAStep(false)
                       reset(loginState)
                       reset(totpState)
                     }}
-                  >
-                    ← {t('back')}
-                  </button>
+                    label={`← ${t('back')}`}
+                  />
                 </div>
               </Totp.Form>
             </Show>

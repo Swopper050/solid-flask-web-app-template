@@ -20,7 +20,7 @@ import { useLocale } from '../../context/LocaleProvider'
 import { pattern, email, minLength, required } from '@modular-forms/solid'
 import { Table, TableRow } from '../../components/Table'
 import { Tooltip } from '../../components/Tooltip'
-import { Button } from '../../components/Button'
+import { Button, IconButton } from '../../components/Button'
 import { createFormState } from '../../form_helpers'
 
 export function UsersAdmin(): JSXElement {
@@ -82,13 +82,13 @@ export function UsersAdmin(): JSXElement {
 
   const DeleteUserButton = (props: { user: UserAttributes }): JSXElement => {
     return (
-      <button
-        class="btn btn-ghost btn-sm mx-1"
+      <IconButton
+        icon="fa-solid fa-trash"
+        color="error"
+        class="mx-1"
         onClick={() => handleDelete(props.user)}
-        data-cy={`delete-user-${props.user.email}`}
-      >
-        <i class="fa-solid fa-trash text-error" />
-      </button>
+        dataCy={`delete-user-${props.user.email}`}
+      />
     )
   }
 
@@ -108,14 +108,14 @@ export function UsersAdmin(): JSXElement {
           t('id'),
           t('email'),
           t('verified'),
-          <button
-            class="btn btn-primary btn-sm"
+          <Button
+            color="primary"
+            size="sm"
+            icon="fa-solid fa-plus"
             onClick={() => openModal('createUser')}
-            data-cy="create-new-user"
-          >
-            <i class="fa-solid fa-plus" />
-            <p class="hidden md:block">{t('create_new_user')}</p>
-          </button>,
+            dataCy="create-new-user"
+            label={<p class="hidden md:block">{t('create_new_user')}</p>}
+          />,
         ]}
       >
         <Show when={!users.loading && !users.error}>

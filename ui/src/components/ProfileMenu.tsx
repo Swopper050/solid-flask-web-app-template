@@ -1,9 +1,9 @@
 import { createSignal, JSXElement, Show } from 'solid-js'
 import { A, useNavigate } from '@solidjs/router'
-import { clsx } from 'clsx'
 
 import { useUser } from '../context/UserProvider'
 import { useLocale } from '../context/LocaleProvider'
+import { Button } from './Button'
 import { Toast } from './Toast'
 
 import { logout } from '../api'
@@ -65,24 +65,17 @@ export function ProfileMenu(): JSXElement {
         </Show>
 
         <li>
-          <button
-            class={clsx(
-              'btn',
-              'btn-ghost',
-              'justify-start',
-              loggingOut() && 'btn-disabled'
-            )}
+          <Button
+            variant="ghost"
+            class="justify-start"
+            icon={
+              loggingOut() ? undefined : 'fa-solid fa-arrow-right-from-bracket'
+            }
+            isLoading={loggingOut()}
             onClick={onLogout}
-            data-cy="logout"
-          >
-            <Show
-              when={loggingOut()}
-              fallback={<i class="fa-solid fa-arrow-right-from-bracket" />}
-            >
-              <span class="loading loading-ball text-neutral loading-sm" />
-            </Show>
-            {t('logout')}
-          </button>
+            dataCy="logout"
+            label={t('logout')}
+          />
         </li>
       </ul>
 

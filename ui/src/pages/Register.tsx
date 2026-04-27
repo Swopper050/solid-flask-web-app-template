@@ -16,6 +16,7 @@ import { useUser } from '../context/UserProvider'
 import { useLocale } from '../context/LocaleProvider'
 import { useWorkspace } from '../context/WorkspaceProvider'
 import { Alert } from '../components/Alert'
+import { Button } from '../components/Button'
 import { createFormState } from '../form_helpers'
 import { mustMatch } from '../validators'
 
@@ -492,34 +493,32 @@ function RegisterForm(): JSXElement {
                   />
                 </Show>
 
-                <button
-                  data-cy="register-button"
+                <Button
+                  dataCy="register-button"
                   class="register-btn-submit"
                   type="submit"
-                  disabled={state.submitting}
-                >
-                  <Show
-                    when={!state.submitting}
-                    fallback={<div class="register-spinner" />}
-                  >
-                    {isInvite()
-                      ? t('invite_join_workspace')
-                      : t('register_create_free_account')}
-                    <svg
-                      width="15"
-                      height="15"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2.5"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    >
-                      <line x1="5" y1="12" x2="19" y2="12" />
-                      <polyline points="12 5 19 12 12 19" />
-                    </svg>
-                  </Show>
-                </button>
+                  isLoading={state.submitting}
+                  label={
+                    <Show when={!state.submitting}>
+                      {isInvite()
+                        ? t('invite_join_workspace')
+                        : t('register_create_free_account')}
+                      <svg
+                        width="15"
+                        height="15"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <line x1="5" y1="12" x2="19" y2="12" />
+                        <polyline points="12 5 19 12 12 19" />
+                      </svg>
+                    </Show>
+                  }
+                />
 
                 <p class="register-terms">
                   {t('register_terms_prefix')}{' '}

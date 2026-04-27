@@ -5,6 +5,7 @@ import { clsx } from 'clsx'
 import { useUser } from '../context/UserProvider'
 import { useLocale } from '../context/LocaleProvider'
 
+import { Button, IconButton } from '../components/Button'
 import { ThemeSwitcher } from '../components/ThemeSwitcher'
 import { LanguageSelector } from '../components/LanguageSelector'
 import { LoginModal } from '../components/LoginModal'
@@ -22,12 +23,12 @@ export function TopBar(): JSXElement {
     <>
       <div class="navbar fixed bg-base-100 top-0 left-0 z-20">
         <div class="flex-none md:hidden">
-          <button
-            class="btn btn-square btn-ghost"
+          <IconButton
+            icon="fa-solid fa-bars"
+            shape="square"
+            size="md"
             onClick={() => setSidebarOpen(!sidebarOpen())}
-          >
-            <i class="fa-solid fa-bars" />
-          </button>
+          />
         </div>
 
         <div class="flex-1 text-center md:text-left">
@@ -51,21 +52,19 @@ export function TopBar(): JSXElement {
               </A>
             }
           >
-            <button
-              class="btn btn-ghost"
+            <Button
+              variant="ghost"
               onClick={() => setOpenLoginModal(true)}
-              data-cy="open-login-modal"
-            >
-              {t('login')}
-            </button>
+              dataCy="open-login-modal"
+              label={t('login')}
+            />
 
-            <button
-              class="btn btn-ghost"
+            <Button
+              variant="ghost"
               onClick={() => setOpenRegisterModal(true)}
-              data-cy="open-register-modal"
-            >
-              {t('register')}
-            </button>
+              dataCy="open-register-modal"
+              label={t('register')}
+            />
           </Show>
         </div>
       </div>
@@ -82,12 +81,12 @@ export function TopBar(): JSXElement {
             <A class="text-xl font-bold" href="">
               My solid app
             </A>
-            <button
-              class="btn btn-square btn-ghost"
+            <IconButton
+              icon="fa-solid fa-xmark"
+              shape="square"
+              size="md"
               onClick={() => setSidebarOpen(false)}
-            >
-              <i class="fa-solid fa-xmark" />
-            </button>
+            />
           </div>
 
           <div class="flex flex-col">
@@ -104,29 +103,31 @@ export function TopBar(): JSXElement {
               }
             >
               <div class="space-y-2 mb-6">
-                <button
-                  class="btn btn-ghost w-full justify-start"
+                <Button
+                  variant="ghost"
+                  block
+                  class="justify-start"
+                  icon="fa-solid fa-sign-in-alt mr-2"
                   onClick={() => {
                     setOpenLoginModal(true)
                     setSidebarOpen(false)
                   }}
-                  data-cy="open-login-modal-mobile"
-                >
-                  <i class="fa-solid fa-sign-in-alt mr-2" />
-                  {t('login')}
-                </button>
+                  dataCy="open-login-modal-mobile"
+                  label={t('login')}
+                />
 
-                <button
-                  class="btn btn-ghost w-full justify-start"
+                <Button
+                  variant="ghost"
+                  block
+                  class="justify-start"
+                  icon="fa-solid fa-user-plus mr-2"
                   onClick={() => {
                     setOpenRegisterModal(true)
                     setSidebarOpen(false)
                   }}
-                  data-cy="open-login-modal-mobile"
-                >
-                  <i class="fa-solid fa-user-plus mr-2" />
-                  {t('register')}
-                </button>
+                  dataCy="open-login-modal-mobile"
+                  label={t('register')}
+                />
               </div>
             </Show>
           </div>

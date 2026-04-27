@@ -61,13 +61,13 @@ export function DeleteWorkspaceModal(props: Props): JSXElement {
 
           {/* Footer */}
           <div class="flex items-center justify-end gap-2 px-6 py-4 border-t border-base-100">
-            <button
-              type="button"
+            <Button
+              variant="ghost"
+              size="sm"
               class="px-4 py-2 rounded-[10px] text-[13.5px] font-semibold text-base-content/60 border-[1.5px] border-base-200 hover:border-base-300 hover:bg-base-200/50 hover:text-base-content transition-all"
               onClick={() => props.onCancel()}
-            >
-              {t('cancel')}
-            </button>
+              label={t('cancel')}
+            />
             <Button
               label={t('yes_delete')}
               color="error"

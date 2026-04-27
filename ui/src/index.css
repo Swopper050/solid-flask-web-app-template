@@ -473,6 +473,7 @@
 .register-btn-submit {
   width: 100%;
   height: 46px;
+  min-height: 46px;
   background: var(--color-primary);
   color: white;
   font-family: inherit;
@@ -485,6 +486,7 @@
   align-items: center;
   justify-content: center;
   gap: 7px;
+  padding: 0;
   transition:
     background 0.2s,
     transform 0.15s,
@@ -583,7 +585,10 @@
 
 .login-back-btn {
   width: 100%;
+  min-height: 0;
+  height: auto;
   font-size: 12px;
+  font-weight: 400;
   color: #9ca3af;
   background: none;
   border: none;
