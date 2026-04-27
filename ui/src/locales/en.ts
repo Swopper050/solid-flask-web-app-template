@@ -36,7 +36,7 @@ export const dict = {
   billing_feature_invoices: 'Download invoices as PDF',
   billing_feature_unlimited_members: 'Unlimited members',
   billing_founding_user_title: 'Upgrade to Pro',
-  billing_go_to_dashboard: 'Go to your dashboard',
+  billing_go_to_home: 'Go to home',
   billing_load_more: 'Load more',
   billing_next_invoice: 'Next invoice',
   billing_no_limits: 'No limits',

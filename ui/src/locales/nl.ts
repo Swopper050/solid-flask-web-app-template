@@ -40,7 +40,7 @@ export const dict: Translations = {
   billing_feature_invoices: 'Facturen downloaden als PDF',
   billing_feature_unlimited_members: 'Onbeperkt leden',
   billing_founding_user_title: 'Upgrade naar Pro',
-  billing_go_to_dashboard: 'Ga naar je dashboard',
+  billing_go_to_home: 'Ga naar home',
   billing_load_more: 'Meer laden',
   billing_next_invoice: 'Volgende factuur',
   billing_no_limits: 'Geen limieten',

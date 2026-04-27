@@ -54,6 +54,7 @@ export function DeleteAccountModal(props: ModalBaseProps): JSXElement {
             type="submit"
             color="error"
             isLoading={state.submitting}
+            dataCy="confirm-delete-account"
           />
         </div>
       </Form>

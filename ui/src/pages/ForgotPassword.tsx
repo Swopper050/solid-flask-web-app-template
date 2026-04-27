@@ -39,6 +39,7 @@ export function ForgotPasswordPage(): JSXElement {
             {(field, props) => (
               <TextInput
                 {...props}
+                data-cy="forgot-password-email"
                 type="email"
                 value={field.value}
                 error={field.error}
@@ -52,6 +53,7 @@ export function ForgotPasswordPage(): JSXElement {
 
           <Show when={state.response.status === 'success'}>
             <Alert
+              data-cy="forgot-password-success"
               type="success"
               message={
                 'if_a_user_with_this_email_exists_a_reset_password_mail_has_been_sent'
@@ -70,6 +72,7 @@ export function ForgotPasswordPage(): JSXElement {
             class="w-full mt-2"
             isLoading={state.submitting}
             disabled={state.response.status === 'success'}
+            dataCy="forgot-password-submit"
           />
         </div>
       </Form>

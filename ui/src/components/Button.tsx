@@ -74,6 +74,7 @@ export function IconButton(props: {
   size?: DaisyUIButtonSize
   variant?: DaisyUIButtonVariant
   class?: string
+  dataCy?: string
 }): JSXElement {
   return (
     <button
@@ -86,6 +87,7 @@ export function IconButton(props: {
       )}
       onClick={() => props.onClick?.()}
       disabled={props.disabled}
+      data-cy={props.dataCy}
     >
       <Show
         when={props.isLoading}

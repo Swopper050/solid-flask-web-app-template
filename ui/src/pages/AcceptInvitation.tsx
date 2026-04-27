@@ -47,7 +47,7 @@ export function AcceptInvitationPage(): JSXElement {
           const body = await response.json()
           await fetchWorkspaces()
           setCurrentWorkspace(body)
-          navigate('/dashboard', { replace: true })
+          navigate('/home', { replace: true })
         } catch {
           setAcceptState('error')
         }
@@ -73,7 +73,7 @@ export function AcceptInvitationPage(): JSXElement {
             <Button
               label={t('back_to_home')}
               variant="ghost"
-              onClick={() => navigate('/dashboard')}
+              onClick={() => navigate('/home')}
             />
           </div>
         </Match>

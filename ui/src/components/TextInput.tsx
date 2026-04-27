@@ -12,6 +12,7 @@ type TextInputProps = {
   required?: boolean
   disabled?: boolean
   autocomplete?: string
+  'data-cy'?: string
   ref: (element: HTMLInputElement) => void
   onInput: JSX.EventHandler<HTMLInputElement, InputEvent>
   onChange: JSX.EventHandler<HTMLInputElement, Event>

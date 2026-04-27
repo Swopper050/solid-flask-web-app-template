@@ -55,7 +55,7 @@ export function VerifyEmailPage(): JSXElement {
 
       <Show when={!loading()}>
         <div class="mt-4 text-center">
-          <A class="btn btn-primary btn-sm" href="/dashboard">
+          <A class="btn btn-primary btn-sm" href="/home">
             {t('back_to_home')}
           </A>
         </div>

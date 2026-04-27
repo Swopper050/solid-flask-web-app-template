@@ -20,7 +20,7 @@ export function NotFoundPage(): JSXElement {
         <figure>
           <img src={puppy} alt="Puppy" class="rounded-lg max-h-48 w-auto" />
         </figure>
-        <A class="btn btn-primary btn-sm" href="/dashboard">
+        <A class="btn btn-primary btn-sm" href="/home">
           {t('back_to_home')}
         </A>
       </div>

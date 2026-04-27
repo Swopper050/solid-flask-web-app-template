@@ -87,7 +87,7 @@ export function WorkspaceSwitcher(): JSXElement {
   const handleSwitch = (workspace: WorkspaceListItemAttributes) => {
     setCurrentWorkspace(workspace)
     setOpen(false)
-    navigate('/dashboard')
+    navigate('/home')
   }
 
   const handleCreateWorkspace = async () => {
@@ -110,7 +110,7 @@ export function WorkspaceSwitcher(): JSXElement {
       if (created) setCurrentWorkspace(created)
       setCreating(false)
       setOpen(false)
-      navigate('/dashboard')
+      navigate('/home')
     } catch {
       setCreateError('an_unknown_error_occurred')
       setCreating(false)

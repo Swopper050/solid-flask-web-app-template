@@ -17,7 +17,7 @@ import { createFormState } from '../form_helpers'
 export function LoginPage(): JSXElement {
   const { user, loading } = useUser()
   const [searchParams] = useSearchParams()
-  const redirectTo = () => (searchParams.redirect as string) || '/dashboard'
+  const redirectTo = () => (searchParams.redirect as string) || '/home'
 
   return (
     <Switch>
@@ -42,7 +42,7 @@ function LoginForm(): JSXElement {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
 
-  const redirectTo = () => (searchParams.redirect as string) || '/dashboard'
+  const redirectTo = () => (searchParams.redirect as string) || '/home'
 
   const [at2FAStep, setAt2FAStep] = createSignal(false)
 
@@ -163,6 +163,7 @@ function LoginForm(): JSXElement {
                           </span>
                           <input
                             {...props}
+                            data-cy="login-email"
                             type="email"
                             class={field.error ? 'register-input-error' : ''}
                             value={field.value || ''}
@@ -208,6 +209,7 @@ function LoginForm(): JSXElement {
                           </span>
                           <input
                             {...props}
+                            data-cy="login-password"
                             type="password"
                             class={field.error ? 'register-input-error' : ''}
                             value={field.value || ''}
@@ -229,10 +231,15 @@ function LoginForm(): JSXElement {
                   </div>
 
                   <Show when={loginState.response.status === 'error'}>
-                    <Alert type="error" message={loginState.response.message} />
+                    <Alert
+                      data-cy="login-error"
+                      type="error"
+                      message={loginState.response.message}
+                    />
                   </Show>
 
                   <button
+                    data-cy="login-button"
                     class="register-btn-submit"
                     type="submit"
                     disabled={loginState.submitting}

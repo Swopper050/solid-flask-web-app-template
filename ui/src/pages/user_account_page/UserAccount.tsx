@@ -65,6 +65,7 @@ export function UserAccountPage(): JSXElement {
                   icon="fa-solid fa-edit"
                   onClick={() => openModal('password')}
                   color="primary"
+                  dataCy="open-change-password"
                 />
               </Tooltip>,
             ]}
@@ -102,6 +103,7 @@ export function UserAccountPage(): JSXElement {
             onClick={() => openModal('deleteAcount')}
             color="error"
             icon="fa-solid fa-trash"
+            dataCy="delete-account"
           />
         </div>
 

@@ -44,7 +44,7 @@ function ProtectedRoute(props: {
       >
         <Show
           when={!props.adminOnly || user()?.isAdmin}
-          fallback={<Navigate href="/dashboard" />}
+          fallback={<Navigate href="/home" />}
         >
           <props.component />
         </Show>
@@ -70,12 +70,6 @@ export const routes: RouteDefinition[] = [
   },
   {
     path: '/home',
-    component: () => (
-      <ProtectedRoute component={() => <BasePage mainComponent={Home} />} />
-    ),
-  },
-  {
-    path: '/dashboard',
     component: () => (
       <ProtectedRoute component={() => <BasePage mainComponent={Home} />} />
     ),

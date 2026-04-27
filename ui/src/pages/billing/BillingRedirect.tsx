@@ -2,7 +2,7 @@ import { JSXElement } from 'solid-js'
 import { Navigate, useSearchParams } from '@solidjs/router'
 
 /**
- * Redirects legacy /billing and /billing/checkout URLs to the dashboard,
+ * Redirects legacy /billing and /billing/checkout URLs to the home,
  * preserving billing status query params so the modal opens automatically.
  */
 export function BillingRedirect(): JSXElement {
@@ -16,5 +16,5 @@ export function BillingRedirect(): JSXElement {
   if (workspaceId) params.set('workspace_id', workspaceId)
 
   const query = params.toString()
-  return <Navigate href={`/dashboard${query ? `?${query}` : ''}`} />
+  return <Navigate href={`/home${query ? `?${query}` : ''}`} />
 }

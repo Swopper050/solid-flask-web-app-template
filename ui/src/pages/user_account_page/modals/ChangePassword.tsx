@@ -52,6 +52,7 @@ export function ChangePasswordModal(props: ModalBaseProps): JSXElement {
           {(field, props) => (
             <TextInput
               {...props}
+              data-cy="change-password-current"
               type="password"
               value={field.value}
               error={field.error}
@@ -74,6 +75,7 @@ export function ChangePasswordModal(props: ModalBaseProps): JSXElement {
           {(field, props) => (
             <TextInput
               {...props}
+              data-cy="change-password-new"
               type="password"
               value={field.value}
               error={field.error}
@@ -89,6 +91,7 @@ export function ChangePasswordModal(props: ModalBaseProps): JSXElement {
           {(field, props) => (
             <TextInput
               {...props}
+              data-cy="change-password-confirm"
               type="password"
               value={field.value}
               error={field.error}
@@ -108,6 +111,7 @@ export function ChangePasswordModal(props: ModalBaseProps): JSXElement {
             type="submit"
             color="primary"
             isLoading={state.submitting}
+            dataCy="change-password-submit"
           />
         </div>
       </Form>

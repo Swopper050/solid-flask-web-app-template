@@ -54,7 +54,7 @@ export function RegisterPage(): JSXElement {
 
   const acceptHref = () => {
     const tok = invitationToken()
-    if (!tok) return '/dashboard'
+    if (!tok) return '/home'
     return `/accept-invitation?token=${encodeURIComponent(tok)}`
   }
 
@@ -91,7 +91,7 @@ function RegisterForm(): JSXElement {
   })
 
   const isInvite = () => !!inviteInfo()
-  const redirectTo = () => (searchParams.redirect as string) || '/dashboard'
+  const redirectTo = () => (searchParams.redirect as string) || '/home'
 
   const {
     state,
@@ -291,6 +291,7 @@ function RegisterForm(): JSXElement {
                         <input
                           {...props}
                           id="register-name"
+                          data-cy="register-name"
                           type="text"
                           class={field.error ? 'register-input-error' : ''}
                           value={field.value || ''}
@@ -336,6 +337,7 @@ function RegisterForm(): JSXElement {
                         <input
                           {...props}
                           id="register-email"
+                          data-cy="register-email"
                           type="email"
                           class={field.error ? 'register-input-error' : ''}
                           value={
@@ -409,6 +411,7 @@ function RegisterForm(): JSXElement {
                         <input
                           {...props}
                           id="register-password"
+                          data-cy="register-password"
                           type="password"
                           class={field.error ? 'register-input-error' : ''}
                           value={field.value || ''}
@@ -464,6 +467,7 @@ function RegisterForm(): JSXElement {
                         <input
                           {...props}
                           id="register-check-password"
+                          data-cy="register-check-password"
                           type="password"
                           class={field.error ? 'register-input-error' : ''}
                           value={field.value || ''}
@@ -481,10 +485,15 @@ function RegisterForm(): JSXElement {
                 </Field>
 
                 <Show when={state.response.status === 'error'}>
-                  <Alert type="error" message={state.response.message} />
+                  <Alert
+                    data-cy="register-error"
+                    type="error"
+                    message={state.response.message}
+                  />
                 </Show>
 
                 <button
+                  data-cy="register-button"
                   class="register-btn-submit"
                   type="submit"
                   disabled={state.submitting}

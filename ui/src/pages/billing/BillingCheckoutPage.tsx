@@ -71,7 +71,7 @@ export function BillingCheckoutPage(): JSXElement {
       <div class="bg-base-100 border-b border-base-300 h-16 flex items-center justify-between px-8 sticky top-0 z-50">
         <button
           class="flex items-center gap-2 text-sm text-base-content/50 hover:text-base-content transition-colors"
-          onClick={() => navigate('/dashboard')}
+          onClick={() => navigate('/home')}
         >
           <i class="fa-solid fa-arrow-left text-xs" />
           {t('back')}
@@ -308,9 +308,9 @@ export function BillingCheckoutPage(): JSXElement {
 
             <button
               class="w-full py-4 bg-primary hover:bg-primary-focus text-primary-content font-bold rounded-xl flex items-center justify-center gap-2 transition-all"
-              onClick={() => navigate('/dashboard')}
+              onClick={() => navigate('/home')}
             >
-              {t('billing_go_to_dashboard')}
+              {t('billing_go_to_home')}
               <i class="fa-solid fa-arrow-right text-sm" />
             </button>
           </div>
