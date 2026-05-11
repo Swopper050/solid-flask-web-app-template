@@ -16,7 +16,9 @@ import clsx from 'clsx'
 import { DeleteWorkspaceModal } from './DeleteWorkspaceModal'
 import { Alert } from '../../components/Alert'
 import { Button } from '../../components/Button'
+import { ConfirmModal } from '../../components/ConfirmModal'
 import { ModalBaseProps } from '../../components/Modal'
+import { PlanBadge } from '../../components/PlanBadge'
 import { TextInput } from '../../components/TextInput'
 import { TranslationKey, useLocale } from '../../context/LocaleProvider'
 import { useUser } from '../../context/UserProvider'
@@ -524,17 +526,7 @@ export function WorkspaceSettingsModal(props: Props): JSXElement {
                       '...'}
                   </div>
                   <Show when={isPro()}>
-                    <span class="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide text-primary bg-primary/15 px-1.5 py-0.5 rounded-full">
-                      <svg
-                        width="9"
-                        height="9"
-                        viewBox="0 0 24 24"
-                        fill="currentColor"
-                      >
-                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                      </svg>
-                      Pro
-                    </span>
+                    <PlanBadge color="primary" size="sm" />
                   </Show>
                 </div>
               </div>
@@ -1057,101 +1049,49 @@ export function WorkspaceSettingsModal(props: Props): JSXElement {
 
           <div class="modal-backdrop" onClick={() => props.onClose()} />
         </dialog>
-
-        {/* Leave workspace confirmation modal */}
-        <dialog
-          class={clsx('modal z-[1100]', confirmLeave() ? 'modal-open' : '')}
-        >
-          <div class="modal-box max-w-sm">
-            <h3 class="font-bold text-lg mb-2">{t('leave_workspace')}</h3>
-            <p class="text-sm text-base-content/70 mb-4">
-              {t('leave_workspace_confirmation')}
-            </p>
-            <Show when={leaveError()}>
-              <div class="alert alert-error py-2 text-sm mb-3">
-                {leaveError()}
-              </div>
-            </Show>
-            <div class="flex justify-end gap-2">
-              <button
-                type="button"
-                class="px-4 py-2 rounded-[10px] text-[13.5px] font-semibold text-base-content/60 border-[1.5px] border-base-200 hover:border-base-300 hover:bg-base-200/50 hover:text-base-content transition-all"
-                onClick={() => {
-                  setConfirmLeave(false)
-                  setLeaveError(null)
-                }}
-              >
-                {t('cancel')}
-              </button>
-              <button
-                type="button"
-                class="px-4 py-2 rounded-[10px] text-[13.5px] font-semibold bg-amber-500 text-white hover:bg-amber-600 active:scale-[0.98] transition-all flex items-center gap-1.5"
-                disabled={leavingWorkspace()}
-                onClick={handleLeaveWorkspace}
-              >
-                {leavingWorkspace() && (
-                  <span class="loading loading-spinner loading-xs" />
-                )}
-                {t('leave_workspace')}
-              </button>
-            </div>
-          </div>
-          <div
-            class="modal-backdrop"
-            onClick={() => {
-              setConfirmLeave(false)
-              setLeaveError(null)
-            }}
-          />
-        </dialog>
-
-        {/* Remove member confirmation modal */}
-        <dialog
-          class={clsx(
-            'modal z-[1100]',
-            confirmRemoveMember() ? 'modal-open' : ''
-          )}
-        >
-          <div class="modal-box max-w-sm">
-            <h3 class="font-bold text-lg mb-2">{t('remove_member')}</h3>
-            <p class="text-sm text-base-content/70 mb-4">
-              {t('remove_member_confirmation').replace(
-                '{name}',
-                confirmRemoveMember()?.name ?? ''
-              )}
-            </p>
-            <div class="flex justify-end gap-2">
-              <button
-                type="button"
-                class="px-4 py-2 rounded-[10px] text-[13.5px] font-semibold text-base-content/60 border-[1.5px] border-base-200 hover:border-base-300 hover:bg-base-200/50 hover:text-base-content transition-all"
-                onClick={() => setConfirmRemoveMember(null)}
-              >
-                {t('cancel')}
-              </button>
-              <button
-                type="button"
-                class="px-4 py-2 rounded-[10px] text-[13.5px] font-semibold bg-error text-white hover:bg-error/80 active:scale-[0.98] transition-all flex items-center gap-1.5"
-                disabled={removingMember() !== null}
-                onClick={async () => {
-                  const member = confirmRemoveMember()
-                  if (!member) return
-                  setConfirmRemoveMember(null)
-                  await handleRemoveMember(member.userId)
-                }}
-              >
-                {removingMember() !== null && (
-                  <span class="loading loading-spinner loading-xs" />
-                )}
-                {t('remove_member')}
-              </button>
-            </div>
-          </div>
-          <div
-            class="modal-backdrop"
-            onClick={() => setConfirmRemoveMember(null)}
-          />
-        </dialog>
       </Portal>
+
+      <ConfirmModal
+        title={t('leave_workspace')}
+        isOpen={confirmLeave()}
+        onClose={() => {
+          setConfirmLeave(false)
+          setLeaveError(null)
+        }}
+        message={
+          <span class="text-sm text-base-content/70">
+            {t('leave_workspace_confirmation')}
+          </span>
+        }
+        confirmLabel={t('leave_workspace')}
+        confirmColor="warning"
+        isLoading={leavingWorkspace()}
+        errorMessage={leaveError()}
+        onConfirm={handleLeaveWorkspace}
+      />
+
+      <ConfirmModal
+        title={t('remove_member')}
+        isOpen={confirmRemoveMember() !== null}
+        onClose={() => setConfirmRemoveMember(null)}
+        message={
+          <span class="text-sm text-base-content/70">
+            {t('remove_member_confirmation').replace(
+              '{name}',
+              confirmRemoveMember()?.name ?? ''
+            )}
+          </span>
+        }
+        confirmLabel={t('remove_member')}
+        confirmColor="error"
+        isLoading={removingMember() !== null}
+        onConfirm={() => {
+          const member = confirmRemoveMember()
+          if (!member) return
+          setConfirmRemoveMember(null)
+          void handleRemoveMember(member.userId)
+        }}
+      />
 
       <DeleteWorkspaceModal
         isOpen={confirmDelete()}

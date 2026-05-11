@@ -3,25 +3,22 @@ import { createSignal, createResource, JSXElement, Show, For } from 'solid-js'
 import { UserAttributes } from '../../models/User'
 import { Alert } from '../../components/Alert'
 import { Pagination } from '../../components/Pagination'
-import {
-  createUser,
-  getUsers,
-  deleteUser,
-  CreateUserData,
-  DeleteUserData,
-} from '../../api'
+import { createUser, getUsers, deleteUser, CreateUserData } from '../../api'
 
 import { BooleanInput } from '../../components/BooleanInput'
 import { TextInput } from '../../components/TextInput'
 import { createModalState, Modal, ModalBaseProps } from '../../components/Modal'
+import { ConfirmModal } from '../../components/ConfirmModal'
+import { Spinner } from '../../components/Spinner'
 
 import { useLocale } from '../../context/LocaleProvider'
 
-import { pattern, email, minLength, required } from '@modular-forms/solid'
+import { email, required } from '@modular-forms/solid'
 import { Table, TableRow } from '../../components/Table'
 import { Tooltip } from '../../components/Tooltip'
 import { Button, IconButton } from '../../components/Button'
 import { createFormState } from '../../form_helpers'
+import { passwordRules } from '../../validators'
 
 export function UsersAdmin(): JSXElement {
   const { t } = useLocale()
@@ -140,7 +137,7 @@ export function UsersAdmin(): JSXElement {
 
       <Show when={users.loading}>
         <div class="flex justify-center mt-8 w-full">
-          <span class="loading loading-ball loading-xl" />
+          <Spinner size="xl" />
         </div>
       </Show>
 
@@ -177,55 +174,39 @@ function DeleteUserModal(
   } & ModalBaseProps
 ): JSXElement {
   const { t } = useLocale()
-  const user = () => props.user
+  const [submitting, setSubmitting] = createSignal(false)
+  const [error, setError] = createSignal<string | null>(null)
 
-  const {
-    state,
-    onSubmit,
-    components: { Form },
-  } = createFormState<DeleteUserData>({
-    action: () => deleteUser({ userID: user()?.id ?? 0 }),
-    onFinish: () => {
-      props.onDelete()
-      props.onClose()
-    },
-  })
+  const handleConfirm = async () => {
+    const id = props.user?.id
+    if (!id) return
+    setError(null)
+    setSubmitting(true)
+    const response = await deleteUser({ userID: id })
+    setSubmitting(false)
+    if (response.status !== 200) {
+      setError(t('an_unknown_error_occurred'))
+      return
+    }
+    props.onDelete()
+    props.onClose()
+  }
 
   return (
-    <Modal
+    <ConfirmModal
       title={t('delete_user')}
       isOpen={props.isOpen}
       onClose={props.onClose}
+      confirmLabel={t('delete')}
+      confirmColor="error"
+      confirmDataCy="delete-user"
+      isLoading={submitting()}
+      errorMessage={error()}
+      onConfirm={handleConfirm}
     >
       <p class="mt-4">{t('delete_user_confirmation')}</p>
       <p class="mt-2 font-bold">{props.user?.email}</p>
-
-      <Show when={state.response.status === 'error'}>
-        <Alert type="error" message={state.response.message} />
-      </Show>
-
-      <Form onSubmit={onSubmit}>
-        <div class="modal-action">
-          <Button
-            label={t('cancel')}
-            class="btn-outline"
-            isLoading={state.submitting}
-            onClick={(e) => {
-              e?.preventDefault()
-              props.onClose()
-            }}
-          />
-
-          <Button
-            label={t('delete')}
-            type="submit"
-            color="error"
-            isLoading={state.submitting}
-            dataCy="delete-user"
-          />
-        </div>
-      </Form>
-    </Modal>
+    </ConfirmModal>
   )
 }
 
@@ -283,11 +264,7 @@ function CreateUserModal(props: CreateUserModalProps): JSXElement {
             name="password"
             validate={[
               required(t('please_enter_a_password')),
-              minLength(8, t('your_password_must_have_8_characters_or_more')),
-              pattern(/[A-Z]/, t('your_password_must_have_1_uppercase_letter')),
-              pattern(/[a-z]/, t('your_password_must_have_1_lowercase_letter')),
-              pattern(/[0-9]/, t('your_password_must_have_1_digit')),
-              pattern(/[\W]/, t('your_password_must_have_1_special_character')),
+              ...passwordRules(t),
             ]}
           >
             {(field, props) => (

@@ -21,7 +21,10 @@ import {
 } from '../../api'
 import { useLocale } from '../../context/LocaleProvider'
 import { Button } from '../../components/Button'
-import { Modal } from '../../components/Modal'
+import { ConfirmModal } from '../../components/ConfirmModal'
+import { StatusBanner } from '../../components/StatusBanner'
+import { PlanBadge } from '../../components/PlanBadge'
+import { BillingStatCard } from '../../components/BillingStatCard'
 import { InvoiceAttributes } from '../../models/Billing'
 
 export function BillingTabContent(props: {
@@ -175,22 +178,25 @@ export function BillingTabContent(props: {
     <div class="flex-1 overflow-y-auto px-5 md:px-7 py-4 md:py-5">
       {/* Payment status banners */}
       <Show when={props.statusMessage === 'success'}>
-        <div class="alert bg-primary/10 text-primary border-primary/20 mb-4">
-          <i class="fa-solid fa-circle-check" />
-          <span>{t('billing_payment_success')}</span>
-        </div>
+        <StatusBanner
+          type="success"
+          message={t('billing_payment_success')}
+          class="mb-4"
+        />
       </Show>
       <Show when={props.statusMessage === 'cancelled'}>
-        <div class="flex items-center gap-2 px-3 py-2.5 border rounded-lg text-sm font-medium bg-warning/10 border-warning/20 text-warning mb-4">
-          <i class="fa-solid fa-circle-exclamation text-xs" />
-          <span>{t('billing_payment_cancelled')}</span>
-        </div>
+        <StatusBanner
+          type="warning"
+          message={t('billing_payment_cancelled')}
+          class="mb-4"
+        />
       </Show>
       <Show when={props.statusMessage === 'method_updated'}>
-        <div class="alert bg-primary/10 text-primary border-primary/20 mb-4">
-          <i class="fa-solid fa-circle-check" />
-          <span>{t('billing_payment_method_updated')}</span>
-        </div>
+        <StatusBanner
+          type="success"
+          message={t('billing_payment_method_updated')}
+          class="mb-4"
+        />
       </Show>
 
       <Show
@@ -207,10 +213,10 @@ export function BillingTabContent(props: {
             <div class="space-y-5">
               {/* ── PENDING VIEW ── */}
               <Show when={isPending()}>
-                <div class="flex items-center gap-2 px-3 py-2.5 border rounded-lg text-sm font-medium bg-info/10 border-info/20 text-info">
-                  <i class="fa-solid fa-circle-info text-xs" />
-                  <span>{t('billing_payment_pending')}</span>
-                </div>
+                <StatusBanner
+                  type="info"
+                  message={t('billing_payment_pending')}
+                />
                 <div class="flex gap-2">
                   <Button
                     label={t('cancel_checkout')}
@@ -239,32 +245,27 @@ export function BillingTabContent(props: {
                   </p>
 
                   <div class="grid grid-cols-3 gap-2.5 mt-4">
-                    <div class="bg-white/70 dark:bg-base-100/50 rounded-lg p-3 text-center">
-                      <p
-                        class={`font-extrabold text-lg ${b().trial_days_remaining === 0 ? 'text-error' : b().trial_days_remaining <= 7 ? 'text-warning' : ''}`}
-                      >
-                        {b().trial_days_remaining}
-                      </p>
-                      <p class="text-[11px] font-semibold text-success/80">
-                        {t('billing_trial_days_left')}
-                      </p>
-                    </div>
-                    <div class="bg-white/70 dark:bg-base-100/50 rounded-lg p-3 text-center">
-                      <p class="font-extrabold text-lg text-success">
-                        <i class="fa-solid fa-check" />
-                      </p>
-                      <p class="text-[11px] font-semibold text-success/80">
-                        {t('billing_all_features_included')}
-                      </p>
-                    </div>
-                    <div class="bg-white/70 dark:bg-base-100/50 rounded-lg p-3 text-center">
-                      <p class="font-extrabold text-lg text-success">
-                        <i class="fa-solid fa-check" />
-                      </p>
-                      <p class="text-[11px] font-semibold text-success/80">
-                        {t('billing_no_limits')}
-                      </p>
-                    </div>
+                    <BillingStatCard
+                      value={b().trial_days_remaining}
+                      label={t('billing_trial_days_left')}
+                      valueClass={
+                        b().trial_days_remaining === 0
+                          ? 'text-error'
+                          : b().trial_days_remaining <= 7
+                            ? 'text-warning'
+                            : undefined
+                      }
+                    />
+                    <BillingStatCard
+                      value={<i class="fa-solid fa-check" />}
+                      label={t('billing_all_features_included')}
+                      valueClass="text-success"
+                    />
+                    <BillingStatCard
+                      value={<i class="fa-solid fa-check" />}
+                      label={t('billing_no_limits')}
+                      valueClass="text-success"
+                    />
                   </div>
                 </div>
 
@@ -281,10 +282,11 @@ export function BillingTabContent(props: {
                   </p>
 
                   <Show when={checkoutError()}>
-                    <div class="flex items-center gap-2 px-3 py-2.5 border rounded-lg text-sm font-medium bg-error/10 border-error/20 text-error mt-3">
-                      <i class="fa-solid fa-circle-xmark text-xs" />
-                      <span>{checkoutError()}</span>
-                    </div>
+                    <StatusBanner
+                      type="error"
+                      message={checkoutError()}
+                      class="mt-3"
+                    />
                   </Show>
 
                   <div class="mt-4">
@@ -304,34 +306,25 @@ export function BillingTabContent(props: {
                 <div class="bg-success/5 border border-success/20 rounded-xl p-5">
                   <div class="flex items-start justify-between">
                     <p class="font-bold text-sm">{t('billing_pro_plan')}</p>
-                    <span class="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-success bg-success/15 px-2.5 py-1 rounded-full">
-                      <i class="fa-solid fa-star text-[8px]" />
-                      Pro
-                    </span>
+                    <PlanBadge />
                   </div>
                   <p class="text-xs text-success/80 mt-1">
                     €{seatPrice().toFixed(2)} {t('billing_per_user_month')}
                   </p>
 
                   <div class="grid grid-cols-3 gap-2.5 mt-4">
-                    <div class="bg-white/70 dark:bg-base-100/50 rounded-lg p-3 text-center">
-                      <p class="font-extrabold text-lg">{b().member_count}</p>
-                      <p class="text-[11px] font-semibold text-success/80">
-                        {t('members')}
-                      </p>
-                    </div>
-                    <div class="bg-white/70 dark:bg-base-100/50 rounded-lg p-3 text-center">
-                      <p class="font-extrabold text-lg">€{total()}</p>
-                      <p class="text-[11px] font-semibold text-success/80">
-                        {t('billing_per_month')}
-                      </p>
-                    </div>
-                    <div class="bg-white/70 dark:bg-base-100/50 rounded-lg p-3 text-center">
-                      <p class="font-extrabold text-lg">{nextInvoiceLabel()}</p>
-                      <p class="text-[11px] font-semibold text-success/80">
-                        {t('billing_next_invoice')}
-                      </p>
-                    </div>
+                    <BillingStatCard
+                      value={b().member_count}
+                      label={t('members')}
+                    />
+                    <BillingStatCard
+                      value={`€${total()}`}
+                      label={t('billing_per_month')}
+                    />
+                    <BillingStatCard
+                      value={nextInvoiceLabel()}
+                      label={t('billing_next_invoice')}
+                    />
                   </div>
                 </div>
 
@@ -448,34 +441,22 @@ export function BillingTabContent(props: {
                 <div class="bg-success/5 border border-success/20 rounded-xl p-5">
                   <div class="flex items-start justify-between">
                     <p class="font-bold text-sm">{t('billing_pro_plan')}</p>
-                    <span class="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-success bg-success/15 px-2.5 py-1 rounded-full">
-                      <i class="fa-solid fa-star text-[8px]" />
-                      Pro
-                    </span>
+                    <PlanBadge />
                   </div>
                   <p class="text-xs text-success/80 mt-1">
                     {t('billing_exempt_description')}
                   </p>
 
                   <div class="grid grid-cols-3 gap-2.5 mt-4">
-                    <div class="bg-white/70 dark:bg-base-100/50 rounded-lg p-3 text-center">
-                      <p class="font-extrabold text-lg">{b().member_count}</p>
-                      <p class="text-[11px] font-semibold text-success/80">
-                        {t('members')}
-                      </p>
-                    </div>
-                    <div class="bg-white/70 dark:bg-base-100/50 rounded-lg p-3 text-center">
-                      <p class="font-extrabold text-lg">—</p>
-                      <p class="text-[11px] font-semibold text-success/80">
-                        {t('billing_per_month')}
-                      </p>
-                    </div>
-                    <div class="bg-white/70 dark:bg-base-100/50 rounded-lg p-3 text-center">
-                      <p class="font-extrabold text-lg">—</p>
-                      <p class="text-[11px] font-semibold text-success/80">
-                        {t('billing_next_invoice')}
-                      </p>
-                    </div>
+                    <BillingStatCard
+                      value={b().member_count}
+                      label={t('members')}
+                    />
+                    <BillingStatCard value="—" label={t('billing_per_month')} />
+                    <BillingStatCard
+                      value="—"
+                      label={t('billing_next_invoice')}
+                    />
                   </div>
                 </div>
 
@@ -496,29 +477,20 @@ export function BillingTabContent(props: {
         </Show>
       </Show>
 
-      {/* Cancel subscription modal */}
-      <Modal
+      <ConfirmModal
         isOpen={cancelModalOpen()}
         onClose={() => setCancelModalOpen(false)}
         title={t('cancel_subscription')}
-      >
-        <p class="text-sm text-base-content/70 mb-4">
-          {t('cancel_subscription_confirmation')}
-        </p>
-        <div class="flex gap-2 justify-end">
-          <Button
-            label={t('cancel')}
-            onClick={() => setCancelModalOpen(false)}
-            variant="ghost"
-          />
-          <Button
-            label={t('yes_cancel_subscription')}
-            color="error"
-            onClick={handleCancelConfirm}
-            isLoading={cancelling()}
-          />
-        </div>
-      </Modal>
+        message={
+          <span class="text-sm text-base-content/70">
+            {t('cancel_subscription_confirmation')}
+          </span>
+        }
+        confirmLabel={t('yes_cancel_subscription')}
+        confirmColor="error"
+        isLoading={cancelling()}
+        onConfirm={handleCancelConfirm}
+      />
     </div>
   )
 }

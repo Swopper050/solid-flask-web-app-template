@@ -16,6 +16,7 @@ import { WorkspaceListItemAttributes } from '../models/Workspace'
 import { createModalState } from './Modal'
 import { WorkspaceSettingsModal } from '../pages/workspace_modals/WorkspaceSettingsModal'
 import { Alert } from './Alert'
+import { WorkspaceAvatar } from './WorkspaceAvatar'
 import { createWorkspace, getErrorMessage } from '../api'
 
 export function WorkspaceSwitcher(): JSXElement {
@@ -126,22 +127,7 @@ export function WorkspaceSwitcher(): JSXElement {
           onClick={() => setOpen((v) => !v)}
         >
           <div class="flex items-center gap-2 min-w-0">
-            <div
-              class={clsx(
-                'w-6 h-6 rounded flex items-center justify-center flex-shrink-0',
-                !ws()?.color && 'bg-primary/20'
-              )}
-              style={ws()?.color ? { background: ws()!.color! } : undefined}
-            >
-              <span
-                class={clsx(
-                  'text-xs font-bold uppercase',
-                  ws()?.color ? 'text-white' : 'text-primary'
-                )}
-              >
-                {ws()?.name?.charAt(0) ?? '?'}
-              </span>
-            </div>
+            <WorkspaceAvatar name={ws()?.name} color={ws()?.color} size="md" />
             <span class="text-sm font-medium truncate">
               {ws()?.name ?? '...'}
             </span>
@@ -192,22 +178,12 @@ export function WorkspaceSwitcher(): JSXElement {
                       class="w-full flex items-center gap-2 text-sm px-2 py-1.5 rounded-lg hover:bg-base-200 transition-colors"
                       onClick={() => handleSwitch(w)}
                     >
-                      <div
-                        class={clsx(
-                          'w-5 h-5 rounded flex items-center justify-center flex-shrink-0',
-                          !w.color && 'bg-base-300'
-                        )}
-                        style={w.color ? { background: w.color } : undefined}
-                      >
-                        <span
-                          class={clsx(
-                            'text-xs font-bold uppercase',
-                            w.color && 'text-white'
-                          )}
-                        >
-                          {w.name.charAt(0)}
-                        </span>
-                      </div>
+                      <WorkspaceAvatar
+                        name={w.name}
+                        color={w.color}
+                        size="sm"
+                        mutedFallback
+                      />
                       <span class="truncate">{w.name}</span>
                     </button>
                   )}

@@ -15,6 +15,7 @@ import {
 } from '../../api'
 import { useLocale } from '../../context/LocaleProvider'
 import { useWorkspace } from '../../context/WorkspaceProvider'
+import { StatusBanner } from '../../components/StatusBanner'
 
 type CheckoutStep = 1 | 2 | 3
 
@@ -237,10 +238,7 @@ export function BillingCheckoutPage(): JSXElement {
           </p>
 
           <Show when={checkoutError()}>
-            <div class="flex items-center gap-2 px-3 py-2.5 border rounded-lg text-sm font-medium bg-error/10 border-error/20 text-error mb-4">
-              <i class="fa-solid fa-circle-xmark text-xs" />
-              <span>{checkoutError()}</span>
-            </div>
+            <StatusBanner type="error" message={checkoutError()} class="mb-4" />
           </Show>
 
           <button

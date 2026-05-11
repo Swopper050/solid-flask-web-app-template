@@ -2,6 +2,7 @@ import { JSXElement, Show } from 'solid-js'
 
 import { useLocale } from '../context/LocaleProvider'
 import { IconButton } from './Button'
+import { Spinner } from './Spinner'
 
 interface PaginationProps {
   page: number
@@ -30,7 +31,7 @@ export function Pagination(props: PaginationProps): JSXElement {
         <p class="w-2">
           <Show
             when={props.totalPages !== undefined}
-            fallback={<span class="loading loading-ball loading-xs" />}
+            fallback={<Spinner size="xs" />}
           >
             {props.totalPages}
           </Show>
