@@ -18,6 +18,7 @@ import { Alert } from '../../components/Alert'
 import { Button } from '../../components/Button'
 import { ConfirmModal } from '../../components/ConfirmModal'
 import { ModalBaseProps } from '../../components/Modal'
+import { PlanBadge } from '../../components/PlanBadge'
 import { TextInput } from '../../components/TextInput'
 import { TranslationKey, useLocale } from '../../context/LocaleProvider'
 import { useUser } from '../../context/UserProvider'
@@ -525,17 +526,7 @@ export function WorkspaceSettingsModal(props: Props): JSXElement {
                       '...'}
                   </div>
                   <Show when={isPro()}>
-                    <span class="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide text-primary bg-primary/15 px-1.5 py-0.5 rounded-full">
-                      <svg
-                        width="9"
-                        height="9"
-                        viewBox="0 0 24 24"
-                        fill="currentColor"
-                      >
-                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                      </svg>
-                      Pro
-                    </span>
+                    <PlanBadge color="primary" size="sm" />
                   </Show>
                 </div>
               </div>
